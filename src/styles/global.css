@@ -607,6 +607,12 @@ textarea.form-input {
   padding: 2rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
+.form-error {
+  font-family: 'Krub', sans-serif;
+  font-size: 0.875rem;
+  color: #E4572E;
+  margin: 0 0 0.75rem;
+}
 
 /* FOOTER */
 footer {

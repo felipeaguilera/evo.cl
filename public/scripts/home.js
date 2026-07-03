@@ -26,18 +26,28 @@ document.querySelector('.contact-form').addEventListener('submit', async functio
         ? '<p class="form-thanks">Mensaje enviado. Te contactamos en menos de 24 horas.</p>'
         : '<p class="form-thanks">Message sent. We\'ll be in touch within 24 hours.</p>';
     } else {
-      btn.disabled = false;
-      btn.innerHTML = lang === 'es'
-        ? '<span>Enviar mensaje</span><i class="ph ph-arrow-right"></i>'
-        : '<span>Send message</span><i class="ph ph-arrow-right"></i>';
+      showFormError(form, btn, lang);
     }
   } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = lang === 'es'
-      ? '<span>Enviar mensaje</span><i class="ph ph-arrow-right"></i>'
-      : '<span>Send message</span><i class="ph ph-arrow-right"></i>';
+    showFormError(form, btn, lang);
   }
 });
+
+function showFormError(form, btn, lang) {
+  btn.disabled = false;
+  btn.innerHTML = lang === 'es'
+    ? '<span>Enviar mensaje</span><i class="ph ph-arrow-right"></i>'
+    : '<span>Send message</span><i class="ph ph-arrow-right"></i>';
+  let errMsg = form.querySelector('.form-error');
+  if (!errMsg) {
+    errMsg = document.createElement('p');
+    errMsg.className = 'form-error';
+    btn.before(errMsg);
+  }
+  errMsg.textContent = lang === 'es'
+    ? 'Hubo un error al enviar. Escríbenos por WhatsApp.'
+    : 'Something went wrong. Please reach out via WhatsApp.';
+}
 
 function toggleTheme() {
   const html = document.documentElement;

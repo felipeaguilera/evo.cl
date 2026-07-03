@@ -100,19 +100,34 @@ export default async (req: Request, context: Context) => {
 </div>
 </body></html>`;
 
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = Number(process.env.SMTP_PORT || 465);
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpFrom = process.env.SMTP_FROM;
+  const smtpFromName = process.env.SMTP_FROM_NAME;
+
+  if (!smtpHost || !smtpUser || !smtpPass || !smtpFrom) {
+    console.error("contact function: missing SMTP env vars", { smtpHost, smtpUser, smtpFrom });
+    return new Response(JSON.stringify({ ok: false, error: "smtp_config" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const transporter = nodemailer.createTransport({
-      host: Netlify.env.get("SMTP_HOST"),
-      port: Number(Netlify.env.get("SMTP_PORT") || 465),
+      host: smtpHost,
+      port: smtpPort,
       secure: true,
       auth: {
-        user: Netlify.env.get("SMTP_USER"),
-        pass: Netlify.env.get("SMTP_PASS"),
+        user: smtpUser,
+        pass: smtpPass,
       },
     });
 
     await transporter.sendMail({
-      from: `"${Netlify.env.get("SMTP_FROM_NAME")}" <${Netlify.env.get("SMTP_FROM")}>`,
+      from: `"${smtpFromName}" <${smtpFrom}>`,
       to: `"${TO_NAME}" <${TO_EMAIL}>`,
       replyTo: `"${nombre}" <${email}>`,
       subject,
@@ -125,8 +140,8 @@ export default async (req: Request, context: Context) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("contact function error:", err);
-    return new Response(JSON.stringify({ ok: false }), {
+    console.error("contact function SMTP error:", err);
+    return new Response(JSON.stringify({ ok: false, error: "smtp_send" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

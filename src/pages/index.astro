@@ -224,6 +224,7 @@ import Base from '../layouts/Base.astro';
           <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
         </div>
         <input type="hidden" name="ts" id="form-ts">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAADvDhVIhf6oo1qSb" data-theme="auto"></div>
         <button type="submit" class="btn btn-primary btn-block">
           <span data-es="Enviar mensaje" data-en="Send message">Enviar mensaje</span>
           <i class="ph ph-arrow-right" aria-hidden="true"></i>
@@ -244,5 +245,6 @@ import Base from '../layouts/Base.astro';
   </footer>
 
   <script is:inline src="/scripts/home.js"></script>
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 </Base>

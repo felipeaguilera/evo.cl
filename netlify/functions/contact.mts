@@ -52,6 +52,43 @@ export default async (req: Request, context: Context) => {
     });
   }
 
+  // Anti-spam: Cloudflare Turnstile — catches bots that dodge the honeypot/timing trap
+  const turnstileToken = clean(form.get("cf-turnstile-response"));
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+
+  if (!turnstileSecret) {
+    console.error("contact function: missing TURNSTILE_SECRET_KEY env var");
+    return new Response(JSON.stringify({ ok: false, error: "turnstile_config" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (!turnstileToken) {
+    return new Response(JSON.stringify({ ok: false, error: "turnstile_missing" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      secret: turnstileSecret,
+      response: turnstileToken,
+      remoteip: context.ip ?? "",
+    }),
+  });
+  const verifyData = await verifyRes.json();
+
+  if (!verifyData.success) {
+    return new Response(JSON.stringify({ ok: false, error: "turnstile_failed" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   if (!nombre || !isValidEmail(email) || !mensaje) {
     return new Response(
       JSON.stringify({ ok: false, error: "Missing or invalid fields" }),

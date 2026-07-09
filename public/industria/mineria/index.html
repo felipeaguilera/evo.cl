@@ -1180,7 +1180,7 @@
         </a>
       </div>
     </div>
-    <form id="contact-form" class="contact-form" action="/contact.php" method="POST">
+    <form id="contact-form" class="contact-form" action="/.netlify/functions/contact" method="POST">
       <div class="form-row">
         <div class="form-field">
           <label class="form-label" for="nombre">Nombre</label>
@@ -1199,6 +1199,13 @@
         <label class="form-label" for="mensaje">Mensaje</label>
         <textarea class="form-input" id="mensaje" name="mensaje" placeholder="Cuéntanos qué necesitas..." required></textarea>
       </div>
+      <!-- Honeypot anti-spam: invisible to humans, bots fill it blindly -->
+      <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <input type="hidden" name="ts" id="form-ts">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAADvDhVIhf6oo1qSb" data-theme="auto" data-appearance="interaction-only"></div>
       <button type="submit" class="btn btn-primary btn-block">
         Enviar mensaje <i class="ph ph-arrow-right" aria-hidden="true"></i>
       </button>
@@ -1318,7 +1325,10 @@
     }
   }
 
-  /* ── CONTACT FORM (Formspree AJAX) ── */
+  /* ── CONTACT FORM ── */
+  const tsField = document.getElementById('form-ts');
+  if (tsField) tsField.value = Date.now();
+
   const form = document.getElementById('contact-form');
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -1347,5 +1357,6 @@
     });
   }
 </script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>
 </html>

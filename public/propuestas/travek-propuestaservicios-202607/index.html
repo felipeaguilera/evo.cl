@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta: Travek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E4572E;
+    --dark:   #111111;
+    --light:  #F5F3EE;
+    --bg:     #FFFFFF;
+    --text:   #111111;
+    --muted:  #5A5A5A;
+    --border: #E5E2DC;
+    --f-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --f-mono:    'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  @page { size: A4; margin: 20mm 18mm; }
+  @media print {
+    * { background: white !important; }
+    .pdf-bar { display: none !important; }
+    body { padding-bottom: 0 !important; }
+    html, body { height: auto !important; }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--f-display);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 32px 20px 96px;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  /* --- HEADER --- */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid var(--orange);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark {
+    height: 28px; width: auto;
+    display: block; flex-shrink: 0;
+  }
+  .brand-name {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    line-height: 1.3;
+  }
+  .brand-sub {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-top: 2px;
+  }
+  .doc-date {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); text-align: right; padding-top: 4px;
+  }
+
+  /* --- PARTIES --- */
+  .parties {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .party { background: var(--bg); padding: 12px 14px; }
+  .party-label {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 5px;
+  }
+  .party-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .party-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* --- SECTION --- */
+  .section { margin-bottom: 28px; }
+  .sec-label {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-label::before {
+    content: ""; display: inline-block;
+    width: 18px; height: 2px; background: var(--orange);
+  }
+
+  p { color: var(--muted); margin-bottom: 10px; font-size: 13px; }
+  p strong { color: var(--text); font-weight: 600; }
+  p:last-child { margin-bottom: 0; }
+
+  .sub-head {
+    font-size: 12px; font-weight: 700; color: var(--text);
+    text-transform: uppercase; letter-spacing: .04em;
+    margin: 14px 0 8px;
+  }
+  .sub-head:first-child { margin-top: 0; }
+
+  /* --- LIST --- */
+  ul.items { list-style: none; }
+  ul.items li {
+    font-size: 13px; color: var(--muted);
+    padding: 7px 0 7px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative; line-height: 1.5;
+  }
+  ul.items li:last-child { border-bottom: none; }
+  ul.items li::before {
+    content: "";
+    position: absolute; left: 0; top: 14px;
+    width: 7px; height: 7px; background: var(--orange);
+  }
+  ul.items li strong { color: var(--text); font-weight: 600; }
+  ul.items li span { display: block; font-size: 11px; color: #888; margin-top: 1px; }
+
+  /* --- TIMELINE --- */
+  .tl { border-left: 2px solid var(--orange); padding-left: 18px; }
+  .tl-item { position: relative; margin-bottom: 16px; }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-item::before {
+    content: "";
+    position: absolute; left: -24px; top: 4px;
+    width: 8px; height: 8px;
+    background: var(--orange); border-radius: 50%;
+  }
+  .tl-when {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 2px;
+  }
+  .tl-what { font-size: 13px; color: var(--text); font-weight: 600; }
+  .tl-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tl-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #aaa;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- PRICE --- */
+  .price-block {
+    background: var(--light);
+    padding: 18px 16px;
+    border-left: 3px solid var(--orange);
+    margin-bottom: 12px;
+  }
+  .price-amount {
+    font-size: 28px; font-weight: 800;
+    color: var(--orange); letter-spacing: -.01em;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .price-iva {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .price-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .price-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .08em; color: #888;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- PAYMENT TABLE --- */
+  table.pay { width: 100%; border-collapse: collapse; border: 1px solid var(--border); }
+  table.pay td {
+    padding: 7px 12px; font-size: 11px;
+    border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  table.pay tr:last-child td { border-bottom: none; }
+  table.pay td.k {
+    font-family: var(--f-mono); font-size: 8.5px;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); width: 38%; white-space: nowrap;
+  }
+  table.pay td.v { color: var(--text); }
+
+  /* --- FOOTER --- */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 16px;
+  }
+  .foot-brand { display: flex; align-items: center; gap: 8px; }
+  .mark-sm {
+    height: 18px; width: auto;
+    display: block; flex-shrink: 0;
+  }
+  .foot-text {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .foot-right {
+    font-family: var(--f-mono); font-size: 8px;
+    color: #aaa; text-align: right; line-height: 1.5;
+  }
+
+  /* --- PDF BAR --- */
+  .pdf-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--dark);
+    padding: 12px 20px;
+    display: flex; justify-content: center;
+    z-index: 100;
+  }
+  .pdf-btn {
+    background: var(--orange); color: #fff;
+    border: none; cursor: pointer;
+    font-family: var(--f-mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 10px 28px;
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; max-width: 560px;
+    justify-content: center;
+  }
+  .pdf-btn:hover { background: #CC4A24; }
+  .pdf-btn svg { display: none; }
+
+  @media (max-width: 480px) {
+    body { padding: 20px 16px 96px; }
+    .header { flex-direction: column; gap: 12px; }
+    .doc-date { text-align: left; }
+    .parties { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .foot-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark">
+      <div>
+        <div class="brand-name">EVO Communication Lab</div>
+        <div class="brand-sub">Brand &amp; Communication</div>
+      </div>
+    </div>
+    <div class="doc-date">Julio 2026<br>v1a</div>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="parties">
+    <div class="party">
+      <div class="party-label">Cliente</div>
+      <div class="party-name">Juan Salinas</div>
+      <div class="party-detail">Travek<br>+56 9 6228 0646</div>
+    </div>
+    <div class="party">
+      <div class="party-label">Proveedor</div>
+      <div class="party-name">EVO Communication Lab</div>
+      <div class="party-detail">EVO SpA · RUT 77.939.226-0<br>info@evo.cl</div>
+    </div>
+  </div>
+
+  <!-- 01. OBJETIVO -->
+  <div class="section">
+    <div class="sec-label">01 Objetivo</div>
+    <p>
+      Presencia digital completa para <strong>Travek</strong>: una landing page que muestre el negocio y los servicios, con dominio, hosting y correo funcionando desde cero.
+    </p>
+    <p>
+      La propuesta se cotiza en <strong>dos módulos separados</strong>: el desarrollo del sitio, y la infraestructura que lo sostiene (dominio, hosting y correo). Cada módulo se factura por separado, para que quede claro qué corresponde a cada parte.
+    </p>
+  </div>
+
+  <!-- 02. ALCANCE -->
+  <div class="section">
+    <div class="sec-label">02 Alcance</div>
+
+    <div class="sub-head">Módulo 1 · Desarrollo del sitio</div>
+    <ul class="items">
+      <li><strong>Landing de una página</strong><span>Negocio, servicios y contacto vía WhatsApp y email.</span></li>
+      <li><strong>Diseño sobre la identidad ya existente</strong><span>Paleta, tipografía y logo de Travek, sin trabajo de marca nuevo.</span></li>
+      <li><strong>2 rondas de revisión incluidas</strong><span>Ajustes sobre la propuesta visual antes de la publicación.</span></li>
+    </ul>
+
+    <div class="sub-head">Módulo 2 · Infraestructura digital</div>
+    <ul class="items">
+      <li><strong>Dominio travek.cl</strong><span>Registro oficial por un año.</span></li>
+      <li><strong>Hosting</strong><span>Publicación del sitio con certificado SSL.</span></li>
+      <li><strong>Correo profesional</strong><span>2 casillas con el dominio travek.cl: contacto@travek.cl y juansalinas@travek.cl.</span></li>
+      <li><strong>Configuración técnica</strong><span>Registros de dominio y correo, con verificación de seguridad.</span></li>
+    </ul>
+  </div>
+
+  <!-- 03. MATERIALES -->
+  <div class="section">
+    <div class="sec-label">03 Materiales a proveer por el cliente</div>
+    <p>El kit de marca de Travek ya está definido. Lo que falta es el contenido específico para esta landing.</p>
+
+    <div class="sub-head">Textos</div>
+    <ul class="items">
+      <li><strong>Descripción del negocio</strong><span>1 a 2 párrafos: qué es Travek, qué resuelve, para quién.</span></li>
+      <li><strong>Servicios a destacar</strong><span>Lista priorizada de los servicios que van en esta primera versión del sitio.</span></li>
+      <li><strong>Datos de contacto a publicar</strong><span>WhatsApp, email, y horario de atención si aplica.</span></li>
+    </ul>
+
+    <div class="sub-head">Fotos</div>
+    <ul class="items">
+      <li><strong>Logo en alta resolución</strong><span>Archivo vectorial existente.</span></li>
+      <li><strong>Fotos reales de trabajos</strong><span>Mínimo 4 a 6, representativas de los servicios priorizados.</span></li>
+    </ul>
+  </div>
+
+  <!-- 04. PLAZOS -->
+  <div class="section">
+    <div class="sec-label">04 Plazos</div>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-when">Julio 2026</div>
+        <div class="tl-what">Aprobación de esta propuesta</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">10 días hábiles</div>
+        <div class="tl-what">Entrega de contenido</div>
+        <div class="tl-detail">Textos y fotos según el listado de la sección 03. El cronograma corre desde que el contenido está completo.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">1 a 2 semanas</div>
+        <div class="tl-what">Desarrollo y publicación</div>
+        <div class="tl-detail">Landing construida con 2 rondas de revisión, dominio y correo configurados, sitio publicado.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Desde el año 2</div>
+        <div class="tl-what">Mantención anual</div>
+        <div class="tl-detail">Renovación de dominio, soporte técnico de correo y DNS, respuesta a incidentes.</div>
+      </div>
+    </div>
+    <div class="tl-note">Plazos estimados desde la entrega completa del contenido. Si el contenido llega después del plazo acordado, el cronograma se ajusta en la misma proporción del atraso.</div>
+  </div>
+
+  <!-- 05. HONORARIOS -->
+  <div class="section">
+    <div class="sec-label">05 Honorarios</div>
+
+    <div class="sub-head">Módulo 1 · Desarrollo del sitio</div>
+    <div class="price-block">
+      <div class="price-amount">$285.000</div>
+      <div class="price-iva">Valor neto + IVA</div>
+      <div class="price-desc">
+        Landing de una página construida sobre la identidad visual ya existente de Travek. Incluye 2 rondas de revisión. Rondas adicionales a las incluidas: $50.000 + IVA cada una.
+      </div>
+      <div class="price-note">
+        Valor de lista $475.000, con descuento de $190.000 por la relación profesional entre Felipe Aguilera y Juan Salinas.
+      </div>
+    </div>
+
+    <div class="sub-head">Módulo 2 · Infraestructura digital</div>
+    <div class="price-block">
+      <div class="price-amount">$99.990</div>
+      <div class="price-iva">Dominio exento de IVA · resto valor neto + IVA</div>
+      <div class="price-desc">
+        Incluye el registro del dominio travek.cl por un año ($9.990, costo real sin margen) y la puesta en marcha de hosting y correo: configuración de DNS, conexión del hosting, alta de las 2 casillas de correo, pruebas de envío y recepción.
+      </div>
+      <div class="price-note">
+        Este módulo no lleva descuento: es un costo operativo real, no un ajuste comercial. Casilla de correo adicional a las 2 incluidas: $10.000, solo configuración, sin costo recurrente.
+      </div>
+    </div>
+
+    <div class="sub-head">Desde el segundo año</div>
+    <p>El módulo de infraestructura pasa a un <strong>Plan de Mantención Anual de $55.000</strong> (valor neto + IVA), que incluye renovación de dominio, soporte técnico de correo y DNS, respuesta a incidentes y monitoreo básico de disponibilidad.</p>
+
+    <table class="pay">
+      <tr>
+        <td class="k">Razón social</td>
+        <td class="v">EVO SpA</td>
+      </tr>
+      <tr>
+        <td class="k">RUT</td>
+        <td class="v">77.939.226-0</td>
+      </tr>
+      <tr>
+        <td class="k">Documento</td>
+        <td class="v">Factura electrónica afecta a IVA</td>
+      </tr>
+      <tr>
+        <td class="k">Banco</td>
+        <td class="v">Mercado Pago &nbsp;·&nbsp; Cuenta Vista</td>
+      </tr>
+      <tr>
+        <td class="k">N° de cuenta</td>
+        <td class="v">1025071550</td>
+      </tr>
+      <tr>
+        <td class="k">Email</td>
+        <td class="v">info@evo.cl</td>
+      </tr>
+    </table>
+
+    <div class="sub-head">Opcionales (evaluables aparte)</div>
+    <ul class="items">
+      <li><strong>Ronda de revisión adicional</strong><span>Más allá de las 2 incluidas en el desarrollo del sitio. $50.000 + IVA cada una.</span></li>
+      <li><strong>Casilla de correo adicional</strong><span>Más allá de las 2 incluidas en la infraestructura. $10.000, sin costo recurrente.</span></li>
+    </ul>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="foot-brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark-sm">
+      <div class="foot-text">EVO Communication Lab &nbsp;·&nbsp; evo.cl</div>
+    </div>
+    <div class="foot-right">
+      Propuesta para Travek<br>
+      Julio 2026
+    </div>
+  </div>
+
+</div>
+
+<!-- PDF BAR -->
+<div class="pdf-bar">
+  <button class="pdf-btn" onclick="window.print()">
+    ⎙ &nbsp; Guardar

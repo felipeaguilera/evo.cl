@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossier de servicios DGC Maquinarias: propuesta de estructura y formato</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;500;700&family=Space+Grotesk:wght@500&display=swap');
+
+  :root{
+    --azul-tecnico:#001D4F;
+    --naranjo:#F4412A;
+    --azul-secundario:#3B60D4;
+    --negro-profundo:#000A37;
+    --gris-claro:#F5F5F0;
+    --gris-borde:#DADFE8;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter', Arial, sans-serif;
+    color:var(--negro-profundo);
+    background:#FFFFFF;
+    line-height:1.55;
+  }
+  .page{max-width:880px;margin:0 auto;padding:0 32px 80px;}
+
+  header.cover{
+    background:var(--azul-tecnico);
+    color:#fff;
+    padding:56px 32px 48px;
+  }
+  header.cover .inner{max-width:880px;margin:0 auto;}
+  header.cover .eyebrow{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#9FB3E8;
+    margin-bottom:14px;
+  }
+  header.cover h1{
+    font-family:'Orbitron', sans-serif;
+    font-weight:700;
+    font-size:34px;
+    line-height:1.25;
+    margin:0 0 10px;
+  }
+  header.cover p.subtitle{
+    font-size:17px;
+    color:#D9E0F5;
+    margin:0;
+    max-width:560px;
+  }
+  header.cover .meta{
+    margin-top:32px;
+    font-size:13px;
+    color:#9FB3E8;
+    border-top:1px solid rgba(255,255,255,.18);
+    padding-top:16px;
+  }
+
+  h2{
+    font-family:'Orbitron', sans-serif;
+    font-weight:700;
+    font-size:20px;
+    color:var(--azul-tecnico);
+    margin:56px 0 6px;
+  }
+  h2 .num{color:var(--naranjo);margin-right:8px;}
+  .lead{color:#4A5568;font-size:15px;margin:0 0 20px;}
+  p{font-size:15.5px;}
+
+  ul.plain{padding-left:20px;margin:12px 0;}
+  ul.plain li{margin-bottom:8px;}
+
+  /* Secuencia de páginas */
+  .sequence{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding:20px 0 10px;
+  }
+  .card{
+    flex:0 0 108px;
+    height:150px;
+    border-radius:6px;
+    border:1px solid var(--gris-borde);
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    font-size:11px;
+    line-height:1.3;
+  }
+  .card b{
+    font-family:'Space Grotesk', sans-serif;
+    display:block;
+    font-size:10px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+  }
+  .card.cover{background:var(--azul-tecnico);color:#fff;border-color:var(--azul-tecnico);}
+  .card.cover b{color:#9FB3E8;}
+  .card.presentacion{background:var(--gris-claro);}
+  .card.area-open{background:var(--negro-profundo);color:#fff;border-color:var(--negro-profundo);}
+  .card.area-open b{color:#FF9C8C;}
+  .card.area-detail{background:#fff;}
+  .card.close{background:var(--naranjo);color:#fff;border-color:var(--naranjo);}
+  .card.close b{color:#FFD9D2;}
+
+  /* Comparación de formato */
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin:20px 0 8px;
+  }
+  .option{
+    border:1px solid var(--gris-borde);
+    border-radius:8px;
+    padding:20px;
+  }
+  .option h3{
+    font-family:'Orbitron', sans-serif;
+    font-size:15px;
+    color:var(--azul-tecnico);
+    margin:0 0 4px;
+  }
+  .option .tag{
+    display:inline-block;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:11px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--naranjo);
+    margin-bottom:10px;
+  }
+  .option p{font-size:14px;color:#333;margin:0 0 12px;}
+  .option ul{padding-left:18px;margin:0;font-size:13.5px;color:#444;}
+  .option ul li{margin-bottom:6px;}
+
+  /* Mockup visual: catalogo encuadernado */
+  .mock-bound{
+    display:flex;
+    gap:4px;
+    margin:14px 0;
+  }
+  .mock-bound .sheet{
+    flex:1;
+    height:54px;
+    background:var(--azul-secundario);
+    border-radius:2px;
+    opacity:.85;
+  }
+  .mock-bound .sheet:nth-child(1){background:var(--azul-tecnico);}
+  .mock-bound .sheet:nth-child(6){background:var(--naranjo);}
+
+  /* Mockup visual: carpeta modular */
+  .mock-folder{
+    position:relative;
+    height:70px;
+    margin:14px 0;
+    display:flex;
+    align-items:flex-end;
+    gap:0;
+  }
+  .mock-folder .tab{
+    flex:1;
+    height:44px;
+    background:var(--gris-claro);
+    border:1px solid var(--gris-borde);
+    border-bottom:none;
+    border-radius:4px 4px 0 0;
+    margin-right:-1px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    font-family:'Space Grotesk', sans-serif;
+    text-transform:uppercase;
+    color:#556;
+    text-align:center;
+    padding:0 4px;
+  }
+  .mock-folder .base{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:14px;
+    background:var(--azul-tecnico);
+    border-radius:0 0 4px 4px;
+  }
+
+  .reco{
+    background:var(--gris-claro);
+    border-left:4px solid var(--naranjo);
+    border-radius:4px;
+    padding:18px 20px;
+    margin:24px 0;
+  }
+  .reco .tag{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:11px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--naranjo);
+    display:block;
+    margin-bottom:6px;
+  }
+  .reco p{margin:0;font-size:14.5px;}
+
+  table.compare{
+    width:100%;
+    border-collapse:collapse;
+    margin:24px 0;
+    font-size:13.5px;
+  }
+  table.compare th, table.compare td{
+    border:1px solid var(--gris-borde);
+    padding:10px 12px;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.compare th{
+    background:var(--azul-tecnico);
+    color:#fff;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  table.compare td:first-child{
+    font-weight:700;
+    color:var(--azul-tecnico);
+    width:22%;
+  }
+
+  .checklist{
+    border:1px solid var(--gris-borde);
+    border-radius:8px;
+    padding:20px 24px;
+    margin:20px 0;
+  }
+  .checklist li{margin-bottom:10px;font-size:14.5px;}
+
+  footer{
+    background:var(--negro-profundo);
+    color:#C7D0EA;
+    padding:32px;
+    margin-top:64px;
+    font-size:13px;
+  }
+  footer .inner{max-width:880px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  footer b{color:#fff;}
+
+  @media (max-width: 600px){
+    .page{padding:0 18px 60px;}
+    header.cover{padding:40px 18px 36px;}
+    header.cover h1{font-size:26px;}
+    .options{grid-template-columns:1fr;}
+    table.compare{font-size:12px;}
+    table.compare th, table.compare td{padding:8px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="inner">
+    <div class="eyebrow">DGC Maquinarias · Propuesta de trabajo</div>
+    <h1>Dossier de servicios: estructura y formato</h1>
+    <p class="subtitle">Material impreso, estilo revista, para apoyar a la fuerza de venta y abrir nuevos acuerdos. Cubre las cuatro áreas de servicio: fabricación, recuperación, mantención y remanufactura.</p>
+    <div class="meta">Preparado por Felipe Aguilera para Carolina Faúndez · Julio 2026</div>
+  </div>
+</header>
+
+<div class="page">
+
+  <h2><span class="num">1.</span>Contexto</h2>
+  <p class="lead">Antes de definir tiempos y valores, necesito que revises la estructura de contenido y elijas cómo se produce. Este documento cubre ambas cosas.</p>
+  <p>La idea de fondo se mantiene: un dossier donde manda la fotografía, con una leyenda breve por imagen y la línea gráfica que ya construimos en el kit de marca (paleta, tipografías, tono). Lo que falta cerrar es cómo se materializa: como un catálogo único encuadernado, o como un sistema de hojas por área que aprovecha la carpeta corporativa que ya tienen.</p>
+  <p>Para el estilo visual mantenemos continuidad con la presentación 2025 que ya construimos para DGC: mismos códigos de color, tipografías y tono. El dossier se va a sentir parte de la misma familia de materiales, no como una pieza nueva y distinta.</p>
+
+  <h2><span class="num">2.</span>Estructura de contenido</h2>
+  <p class="lead">La secuencia es la misma sin importar el formato de producción que elijan.</p>
+  <div class="sequence">
+    <div class="card cover"><b>01</b>Portada. Foto emblemática + logotipo.</div>
+    <div class="card presentacion"><b>02</b>Presentación. Qué es DGC, a quién le sirve.</div>
+    <div class="card area-open"><b>03</b>Apertura: Fabricación.</div>
+    <div class="card area-detail"><b>04</b>Trabajos de fabricación, foto + leyenda.</div>
+    <div class="card area-open"><b>05</b>Apertura: Recuperación.</div>
+    <div class="card area-detail"><b>06</b>Trabajos de recuperación.</div>
+    <div class="card area-open"><b>07</b>Apertura: Mantención.</div>
+    <div class="card area-detail"><b>08</b>Trabajos de mantención.</div>
+    <div class="card area-open"><b>09</b>Apertura: Remanufactura.</div>
+    <div class="card area-detail"><b>10</b>Trabajos de remanufactura.</div>
+    <div class="card close"><b>11</b>Cierre. Contacto y llamado a cotizar.</div>
+  </div>
+  <p>Cada área abre con una foto a página completa y cierra con las páginas de trabajo: fotos grandes, una leyenda por línea, el foco siempre en la imagen.</p>
+
+  <h2><span class="num">3.</span>Dos formas de producir el mismo contenido</h2>
+  <p class="lead">El contenido no cambia. Cambia el objeto físico y qué tan fácil es actualizarlo después.</p>
+
+  <div class="options">
+    <div class="option">
+      <span class="tag">Opción A</span>
+      <h3>Catálogo encuadernado</h3>
+      <div class="mock-bound">
+        <div class="sheet"></div><div class="sheet"></div><div class="sheet"></div>
+        <div class="sheet"></div><div class="sheet"></div><div class="sheet"></div>
+      </div>
+      <p>Un solo cuadernillo, grapado o con lomo, que se lee de corrido de portada a cierre.</p>
+      <ul>
+        <li>Se siente como una publicación: portada, narrativa, cierre.</li>
+        <li>Ideal para hojearlo completo frente a un cliente en una sola sesión.</li>
+        <li>Actualizar una foto o un dato implica reimprimir el cuadernillo entero.</li>
+      </ul>
+    </div>
+    <div class="option">
+      <span class="tag">Opción B</span>
+      <h3>Sistema de fichas por área</h3>
+      <div class="mock-folder">
+        <div class="tab">Fabri&shy;cación</div>
+        <div class="tab">Recupe&shy;ración</div>
+        <div class="tab">Manten&shy;ción</div>
+        <div class="tab">Remanu&shy;factura</div>
+        <div class="base"></div>
+      </div>
+      <p>Cada área es una o dos hojas sueltas que van en la carpeta corporativa que ya tienen del kit de marca.</p>
+      <ul>
+        <li>El vendedor arma la selección según el cliente. No todos necesitan ver las cuatro áreas.</li>
+        <li>Actualizar una hoja es una sola impresión, y la pueden hacer ustedes mismos cuando la necesiten: agregar, quitar o reemplazar una hoja sin depender de una reimpresión completa ni de coordinar conmigo cada vez.</li>
+        <li>Agregar una quinta área o un caso de éxito es sumar una hoja, no rehacer el documento.</li>
+        <li>Aprovecha una pieza que ya está pagada y construida, en vez de crear un objeto nuevo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <table class="compare">
+    <tr><th></th><th>Catálogo encuadernado</th><th>Sistema de fichas</th></tr>
+    <tr><td>Lectura</td><td>De corrido, de portada a cierre</td><td>A medida, según lo que el vendedor elija mostrar</td></tr>
+    <tr><td>Actualizar una foto o dato</td><td>Reimprime el documento completo</td><td>Reimprime solo esa hoja</td></tr>
+    <tr><td>Agregar una quinta área</td><td>Rediseño y reimpresión completa</td><td>Se suma una hoja nueva</td></tr>
+    <tr><td>Objeto físico</td><td>Uno nuevo, a diseñar y encuadernar</td><td>Reutiliza la carpeta corporativa existente</td></tr>
+    <tr><td>Costo de producción inicial</td><td>Más alto, formato único</td><td>Similar o menor, sin encuadernación</td></tr>
+  </table>
+
+  <div class="reco">
+    <span class="tag">Mi recomendación</span>
+    <p>Me inclino por el sistema de fichas (Opción B). Aprovecha la carpeta que ya construimos, es más barato de mantener al día a medida que cambian fotos o datos, y le da flexibilidad al vendedor para llevar solo las áreas relevantes a cada reunión. El catálogo encuadernado se ve muy bien como pieza única, pero cualquier ajuste futuro significa reimprimir todo. Igual queda tu decisión, y ambas opciones usan la misma estructura de contenido de arriba.</p>
+  </div>
+
+  <h2><span class="num">4.</span>Selección de fotos: galería online</h2>
+  <p class="lead">En vez de armar carpetas y mandar fotos por WhatsApp, dejamos el material en una galería online pensada para esto.</p>
+  <p>Ahí puedes revisar cada foto, marcarla en el área que corresponde (fabricación, recuperación, mantención o remanufactura) y escribir la leyenda directo en la misma pantalla: nombre del trabajo y un dato clave, como capacidad, material o tipo de pieza. Se guarda sola a medida que avanzas, así que puedes hacerlo en varias sesiones sin perder nada.</p>
+  <p>El enlace es <strong>mediakit.evo.cl/organizer/dgc/dossier-2026</strong>. El usuario y la clave te los mando por un mensaje aparte de este documento.</p>
+  <p>Cuando termines la selección, tomo las fotos y leyendas directo desde ahí para armar el dossier, sin ida y vuelta de archivos sueltos.</p>
+
+  <h2><span class="num">5.</span>Impresión</h2>
+  <p>Como con la libreta, dejo la impresión abierta: yo coordino la producción con imprenta si prefieren que lo maneje completo, o ustedes gestionan directo con su proveedor y yo entrego los archivos listos para imprenta, con sangrado, perfil de color y especificaciones. Lo definimos cuando cerremos formato y cantidad de páginas.</p>
+
+  <h2><span class="num">6.</span>Qué necesito de Carolina para avanzar</h2>
+  <div class="checklist">
+    <ul class="plain">
+      <li>Completar la selección y las leyendas en la galería online (sección 4).</li>
+      <li>Elegir formato: catálogo encuadernado o sistema de fichas.</li>
+      <li>Confirmar tamaño aproximado: vertical tipo revista, o apaisado (funciona bien para fotos de maquinaria ancha).</li>
+    </ul>
+  </div>
+
+  <h2><span class="num">7.</span>Próximo paso</h2>
+  <p>Con la selección de fotos, el formato elegido y la cantidad de páginas aproximada, te paso tiempos y valores.</p>
+
+</div>
+
+<footer>
+  <div class="inner">
+    <div><b>Felipe Aguilera</b> · Consultor en comunicación estratégica</div>
+    <div>felipe@faguilera.com · WhatsApp +56 9 8239 3697</div>
+  </div>
+</footer>
+
+</body>
+</html>

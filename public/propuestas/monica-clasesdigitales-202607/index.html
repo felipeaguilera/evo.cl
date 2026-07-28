@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta: Mónica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E4572E;
+    --dark:   #111111;
+    --light:  #F5F3EE;
+    --bg:     #FFFFFF;
+    --text:   #111111;
+    --muted:  #5A5A5A;
+    --border: #E5E2DC;
+    --f-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --f-mono:    'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  @page { size: A4; margin: 20mm 18mm; }
+  @media print {
+    * { background: white !important; }
+    .pdf-bar { display: none !important; }
+    body { padding-bottom: 0 !important; }
+    html, body { height: auto !important; }
+    .sec-label { break-after: avoid; }
+    .sub-head { break-after: avoid; }
+    .price-block, .parties, table.pay { break-inside: avoid; }
+    ul.items li, .tl-item { break-inside: avoid; }
+    .footer { break-inside: avoid; }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--f-display);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 32px 20px 96px;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  /* --- HEADER --- */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid var(--orange);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark { height: 28px; width: auto; display: block; flex-shrink: 0; }
+  .brand-name {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    line-height: 1.3;
+  }
+  .brand-sub {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-top: 2px;
+  }
+  .doc-date {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); text-align: right; padding-top: 4px;
+  }
+
+  /* --- PARTIES --- */
+  .parties {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .party { background: var(--bg); padding: 12px 14px; }
+  .party-label {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 5px;
+  }
+  .party-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .party-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* --- SECTION --- */
+  .section { margin-bottom: 28px; }
+  .sec-label {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-label::before {
+    content: ""; display: inline-block;
+    width: 18px; height: 2px; background: var(--orange);
+  }
+
+  p { color: var(--muted); margin-bottom: 10px; font-size: 13px; }
+  p strong { color: var(--text); font-weight: 600; }
+  p:last-child { margin-bottom: 0; }
+
+  .sub-head {
+    font-size: 12px; font-weight: 700; color: var(--text);
+    text-transform: uppercase; letter-spacing: .04em;
+    margin: 14px 0 8px;
+  }
+  .sub-head:first-child { margin-top: 0; }
+
+  /* --- LIST --- */
+  ul.items { list-style: none; }
+  ul.items li {
+    font-size: 13px; color: var(--muted);
+    padding: 7px 0 7px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative; line-height: 1.5;
+  }
+  ul.items li:last-child { border-bottom: none; }
+  ul.items li::before {
+    content: "";
+    position: absolute; left: 0; top: 14px;
+    width: 7px; height: 7px; background: var(--orange);
+  }
+  ul.items li strong { color: var(--text); font-weight: 600; }
+  ul.items li span { display: block; font-size: 11px; color: #888; margin-top: 1px; }
+
+  /* --- STEPS (anatomía de la sesión) --- */
+  ol.steps { list-style: none; counter-reset: s; }
+  ol.steps li {
+    counter-increment: s;
+    position: relative; padding: 8px 0 8px 34px;
+    font-size: 13px; color: var(--muted);
+    border-bottom: 1px solid var(--border); line-height: 1.5;
+  }
+  ol.steps li:last-child { border-bottom: none; }
+  ol.steps li::before {
+    content: counter(s);
+    position: absolute; left: 0; top: 8px;
+    width: 22px; height: 22px;
+    background: var(--orange); color: #fff;
+    font-family: var(--f-mono); font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.steps li strong { color: var(--text); font-weight: 600; }
+
+  /* --- TIMELINE --- */
+  .tl { border-left: 2px solid var(--orange); padding-left: 18px; }
+  .tl-item { position: relative; margin-bottom: 16px; }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-item::before {
+    content: "";
+    position: absolute; left: -24px; top: 4px;
+    width: 8px; height: 8px;
+    background: var(--orange); border-radius: 50%;
+  }
+  .tl-when {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 2px;
+  }
+  .tl-what { font-size: 13px; color: var(--text); font-weight: 600; }
+  .tl-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tl-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #aaa;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- PRICE --- */
+  .price-block {
+    background: var(--light);
+    padding: 18px 16px;
+    border-left: 3px solid var(--orange);
+    margin-bottom: 12px;
+  }
+  .price-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline; gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-row:first-child { padding-top: 0; }
+  .price-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+  .price-k { font-size: 12px; font-weight: 600; color: var(--text); }
+  .price-k span { display: block; font-size: 10.5px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  .price-v {
+    font-family: var(--f-display); font-size: 17px; font-weight: 800;
+    color: var(--orange); white-space: nowrap; letter-spacing: -.01em;
+  }
+  .price-iva {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin-top: 12px;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+  .price-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 12px; }
+  .price-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .08em; color: #888;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- PAYMENT TABLE --- */
+  table.pay { width: 100%; border-collapse: collapse; border: 1px solid var(--border); }
+  table.pay td {
+    padding: 7px 12px; font-size: 11px;
+    border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  table.pay tr:last-child td { border-bottom: none; }
+  table.pay td.k {
+    font-family: var(--f-mono); font-size: 8.5px;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); width: 38%; white-space: nowrap;
+  }
+  table.pay td.v { color: var(--text); }
+
+  /* --- FOOTER --- */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 16px;
+  }
+  .foot-brand { display: flex; align-items: center; gap: 8px; }
+  .mark-sm { height: 18px; width: auto; display: block; flex-shrink: 0; }
+  .foot-text {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .foot-right {
+    font-family: var(--f-mono); font-size: 8px;
+    color: #aaa; text-align: right; line-height: 1.5;
+  }
+
+  /* --- PDF BAR --- */
+  .pdf-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--dark);
+    padding: 12px 20px;
+    display: flex; justify-content: center;
+    z-index: 100;
+  }
+  .pdf-btn {
+    background: var(--orange); color: #fff;
+    border: none; cursor: pointer;
+    font-family: var(--f-mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 10px 28px;
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; max-width: 560px;
+    justify-content: center;
+  }
+  .pdf-btn:hover { background: #CC4A24; }
+
+  @media (max-width: 480px) {
+    body { padding: 20px 16px 96px; }
+    .header { flex-direction: column; gap: 12px; }
+    .doc-date { text-align: left; }
+    .parties { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .foot-right { text-align: left; }
+    .price-row { flex-direction: column; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark">
+      <div>
+        <div class="brand-name">EVO Communication Lab</div>
+        <div class="brand-sub">Brand &amp; Communication</div>
+      </div>
+    </div>
+    <div class="doc-date">Julio 2026<br>v1a</div>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="parties">
+    <div class="party">
+      <div class="party-label">Cliente</div>
+      <div class="party-name">Mónica</div>
+      <div class="party-detail">[Apellido y teléfono a completar tras la reunión]</div>
+    </div>
+    <div class="party">
+      <div class="party-label">Proveedor</div>
+      <div class="party-name">EVO Communication Lab</div>
+      <div class="party-detail">EVO SpA · RUT 77.939.226-0<br>info@evo.cl</div>
+    </div>
+  </div>
+
+  <!-- 01. DIAGNÓSTICO -->
+  <div class="section">
+    <div class="sec-label">01 Diagnóstico</div>
+    <p>
+      [Completar el mismo día con lo que salga de la conversación: 2 a 3 líneas describiendo la situación real de Mónica, en sus palabras si es posible. Ejemplo de estructura: "Tienes un negocio funcionando y publicas seguido, pero nadie sabe cómo llegar a comprarte. Ese es el problema que este programa resuelve."]
+    </p>
+    <p>
+      <strong>Lo que ya sabemos:</strong> Mónica quiere aprender a usar la inteligencia artificial de Canva, pero se pierde agregando texto a sus propias plantillas. Por eso el programa enseña primero a navegar el editor con soltura, y recién después la IA, en el orden que efectivamente le va a servir.
+    </p>
+  </div>
+
+  <!-- 02. CÓMO TRABAJAMOS -->
+  <div class="section">
+    <div class="sec-label">02 Cómo trabajamos</div>
+    <p>Clases presenciales, uno a uno, en tu propio computador. No hay ejercicios de práctica: todo lo que se hace en clase queda publicado o funcionando en tu negocio real.</p>
+
+    <div class="sub-head">Reglas que no cambian</div>
+    <ul class="items">
+      <li><strong>Tú manejas el computador</strong><span>Siempre. Yo no tomo el mouse salvo que me lo pidas.</span></li>
+      <li><strong>Un solo camino</strong><span>Te enseño una sola forma de hacer cada cosa, siempre la misma. Menos opciones, menos confusión.</span></li>
+      <li><strong>Cuaderno de recetas</strong><span>Escribes tú, a mano, el paso a paso de cada procedimiento. Al final es tu manual personal.</span></li>
+      <li><strong>Video receta</strong><span>Al cerrar cada sesión grabas un video corto de 2 a 3 minutos haciendo el procedimiento tú misma, para consultar cuando se te olvide.</span></li>
+      <li><strong>Regla de los 20 minutos</strong><span>Nunca más de 20 minutos de explicación seguida antes de poner las manos en el teclado.</span></li>
+    </ul>
+
+    <div class="sub-head">Una sesión de 90 minutos</div>
+    <ol class="steps">
+      <li><strong>Repaso (10 min)</strong> Revisamos la tarea, resolvemos dudas.</li>
+      <li><strong>Demostración (15 min)</strong> Lo hago primero en pantalla mientras miras y anotas.</li>
+      <li><strong>Práctica guiada (30 min)</strong> Lo hacemos juntos, tú manejas el mouse.</li>
+      <li><strong>Práctica sola (25 min)</strong> Lo repites sin ayuda, intervengo solo si te trabas.</li>
+      <li><strong>Cierre (10 min)</strong> Receta escrita, semáforo de avance y tarea.</li>
+    </ol>
+  </div>
+
+  <!-- 03. PROGRAMA -->
+  <div class="section">
+    <div class="sec-label">03 Programa: 8 sesiones semanales</div>
+    <p>Temario armado según lo que conversamos hoy. Se puede ajustar si algo cambia, manteniendo el total de sesiones.</p>
+    <ul class="items">
+      <li><strong>1 · Orden digital y Linktree</strong><span>Carpetas, accesos y Linktree publicado en tu bio de Instagram.</span></li>
+      <li><strong>2 · LinkedIn profesional</strong><span>Perfil completo, conectado con Instagram y Linktree.</span></li>
+      <li><strong>3 · Canva sin perderse</strong><span>Mapa de la pantalla, plantillas ordenadas, kit de marca cargado.</span></li>
+      <li><strong>4 · La inteligencia artificial de Canva</strong><span>Magic Write, generación de imágenes, Magic Switch.</span></li>
+      <li><strong>5 · De una plantilla a un carrusel</strong><span>Estructura, legibilidad y publicación ordenada.</span></li>
+      <li><strong>6 · Historias y formatos verticales</strong><span>Historias, destacadas, elementos interactivos.</span></li>
+      <li><strong>7 · Video desde el celular</strong><span>Grabación, guion de 3 líneas, edición en CapCut.</span></li>
+      <li><strong>8 · Publicar, programar y armar tu rutina</strong><span>Calendario mensual, métricas básicas, cierre del cuaderno de recetas.</span></li>
+    </ul>
+  </div>
+
+  <!-- 04. MATERIALES A PROVEER POR EL CLIENTE -->
+  <div class="section">
+    <div class="sec-label">04 Materiales a proveer por el cliente</div>
+    <p>Lo que necesitas tener listo, sobre todo para la primera sesión.</p>
+    <ul class="items">
+      <li><strong>Computador con internet</strong><span>Y espacio en el escritorio para trabajar cómoda.</span></li>
+      <li><strong>Celular con Instagram y CapCut instalados</strong><span></span></li>
+      <li><strong>Cuenta de Canva</strong><span>Se recomienda Canva Pro para aprovechar bien la IA y el kit de marca.</span></li>
+      <li><strong>Cuaderno y lápiz</strong><span>Sí, de papel. Es tu cuaderno de recetas.</span></li>
+      <li><strong>Accesos a tus cuentas</strong><span>Usuarios y claves a mano en la primera sesión.</span></li>
+    </ul>
+  </div>
+
+  <!-- 05. PLAZOS -->
+  <div class="section">
+    <div class="sec-label">05 Plazos</div>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-when">Julio 2026</div>
+        <div class="tl-what">Aprobación de esta propuesta</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Semana 1</div>
+        <div class="tl-what">Primera sesión</div>
+        <div class="tl-detail">Día y hora fija semanal, a definir. [Confirmar martes o jueves.]</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">8 semanas</div>
+        <div class="tl-what">Programa completo</div>
+        <div class="tl-detail">Una sesión semanal de 90 minutos, mismo día y hora cada semana.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Al cierre</div>
+        <div class="tl-what">Continuidad opcional</div>
+        <div class="tl-detail">Plan de acompañamiento mensual, sin obligación de continuar.</div>
+      </div>
+    </div>
+    <div class="tl-note">Cancelaciones avisadas con 24 horas de anticipación se reagendan sin costo.</div>
+  </div>
+
+  <!-- 06. HONORARIOS -->
+  <div class="section">
+    <div class="sec-label">06 Honorarios</div>
+
+    <div class="price-block">
+      <div class="price-row">
+        <div class="price-k">Pago mensual<span>4 sesiones por mes, 2 meses.</span></div>
+        <div class="price-v">$190.000<span style="font-size:10px;font-weight:400;color:var(--muted)">&nbsp;/mes</span></div>
+      </div>
+      <div class="price-row">
+        <div class="price-k">Pago único<span>Programa completo, 8 sesiones.</span></div>
+        <div class="price-v">$340.000</div>
+      </div>
+      <div class="price-row">
+        <div class="price-k">Sesión suelta<span>Sin programa.</span></div>
+        <div class="price-v">$55.000</div>
+      </div>
+      <div class="price-iva">Valores en pesos chilenos · sesiones de 90 minutos en tu domicilio</div>
+      <div class="price-desc">
+        Incluye las 8 sesiones presenciales, video recetas de cada procedimiento, materiales y plantillas de apoyo, y consultas por WhatsApp entre sesiones (hasta 3 consultas cortas por semana).
+      </div>
+      <div class="price-note">No incluye suscripciones de terceros (Canva Pro, Linktree Pro).</div>
+    </div>
+
+    <div class="sub-head">Continuidad después del programa (opcional)</div>
+    <p>Plan de acompañamiento: <strong>$120.000 al mes</strong>, 2 sesiones mensuales de 90 minutos, para revisar contenido, resolver dudas nuevas y planificar el mes.</p>
+
+    <table class="pay">
+      <tr><td class="k">Razón social</td><td class="v">EVO SpA</td></tr>
+      <tr><td class="k">RUT</td><td class="v">77.939.226-0</td></tr>
+      <tr><td class="k">Documento</td><td class="v">Factura electrónica afecta a IVA</td></tr>
+      <tr><td class="k">Banco</td><td class="v">Mercado Pago &nbsp;·&nbsp; Cuenta Vista</td></tr>
+      <tr><td class="k">N° de cuenta</td><td class="v">1025071550</td></tr>
+      <tr><td class="k">Email</td><td class="v">info@evo.cl</td></tr>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="foot-brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark-sm">
+      <div class="foot-text">EVO Communication Lab &nbsp;·&nbsp; evo.cl</div>
+    </div>
+    <div class="foot-right">
+      Propuesta para Mónica<br>
+      Julio 2026
+    </div>
+  </div>
+
+</div>
+
+<!-- PDF BAR -->
+<div class="pdf-bar">
+  <button class="pdf-btn" onclick="window.print()">
+    ⎙ &nbsp; Guardar como PDF
+  </button>
+</div>
+
+</body>
+</html>

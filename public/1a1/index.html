@@ -20,6 +20,7 @@
     --orange-dk:#C93D1A;
     --dark:#111111;
     --surface:#1C1C1C;
+    --nav-bg:rgba(255,255,255,0.96);
     --max:1100px;
   }
 
@@ -31,7 +32,7 @@
     background:var(--bg);
     color:var(--text);
     font-family:'Krub',system-ui,sans-serif;
-    font-weight:500;
+    font-weight:400;
     font-size:17px;
     line-height:1.7;
     -webkit-font-smoothing:antialiased;
@@ -106,12 +107,19 @@
   .i-whatsapp{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M187.58%2C144.84l-32-16a8%2C8%2C0%2C0%2C0-8%2C.5l-14.69%2C9.8a40.55%2C40.55%2C0%2C0%2C1-16-16l9.8-14.69a8%2C8%2C0%2C0%2C0%2C.5-8l-16-32A8%2C8%2C0%2C0%2C0%2C104%2C64a40%2C40%2C0%2C0%2C0-40%2C40%2C88.1%2C88.1%2C0%2C0%2C0%2C88%2C88%2C40%2C40%2C0%2C0%2C0%2C40-40A8%2C8%2C0%2C0%2C0%2C187.58%2C144.84ZM152%2C176a72.08%2C72.08%2C0%2C0%2C1-72-72A24%2C24%2C0%2C0%2C1%2C99.29%2C80.46l11.48%2C23L101%2C118a8%2C8%2C0%2C0%2C0-.73%2C7.51%2C56.47%2C56.47%2C0%2C0%2C0%2C30.15%2C30.15A8%2C8%2C0%2C0%2C0%2C138%2C155l14.61-9.74%2C23%2C11.48A24%2C24%2C0%2C0%2C1%2C152%2C176ZM128%2C24A104%2C104%2C0%2C0%2C0%2C36.18%2C176.88L24.83%2C210.93a16%2C16%2C0%2C0%2C0%2C20.24%2C20.24l34.05-11.35A104%2C104%2C0%2C1%2C0%2C128%2C24Zm0%2C192a87.87%2C87.87%2C0%2C0%2C1-44.06-11.81%2C8%2C8%2C0%2C0%2C0-6.54-.67L40%2C216%2C52.47%2C178.6a8%2C8%2C0%2C0%2C0-.66-6.54A88%2C88%2C0%2C1%2C1%2C128%2C216Z%22/%3E%3C/svg%3E");}
   .i-envelope{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M224%2C48H32a8%2C8%2C0%2C0%2C0-8%2C8V192a16%2C16%2C0%2C0%2C0%2C16%2C16H216a16%2C16%2C0%2C0%2C0%2C16-16V56A8%2C8%2C0%2C0%2C0%2C224%2C48ZM203.43%2C64%2C128%2C133.15%2C52.57%2C64ZM216%2C192H40V74.19l82.59%2C75.71a8%2C8%2C0%2C0%2C0%2C10.82%2C0L216%2C74.19V192Z%22/%3E%3C/svg%3E");}
 
-  /* ---------- nav ---------- */
-  .barra{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--border);border-top:2px solid var(--orange);}
-  .marca-nav{display:flex;align-items:center;gap:10px;}
+  /* ---------- nav (mismo header del sitio, ver evo.cl/industria/mineria) ---------- */
+  .site-nav{position:sticky;top:0;z-index:50;height:56px;background:var(--nav-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:2px solid var(--orange);border-bottom:1px solid var(--border);}
+  .site-nav-inner{max-width:var(--max);margin:0 auto;height:100%;padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+  @media (min-width:540px){.site-nav-inner{padding:0 2rem;}}
+  @media (min-width:768px){.site-nav-inner{padding:0 3rem;}}
+  .marca-nav{display:flex;align-items:center;gap:10px;text-decoration:none;}
   .wordmark{display:inline-flex;align-items:center;justify-content:center;width:38px;height:27px;background:var(--orange);font-family:'Inter',sans-serif;font-weight:800;font-size:10px;color:#FFFFFF;letter-spacing:2px;margin-right:-2px;}
   .nav-name{font-family:'Inter',sans-serif;font-weight:700;font-size:0.75rem;color:var(--text);}
-  .barra .servicio{font-family:'IBM Plex Mono',monospace;font-size:0.6875rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);}
+  .site-nav-links{display:none;align-items:center;gap:26px;}
+  @media (min-width:768px){.site-nav-links{display:flex;}}
+  .site-nav-links a{font-family:'Inter',sans-serif;font-weight:600;font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-2);text-decoration:none;}
+  .site-nav-links a:hover{color:var(--text);}
+  .site-nav-inner .btn{padding:9px 16px;font-size:0.6875rem;}
 
   /* ---------- hero ---------- */
   .portada{padding:clamp(48px,9vw,96px) 0 clamp(40px,6vw,64px);}
@@ -258,15 +266,23 @@
 </head>
 <body>
 
-<div class="lienzo">
-
-  <div class="barra">
-    <div class="marca-nav">
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="marca-nav" href="https://evo.cl">
       <span class="wordmark">EVO</span>
-      <span class="nav-name">EVO Communication Lab</span>
+      <span class="nav-name">Communication Lab</span>
+    </a>
+    <div class="site-nav-links">
+      <a href="https://evo.cl/#servicios">Servicios</a>
+      <a href="https://evo.cl/#proceso">Proceso</a>
+      <a href="https://evo.cl/#industrias">Industrias</a>
+      <a href="https://evo.cl/#contacto">Contacto</a>
     </div>
-    <span class="servicio">Práctica 1a1</span>
+    <a class="btn btn-primary" href="https://evo.cl/#contacto">Escribir</a>
   </div>
+</nav>
+
+<div class="lienzo">
 
   <header class="portada">
     <span class="rotulo entra">Práctica 1a1</span>

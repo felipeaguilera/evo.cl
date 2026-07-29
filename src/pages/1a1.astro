@@ -1,0 +1,309 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Práctica 1a1 — EVO Communication Lab';
+const description = 'Clases uno a uno, presenciales o remotas, para practicar cualquier pieza que tu negocio necesite comunicar: redes sociales, blog, landing, dossier.';
+---
+<Base title={title} description={description}>
+
+  <Nav />
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-center wrap">
+      <p class="label hero-eyebrow" data-es="Práctica 1a1" data-en="Practice 1-on-1">Práctica 1a1</p>
+      <h1 class="hero-h1">
+        <span data-es="SE APRENDE" data-en="YOU LEARN BY">SE APRENDE</span><br>
+        <span class="hero-accent" data-es="HACIENDO" data-en="DOING">HACIENDO</span><span data-es="," data-en=",">,</span><br>
+        <span data-es="NO MEMORIZANDO" data-en="NOT MEMORIZING">NO MEMORIZANDO</span>
+      </h1>
+      <p class="hero-copy" data-es="Redes sociales, un blog, la landing de un producto, un dossier: lo que tu negocio necesite comunicar, lo practicamos juntos hasta que te salga sola. Presencial o por videollamada, en español o en inglés." data-en="Social media, a blog, a product landing page, a dossier: whatever your business needs to communicate, we practice together until you can do it on your own. In person or by video call, in Spanish or English.">Redes sociales, un blog, la landing de un producto, un dossier: lo que tu negocio necesite comunicar, lo practicamos juntos hasta que te salga sola. Presencial o por videollamada, en español o en inglés.</p>
+      <div class="badges">
+        <span class="badge"><i class="ph ph-globe" aria-hidden="true"></i>Español / English</span>
+        <span class="badge"><i class="ph ph-house" aria-hidden="true"></i>Presencial</span>
+        <span class="badge"><i class="ph ph-video-camera" aria-hidden="true"></i>Remoto</span>
+      </div>
+      <div class="hero-actions">
+        <a href="https://wa.me/56982393697?text=Hola%20Felipe%2C%20quiero%20agendar%20un%20diagn%C3%B3stico%20de%20Pr%C3%A1ctica%201a1." class="btn btn-primary" target="_blank" rel="noopener">
+          <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+          <span data-es="Agenda tu diagnóstico" data-en="Book your diagnostic">Agenda tu diagnóstico</span>
+        </a>
+        <a href="mailto:info@evo.cl?subject=Práctica%201a1%3A%20diagnóstico" class="btn btn-outline">
+          <i class="ph ph-envelope-simple" aria-hidden="true"></i>
+          <span data-es="Escribe a info@evo.cl" data-en="Email info@evo.cl">Escribe a info@evo.cl</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARA QUIÉN ES -->
+  <section class="services section-py">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="label" data-es="Para quién es" data-en="Who it's for">Para quién es</p>
+        <h2 class="section-title" data-es="Para quien ya tiene el negocio andando<br>y comunicarlo le queda grande." data-en="For businesses already running<br>where communicating them outgrew the owner.">Para quien ya tiene el negocio andando<br>y comunicarlo le queda grande.</h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-name" data-es="Ya vendes" data-en="You're already selling">Ya vendes</div>
+          <p class="p-body" data-es="Tienes clientes y producto. Lo que falta es que <strong>te encuentren y te entiendan</strong>." data-en="You have clients and product. What's missing is that <strong>people find you and understand you</strong>.">Tienes clientes y producto. Lo que falta es que <strong>te encuentren y te entiendan</strong>.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-name" data-es="Publicas sin sistema" data-en="You post without a system">Publicas sin sistema</div>
+          <p class="p-body" data-es="Subes contenido cuando te acuerdas, sin saber <strong>si sirve de algo</strong>." data-en="You post content when you remember, without knowing <strong>if it's actually working</strong>.">Subes contenido cuando te acuerdas, sin saber <strong>si sirve de algo</strong>.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-name" data-es="Te trabas a mitad de camino" data-en="You get stuck halfway">Te trabas a mitad de camino</div>
+          <p class="p-body" data-es="Abres la herramienta, empiezas, y en algún punto <strong>no sabes cómo seguir</strong>." data-en="You open the tool, get started, and at some point <strong>you don't know how to continue</strong>.">Abres la herramienta, empiezas, y en algún punto <strong>no sabes cómo seguir</strong>.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-name" data-es="Quieres hacerlo tú" data-en="You want to do it yourself">Quieres hacerlo tú</div>
+          <p class="p-body" data-es="No buscas delegarlo. Buscas <strong>entenderlo y manejarlo</strong> sin depender de otros." data-en="You're not looking to delegate it. You want to <strong>understand and run it</strong> without depending on others.">No buscas delegarlo. Buscas <strong>entenderlo y manejarlo</strong> sin depender de otros.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUÉ PODEMOS PRACTICAR -->
+  <section class="services section-py" style="background:var(--light)">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="label" data-es="Qué podemos practicar" data-en="What we can practice">Qué podemos practicar</p>
+        <h2 class="section-title" data-es="Cualquier pieza que tu negocio<br>necesite comunicar." data-en="Any piece your business<br>needs to communicate.">Cualquier pieza que tu negocio<br>necesite comunicar.</h2>
+        <p class="p-lead" style="margin-top:1rem" data-es="Digital first, pero no excluyente: si algo se resuelve mejor impreso, se resuelve impreso." data-en="Digital first, but not exclusively: if something works better printed, we print it.">Digital first, pero no excluyente: si algo se resuelve mejor impreso, se resuelve impreso.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <i class="ph ph-users service-icon" aria-hidden="true"></i>
+          <div class="service-name" data-es="Redes sociales" data-en="Social media">Redes sociales</div>
+          <p class="p-body" data-es="Instagram, LinkedIn, la presencia del día a día." data-en="Instagram, LinkedIn, day-to-day presence.">Instagram, LinkedIn, la presencia del día a día.</p>
+        </div>
+        <div class="service-card">
+          <i class="ph ph-article service-icon" aria-hidden="true"></i>
+          <div class="service-name" data-es="Blog y artículos" data-en="Blog & articles">Blog y artículos</div>
+          <p class="p-body" data-es="Escribir con regularidad, encontrar tu voz por escrito." data-en="Writing regularly, finding your voice in writing.">Escribir con regularidad, encontrar tu voz por escrito.</p>
+        </div>
+        <div class="service-card">
+          <i class="ph ph-browsers service-icon" aria-hidden="true"></i>
+          <div class="service-name" data-es="Landing de un producto" data-en="Product landing page">Landing de un producto</div>
+          <p class="p-body" data-es="Una página enfocada, para vender algo específico." data-en="A focused page, to sell something specific.">Una página enfocada, para vender algo específico.</p>
+        </div>
+        <div class="service-card">
+          <i class="ph ph-files service-icon" aria-hidden="true"></i>
+          <div class="service-name" data-es="Dossier y catálogos" data-en="Dossiers & catalogs">Dossier y catálogos</div>
+          <p class="p-body" data-es="Documentos de venta, digital o para imprimir." data-en="Sales documents, digital or for print.">Documentos de venta, digital o para imprimir.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODALIDADES -->
+  <section class="services section-py">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="label" data-es="Modalidades" data-en="Formats">Modalidades</p>
+        <h2 class="section-title" data-es="Presencial o remoto,<br>tú eliges." data-en="In person or remote,<br>your choice.">Presencial o remoto,<br>tú eliges.</h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <i class="ph ph-house service-icon" aria-hidden="true"></i>
+          <div class="service-name" data-es="Presencial" data-en="In person">Presencial</div>
+          <p class="p-body" data-es="En tu casa o local, en tu propio computador. Útil si prefieres <strong>tener a alguien al lado</strong> mientras practicas." data-en="At your home or business, on your own computer. Useful if you prefer <strong>having someone next to you</strong> while you practice.">En tu casa o local, en tu propio computador. Útil si prefieres <strong>tener a alguien al lado</strong> mientras practicas.</p>
+        </div>
+        <div class="service-card">
+          <i class="ph ph-video-camera service-icon" aria-hidden="true"></i>
+          <div class="service-name" data-es="Remoto" data-en="Remote">Remoto</div>
+          <p class="p-body" data-es="Por videollamada, compartiendo pantalla. <strong>Mismo método, sin traslado.</strong>" data-en="By video call, screen sharing. <strong>Same method, no travel.</strong>">Por videollamada, compartiendo pantalla. <strong>Mismo método, sin traslado.</strong></p>
+        </div>
+      </div>
+      <p class="p-body" style="margin-top:1.5rem" data-es="El valor varía según la modalidad y, en presencial, según tu ubicación y disponibilidad horaria. <strong>Se conversa en el diagnóstico</strong>, antes de proponer nada." data-en="The price varies by format and, in person, by your location and availability. <strong>We talk about it during the diagnostic</strong>, before proposing anything.">El valor varía según la modalidad y, en presencial, según tu ubicación y disponibilidad horaria. <strong>Se conversa en el diagnóstico</strong>, antes de proponer nada.</p>
+    </div>
+  </section>
+
+  <!-- CÓMO TRABAJAMOS -->
+  <section class="process section-py">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="label" data-es="Cómo trabajamos" data-en="How we work">Cómo trabajamos</p>
+        <h2 class="section-title" data-es="Cuatro reglas<br>que no cambian." data-en="Four rules<br>that don't change.">Cuatro reglas<br>que no cambian.</h2>
+      </div>
+      <div class="process-list">
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">01</div>
+            <div class="process-title" data-es="Tú manejas el computador." data-en="You run the computer.">Tú manejas el computador.</div>
+          </div>
+          <p class="p-body" data-es="Presencial o compartiendo pantalla a distancia. <strong>Lo que hace otro por ti no lo aprendes.</strong>" data-en="In person or screen sharing remotely. <strong>What someone else does for you, you don't learn.</strong>">Presencial o compartiendo pantalla a distancia. <strong>Lo que hace otro por ti no lo aprendes.</strong></p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">02</div>
+            <div class="process-title" data-es="Un solo camino." data-en="One single path.">Un solo camino.</div>
+          </div>
+          <p class="p-body" data-es="Hay cuatro formas de hacer casi todo. <strong>Te enseño una sola</strong> y la repetimos igual cada vez." data-en="There are four ways to do almost anything. <strong>I teach you one</strong> and we repeat it the same way every time.">Hay cuatro formas de hacer casi todo. <strong>Te enseño una sola</strong> y la repetimos igual cada vez.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">03</div>
+            <div class="process-title" data-es="Nada de teoría acumulada." data-en="No stacked-up theory.">Nada de teoría acumulada.</div>
+          </div>
+          <p class="p-body" data-es="<strong>Máximo veinte minutos</strong> de explicación antes de que pongas las manos en el teclado." data-en="<strong>Twenty minutes, max</strong>, of explanation before your hands are on the keyboard."><strong>Máximo veinte minutos</strong> de explicación antes de que pongas las manos en el teclado.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">04</div>
+            <div class="process-title" data-es="Trabajamos en tu espacio." data-en="We work in your space.">Trabajamos en tu espacio.</div>
+          </div>
+          <p class="p-body" data-es="Todo queda configurado <strong>donde tú vas a seguir trabajando después</strong>, no en un entorno de prueba." data-en="Everything gets set up <strong>where you'll keep working afterward</strong>, not in a test environment.">Todo queda configurado <strong>donde tú vas a seguir trabajando después</strong>, no en un entorno de prueba.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EL PROCESO -->
+  <section class="process section-py" style="background:var(--bg)">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="label" data-es="El proceso" data-en="The process">El proceso</p>
+        <h2 class="section-title" data-es="De la primera conversación<br>a la autonomía." data-en="From the first conversation<br>to autonomy.">De la primera conversación<br>a la autonomía.</h2>
+      </div>
+      <div class="process-list">
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">01</div>
+            <div class="process-title" data-es="Diagnóstico." data-en="Diagnostic.">Diagnóstico.</div>
+          </div>
+          <p class="p-body" data-es="<strong>Una hora, sin costo</strong>, para revisar qué tienes hoy y qué te está frenando." data-en="<strong>One hour, no cost</strong>, to review what you have today and what's holding you back."><strong>Una hora, sin costo</strong>, para revisar qué tienes hoy y qué te está frenando.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">02</div>
+            <div class="process-title" data-es="Bloque a medida." data-en="Custom block.">Bloque a medida.</div>
+          </div>
+          <p class="p-body" data-es="Definimos <strong>qué practicar, modalidad, valor y ritmo</strong> de clases." data-en="We define <strong>what to practice, format, price, and pace</strong> of classes.">Definimos <strong>qué practicar, modalidad, valor y ritmo</strong> de clases.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">03</div>
+            <div class="process-title" data-es="Clases, una a una." data-en="Classes, one by one.">Clases, una a una.</div>
+          </div>
+          <p class="p-body" data-es="Se agendan según tu disponibilidad. <strong>Cada clase termina con algo real.</strong>" data-en="Scheduled around your availability. <strong>Every class ends with something real.</strong>">Se agendan según tu disponibilidad. <strong>Cada clase termina con algo real.</strong></p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">04</div>
+            <div class="process-title" data-es="Cierre y autonomía." data-en="Wrap-up and autonomy.">Cierre y autonomía.</div>
+          </div>
+          <p class="p-body" data-es="Terminas con <strong>capacidad real de seguir sola</strong>. Continuar es decisión tuya." data-en="You finish with the <strong>real ability to keep going on your own</strong>. Continuing is your call.">Terminas con <strong>capacidad real de seguir sola</strong>. Continuar es decisión tuya.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUÉ TE LLEVAS -->
+  <section class="services section-py" style="background:var(--light)">
+    <div class="wrap">
+      <div class="section-header">
+        <p class="label" data-es="Qué te llevas" data-en="What you walk away with">Qué te llevas</p>
+        <h2 class="section-title" data-es="Cosas concretas,<br>no apuntes." data-en="Concrete things,<br>not notes.">Cosas concretas,<br>no apuntes.</h2>
+      </div>
+      <ul class="checklist">
+        <li><i class="ph ph-check-circle" aria-hidden="true"></i><span class="p-body" data-es="<strong>Tus canales y piezas</strong> configurados, conectados y publicados." data-en="<strong>Your channels and pieces</strong> set up, connected, and published."><strong>Tus canales y piezas</strong> configurados, conectados y publicados.</span></li>
+        <li><i class="ph ph-check-circle" aria-hidden="true"></i><span class="p-body" data-es="<strong>Tus plantillas</strong> ordenadas y tu identidad visual cargada en las herramientas." data-en="<strong>Your templates</strong> organized and your visual identity loaded into the tools."><strong>Tus plantillas</strong> ordenadas y tu identidad visual cargada en las herramientas.</span></li>
+        <li><i class="ph ph-check-circle" aria-hidden="true"></i><span class="p-body" data-es="<strong>Un calendario o cronograma</strong> realista para el tiempo que tienes." data-en="<strong>A calendar or schedule</strong> that's realistic for the time you have."><strong>Un calendario o cronograma</strong> realista para el tiempo que tienes.</span></li>
+        <li><i class="ph ph-check-circle" aria-hidden="true"></i><span class="p-body" data-es="<strong>Contenido real</strong>, publicado durante el proceso, no ejemplos de prueba." data-en="<strong>Real content</strong>, published during the process, not test examples."><strong>Contenido real</strong>, publicado durante el proceso, no ejemplos de prueba.</span></li>
+        <li><i class="ph ph-check-circle" aria-hidden="true"></i><span class="p-body" data-es="<strong>Capacidad real de seguir sola</strong>, revisada juntas en cada clase." data-en="<strong>The real ability to continue on your own</strong>, checked together in every class."><strong>Capacidad real de seguir sola</strong>, revisada juntas en cada clase.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!--
+    TESTIMONIOS: activar cuando haya 1 o 2 clientes reales dispuestos a dar una cita.
+    No inventar citas mientras no haya casos reales.
+  -->
+
+  <!-- KITS -->
+  <section class="services section-py">
+    <div class="wrap">
+      <div class="kits-callout">
+        <i class="ph ph-package" aria-hidden="true"></i>
+        <div>
+          <p class="label" data-es="Otra opción" data-en="Another option">Otra opción</p>
+          <div class="service-name" data-es="¿Prefieres que lo hagamos nosotros?" data-en="Prefer we do it for you?">¿Prefieres que lo hagamos nosotros?</div>
+          <p class="p-body" data-es="Práctica 1a1 es para aprender a hacerlo tú misma. Si en cambio quieres <strong>un resultado terminado sin dedicarle el tiempo</strong>, ahí están los servicios de EVO: identidad de marca, presencia digital, comunicación técnica y comercial." data-en="Práctica 1a1 is for learning to do it yourself. If instead you want <strong>a finished result without the time investment</strong>, that's what EVO's services are for: brand identity, digital presence, technical and sales communication.">Práctica 1a1 es para aprender a hacerlo tú misma. Si en cambio quieres <strong>un resultado terminado sin dedicarle el tiempo</strong>, ahí están los servicios de EVO: identidad de marca, presencia digital, comunicación técnica y comercial.</p>
+          <a href="/#servicios" class="kits-link" data-es="Ver servicios de EVO" data-en="See EVO's services">Ver servicios de EVO <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIERRE -->
+  <section class="contact-section section-py">
+    <div class="wrap">
+      <p class="label contact-cta-label" data-es="Siguiente paso" data-en="Next step">Siguiente paso</p>
+      <h2 class="contact-h2" data-es="Partimos con una<br>conversación de una hora." data-en="We start with a<br>one-hour conversation.">Partimos con una<br>conversación de una hora.</h2>
+      <p class="contact-sub" data-es="Sin costo y sin compromiso, presencial o por videollamada. Revisamos juntos lo que ya tienes, definimos qué practicar, la modalidad que te acomoda y el valor. Si decides seguir, agendamos la primera clase." data-en="No cost, no commitment, in person or by video call. We review what you already have, define what to practice, the format that suits you, and the price. If you decide to continue, we schedule the first class.">Sin costo y sin compromiso, presencial o por videollamada. Revisamos juntos lo que ya tienes, definimos qué practicar, la modalidad que te acomoda y el valor. Si decides seguir, agendamos la primera clase.</p>
+      <div class="contact-direct">
+        <a href="https://wa.me/56982393697?text=Hola%20Felipe%2C%20quiero%20agendar%20un%20diagn%C3%B3stico%20de%20Pr%C3%A1ctica%201a1." class="btn btn-outline-white" target="_blank" rel="noopener">
+          <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+          <span data-es="Escríbeme por WhatsApp" data-en="Message me on WhatsApp">Escríbeme por WhatsApp</span>
+        </a>
+        <a href="mailto:info@evo.cl?subject=Práctica%201a1%3A%20diagnóstico" class="btn btn-outline-white">
+          <i class="ph ph-envelope-simple" aria-hidden="true"></i>
+          <span data-es="O por correo" data-en="Or by email">O por correo</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+
+  <script is:inline src="/scripts/nav.js"></script>
+
+</Base>
+
+<style>
+  /* Hero de página interior: mismo componente que el home pero menos intenso
+     (sin min-height:100vh, título más chico). Mismo criterio ya usado en
+     industria/mineria para sus páginas interiores. Solo afecta esta página,
+     el hero del home no se toca (estilos con scope de Astro). */
+  .hero { min-height: auto; border-bottom: 1px solid var(--border); }
+  .hero-center { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+  .hero-h1 { font-size: clamp(2.25rem, 7vw, 4.25rem); line-height: 1.05; margin-bottom: 1.75rem; }
+  .hero-copy { max-width: 520px; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 2rem; }
+  .badge {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 8px 16px 8px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    color: var(--text-2); background: var(--light);
+  }
+  .badge i { color: var(--orange); font-size: 15px; }
+
+  .service-icon { font-size: 24px; color: var(--orange); margin-bottom: 0.75rem; display: block; }
+
+  .checklist { list-style: none; max-width: 64ch; }
+  .checklist li { display: flex; align-items: flex-start; gap: 12px; padding: 15px 0; border-bottom: 1px solid var(--border); }
+  .checklist li:first-child { border-top: 1px solid var(--border); }
+  .checklist i { color: var(--orange); font-size: 18px; margin-top: 3px; flex-shrink: 0; }
+  .checklist .p-body { margin-bottom: 0; }
+
+  .kits-callout {
+    display: flex; align-items: flex-start; gap: 20px;
+    background: var(--light); border: 1px solid var(--border);
+    padding: 28px 24px;
+  }
+  .kits-callout > i { font-size: 28px; color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+  .kits-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 0.9rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--orange-btn);
+    text-decoration: none;
+  }
+  .kits-link:hover { text-decoration: underline; }
+  .kits-link i { font-size: 14px; }
+</style>

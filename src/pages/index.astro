@@ -1,31 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 ---
 <Base>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-inner">
-      <a href="#" class="nav-brand">
-        <img src="/assets/EVO-logo.svg" alt="EVO" class="nav-mark">
-        <span class="nav-name">Communication Lab</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="#servicios" data-es="Servicios" data-en="Services">Servicios</a></li>
-        <li><a href="#proceso" data-es="Proceso" data-en="Process">Proceso</a></li>
-      </ul>
-      <div class="nav-controls">
-        <button class="nav-toggle" onclick="toggleLang()" id="lang-btn" aria-label="Switch language">EN</button>
-        <button class="nav-toggle" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle dark mode">
-          <i class="ph ph-moon" id="theme-icon"></i>
-        </button>
-        <a href="https://wa.me/56982393697?text=Hola%20Felipe%2C%20te%20escribo%20desde%20evo.cl" class="nav-cta" target="_blank" rel="noopener">
-          <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
-          <span data-es="WhatsApp" data-en="WhatsApp">WhatsApp</span>
-        </a>
-      </div>
-    </div>
-  </nav>
+  <Nav home={true} />
 
   <!-- HERO -->
   <section class="hero">
@@ -233,17 +213,9 @@ import Base from '../layouts/Base.astro';
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="/assets/EVO-logo.svg" alt="EVO" class="footer-mark">
-        <span class="footer-name">EVO Communication Lab</span>
-      </div>
-      <span class="footer-info">© 2026 EVO Communication Lab · evo.cl · <a href="https://faguilera.com" target="_blank" rel="noopener" data-es="Estudio de Felipe Aguilera" data-en="Felipe Aguilera's studio">Estudio de Felipe Aguilera</a></span>
-    </div>
-  </footer>
+  <Footer />
 
+  <script is:inline src="/scripts/nav.js"></script>
   <script is:inline src="/scripts/home.js"></script>
   <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 

@@ -1,0 +1,31 @@
+---
+// Nav real del sitio, extraído literal de src/pages/index.astro (28-07-2026).
+// No modificar el markup/clases sin actualizar también src/styles/global.css.
+interface Props {
+  home?: boolean; // true solo en index.astro: logo y anchors quedan locales
+}
+const { home = false } = Astro.props;
+const base = home ? '' : 'https://evo.cl/';
+---
+<nav>
+  <div class="nav-inner">
+    <a href={home ? '#' : 'https://evo.cl'} class="nav-brand">
+      <img src="/assets/EVO-logo.svg" alt="EVO" class="nav-mark">
+      <span class="nav-name">Communication Lab</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href={`${base}#servicios`} data-es="Servicios" data-en="Services">Servicios</a></li>
+      <li><a href={`${base}#proceso`} data-es="Proceso" data-en="Process">Proceso</a></li>
+    </ul>
+    <div class="nav-controls">
+      <button class="nav-toggle" onclick="toggleLang()" id="lang-btn" aria-label="Switch language">EN</button>
+      <button class="nav-toggle" onclick="toggleTheme()" id="theme-btn" aria-label="Toggle dark mode">
+        <i class="ph ph-moon" id="theme-icon"></i>
+      </button>
+      <a href="https://wa.me/56982393697?text=Hola%20Felipe%2C%20te%20escribo%20desde%20evo.cl" class="nav-cta" target="_blank" rel="noopener">
+        <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+        <span data-es="WhatsApp" data-en="WhatsApp">WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</nav>

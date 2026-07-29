@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Práctica 1a1 — EVO Communication Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Krub:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --light:#F5F3EE;
+    --border:#E5E2DC;
+    --text:#0E0E0E;
+    --text-2:#5A5A5A;
+    --text-3:#696969;
+    --orange:#E4572E;
+    --orange-btn:#CC4A24;
+    --orange-dk:#C93D1A;
+    --dark:#111111;
+    --surface:#1C1C1C;
+    --max:1100px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Krub',system-ui,sans-serif;
+    font-weight:500;
+    font-size:17px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .lienzo{max-width:var(--max);margin:0 auto;padding:0 1.25rem;}
+  @media (min-width:540px){.lienzo{padding:0 2rem;}}
+  @media (min-width:768px){.lienzo{padding:0 3rem;}}
+
+  h1,h2,h3{
+    font-family:'Inter',system-ui,sans-serif;
+    font-weight:800;
+    text-transform:uppercase;
+    line-height:1.15;
+    margin:0;
+  }
+  h1{font-size:clamp(2.1rem,5.4vw,3.6rem);letter-spacing:-0.02em;}
+  h2{font-size:clamp(1.5rem,3.2vw,2rem);letter-spacing:0.02em;}
+  h3{font-size:1rem;letter-spacing:0.02em;}
+
+  p{margin:0 0 1.1em;}
+  p:last-child{margin-bottom:0;}
+  p strong{color:var(--text);font-weight:600;}
+
+  .rotulo{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.6875rem;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:var(--text-3);
+    margin:0 0 1.4rem;
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+  }
+  .rotulo::before{content:"";width:14px;height:2px;background:var(--orange);display:inline-block;}
+
+  /* accent inherits the parent's weight on purpose: inside h1 (800) it must
+     stay 800, a lighter weight mid-headline reads as a rendering glitch */
+  .accent{color:var(--orange);}
+
+  .guia{color:var(--text-2);font-size:1.02rem;max-width:58ch;}
+
+  /* ---------- icon system: phosphor svgs as css masks, theme-color via currentColor ---------- */
+  .icon{
+    display:inline-block;flex-shrink:0;
+    width:20px;height:20px;
+    background-color:currentColor;
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-position:center;mask-position:center;
+    -webkit-mask-size:contain;mask-size:contain;
+    -webkit-mask-image:var(--icon);mask-image:var(--icon);
+  }
+  .i-house{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M219.31%2C108.68l-80-80a16%2C16%2C0%2C0%2C0-22.62%2C0l-80%2C80A15.87%2C15.87%2C0%2C0%2C0%2C32%2C120v96a8%2C8%2C0%2C0%2C0%2C8%2C8h64a8%2C8%2C0%2C0%2C0%2C8-8V160h32v56a8%2C8%2C0%2C0%2C0%2C8%2C8h64a8%2C8%2C0%2C0%2C0%2C8-8V120A15.87%2C15.87%2C0%2C0%2C0%2C219.31%2C108.68ZM208%2C208H160V152a8%2C8%2C0%2C0%2C0-8-8H104a8%2C8%2C0%2C0%2C0-8%2C8v56H48V120l80-80%2C80%2C80Z%22/%3E%3C/svg%3E");}
+  .i-video-camera{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M251.77%2C73a8%2C8%2C0%2C0%2C0-8.21.39L208%2C97.05V72a16%2C16%2C0%2C0%2C0-16-16H32A16%2C16%2C0%2C0%2C0%2C16%2C72V184a16%2C16%2C0%2C0%2C0%2C16%2C16H192a16%2C16%2C0%2C0%2C0%2C16-16V159l35.56%2C23.71A8%2C8%2C0%2C0%2C0%2C248%2C184a8%2C8%2C0%2C0%2C0%2C8-8V80A8%2C8%2C0%2C0%2C0%2C251.77%2C73ZM192%2C184H32V72H192V184Zm48-22.95-32-21.33V116.28L240%2C95Z%22/%3E%3C/svg%3E");}
+  .i-globe{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M128%2C24h0A104%2C104%2C0%2C1%2C0%2C232%2C128%2C104.12%2C104.12%2C0%2C0%2C0%2C128%2C24Zm88%2C104a87.61%2C87.61%2C0%2C0%2C1-3.33%2C24H174.16a157.44%2C157.44%2C0%2C0%2C0%2C0-48h38.51A87.61%2C87.61%2C0%2C0%2C1%2C216%2C128ZM102%2C168H154a115.11%2C115.11%2C0%2C0%2C1-26%2C45A115.27%2C115.27%2C0%2C0%2C1%2C102%2C168Zm-3.9-16a140.84%2C140.84%2C0%2C0%2C1%2C0-48h59.88a140.84%2C140.84%2C0%2C0%2C1%2C0%2C48ZM40%2C128a87.61%2C87.61%2C0%2C0%2C1%2C3.33-24H81.84a157.44%2C157.44%2C0%2C0%2C0%2C0%2C48H43.33A87.61%2C87.61%2C0%2C0%2C1%2C40%2C128ZM154%2C88H102a115.11%2C115.11%2C0%2C0%2C1%2C26-45A115.27%2C115.27%2C0%2C0%2C1%2C154%2C88Zm52.33%2C0H170.71a135.28%2C135.28%2C0%2C0%2C0-22.3-45.6A88.29%2C88.29%2C0%2C0%2C1%2C206.37%2C88ZM107.59%2C42.4A135.28%2C135.28%2C0%2C0%2C0%2C85.29%2C88H49.63A88.29%2C88.29%2C0%2C0%2C1%2C107.59%2C42.4ZM49.63%2C168H85.29a135.28%2C135.28%2C0%2C0%2C0%2C22.3%2C45.6A88.29%2C88.29%2C0%2C0%2C1%2C49.63%2C168Zm98.78%2C45.6a135.28%2C135.28%2C0%2C0%2C0%2C22.3-45.6h35.66A88.29%2C88.29%2C0%2C0%2C1%2C148.41%2C213.6Z%22/%3E%3C/svg%3E");}
+  .i-cursor-click{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M88%2C24V16a8%2C8%2C0%2C0%2C1%2C16%2C0v8a8%2C8%2C0%2C0%2C1-16%2C0ZM16%2C104h8a8%2C8%2C0%2C0%2C0%2C0-16H16a8%2C8%2C0%2C0%2C0%2C0%2C16ZM124.42%2C39.16a8%2C8%2C0%2C0%2C0%2C10.74-3.58l8-16a8%2C8%2C0%2C0%2C0-14.31-7.16l-8%2C16A8%2C8%2C0%2C0%2C0%2C124.42%2C39.16Zm-96%2C81.69-16%2C8a8%2C8%2C0%2C0%2C0%2C7.16%2C14.31l16-8a8%2C8%2C0%2C1%2C0-7.16-14.31ZM219.31%2C184a16%2C16%2C0%2C0%2C1%2C0%2C22.63l-12.68%2C12.68a16%2C16%2C0%2C0%2C1-22.63%2C0L132.7%2C168%2C115%2C214.09c0%2C.1-.08.21-.13.32a15.83%2C15.83%2C0%2C0%2C1-14.6%2C9.59l-.79%2C0a15.83%2C15.83%2C0%2C0%2C1-14.41-11L32.8%2C52.92A16%2C16%2C0%2C0%2C1%2C52.92%2C32.8L213%2C85.07a16%2C16%2C0%2C0%2C1%2C1.41%2C29.8l-.32.13L168%2C132.69ZM208%2C195.31%2C156.69%2C144h0a16%2C16%2C0%2C0%2C1%2C4.93-26l.32-.14%2C45.95-17.64L48%2C48l52.2%2C159.86%2C17.65-46c0-.11.08-.22.13-.33a16%2C16%2C0%2C0%2C1%2C11.69-9.34%2C16.72%2C16.72%2C0%2C0%2C1%2C3-.28%2C16%2C16%2C0%2C0%2C1%2C11.3%2C4.69L195.31%2C208Z%22/%3E%3C/svg%3E");}
+  .i-signpost{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M246%2C106.65%2C212.33%2C69.3A16%2C16%2C0%2C0%2C0%2C200.44%2C64H136V32a8%2C8%2C0%2C0%2C0-16%2C0V64H40A16%2C16%2C0%2C0%2C0%2C24%2C80v64a16%2C16%2C0%2C0%2C0%2C16%2C16h80v64a8%2C8%2C0%2C0%2C0%2C16%2C0V160h64.44a16%2C16%2C0%2C0%2C0%2C11.89-5.3L246%2C117.35A8%2C8%2C0%2C0%2C0%2C246%2C106.65ZM200.44%2C144H40V80H200.44l28.8%2C32Z%22/%3E%3C/svg%3E");}
+  .i-timer{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M128%2C40a96%2C96%2C0%2C1%2C0%2C96%2C96A96.11%2C96.11%2C0%2C0%2C0%2C128%2C40Zm0%2C176a80%2C80%2C0%2C1%2C1%2C80-80A80.09%2C80.09%2C0%2C0%2C1%2C128%2C216ZM173.66%2C90.34a8%2C8%2C0%2C0%2C1%2C0%2C11.32l-40%2C40a8%2C8%2C0%2C0%2C1-11.32-11.32l40-40A8%2C8%2C0%2C0%2C1%2C173.66%2C90.34ZM96%2C16a8%2C8%2C0%2C0%2C1%2C8-8h48a8%2C8%2C0%2C0%2C1%2C0%2C16H104A8%2C8%2C0%2C0%2C1%2C96%2C16Z%22/%3E%3C/svg%3E");}
+  .i-map-pin{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M128%2C64a40%2C40%2C0%2C1%2C0%2C40%2C40A40%2C40%2C0%2C0%2C0%2C128%2C64Zm0%2C64a24%2C24%2C0%2C1%2C1%2C24-24A24%2C24%2C0%2C0%2C1%2C128%2C128Zm0-112a88.1%2C88.1%2C0%2C0%2C0-88%2C88c0%2C31.4%2C14.51%2C64.68%2C42%2C96.25a254.19%2C254.19%2C0%2C0%2C0%2C41.45%2C38.3%2C8%2C8%2C0%2C0%2C0%2C9.18%2C0A254.19%2C254.19%2C0%2C0%2C0%2C174%2C200.25c27.45-31.57%2C42-64.85%2C42-96.25A88.1%2C88.1%2C0%2C0%2C0%2C128%2C16Zm0%2C206c-16.53-13-72-60.75-72-118a72%2C72%2C0%2C0%2C1%2C144%2C0C200%2C161.23%2C144.53%2C209%2C128%2C222Z%22/%3E%3C/svg%3E");}
+  .i-chat{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M168%2C112a8%2C8%2C0%2C0%2C1-8%2C8H96a8%2C8%2C0%2C0%2C1%2C0-16h64A8%2C8%2C0%2C0%2C1%2C168%2C112Zm-8%2C24H96a8%2C8%2C0%2C0%2C0%2C0%2C16h64a8%2C8%2C0%2C0%2C0%2C0-16Zm72-8A104%2C104%2C0%2C0%2C1%2C79.12%2C219.82L45.07%2C231.17a16%2C16%2C0%2C0%2C1-20.24-20.24l11.35-34.05A104%2C104%2C0%2C1%2C1%2C232%2C128Zm-16%2C0A88%2C88%2C0%2C1%2C0%2C51.81%2C172.06a8%2C8%2C0%2C0%2C1%2C.66%2C6.54L40%2C216%2C77.4%2C203.53a7.85%2C7.85%2C0%2C0%2C1%2C2.53-.42%2C8%2C8%2C0%2C0%2C1%2C4%2C1.08A88%2C88%2C0%2C0%2C0%2C216%2C128Z%22/%3E%3C/svg%3E");}
+  .i-sliders{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M40%2C88H73a32%2C32%2C0%2C0%2C0%2C62%2C0h81a8%2C8%2C0%2C0%2C0%2C0-16H135a32%2C32%2C0%2C0%2C0-62%2C0H40a8%2C8%2C0%2C0%2C0%2C0%2C16Zm64-24A16%2C16%2C0%2C1%2C1%2C88%2C80%2C16%2C16%2C0%2C0%2C1%2C104%2C64ZM216%2C168H199a32%2C32%2C0%2C0%2C0-62%2C0H40a8%2C8%2C0%2C0%2C0%2C0%2C16h97a32%2C32%2C0%2C0%2C0%2C62%2C0h17a8%2C8%2C0%2C0%2C0%2C0-16Zm-48%2C24a16%2C16%2C0%2C1%2C1%2C16-16A16%2C16%2C0%2C0%2C1%2C168%2C192Z%22/%3E%3C/svg%3E");}
+  .i-calendar{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M208%2C32H184V24a8%2C8%2C0%2C0%2C0-16%2C0v8H88V24a8%2C8%2C0%2C0%2C0-16%2C0v8H48A16%2C16%2C0%2C0%2C0%2C32%2C48V208a16%2C16%2C0%2C0%2C0%2C16%2C16H208a16%2C16%2C0%2C0%2C0%2C16-16V48A16%2C16%2C0%2C0%2C0%2C208%2C32ZM72%2C48v8a8%2C8%2C0%2C0%2C0%2C16%2C0V48h80v8a8%2C8%2C0%2C0%2C0%2C16%2C0V48h24V80H48V48ZM208%2C208H48V96H208V208Zm-38.34-85.66a8%2C8%2C0%2C0%2C1%2C0%2C11.32l-48%2C48a8%2C8%2C0%2C0%2C1-11.32%2C0l-24-24a8%2C8%2C0%2C0%2C1%2C11.32-11.32L116%2C164.69l42.34-42.35A8%2C8%2C0%2C0%2C1%2C169.66%2C122.34Z%22/%3E%3C/svg%3E");}
+  .i-trophy{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M232%2C64H208V48a8%2C8%2C0%2C0%2C0-8-8H56a8%2C8%2C0%2C0%2C0-8%2C8V64H24A16%2C16%2C0%2C0%2C0%2C8%2C80V96a40%2C40%2C0%2C0%2C0%2C40%2C40h3.65A80.13%2C80.13%2C0%2C0%2C0%2C120%2C191.61V216H96a8%2C8%2C0%2C0%2C0%2C0%2C16h64a8%2C8%2C0%2C0%2C0%2C0-16H136V191.58c31.94-3.23%2C58.44-25.64%2C68.08-55.58H208a40%2C40%2C0%2C0%2C0%2C40-40V80A16%2C16%2C0%2C0%2C0%2C232%2C64ZM48%2C120A24%2C24%2C0%2C0%2C1%2C24%2C96V80H48v32q0%2C4%2C.39%2C8Zm144-8.9c0%2C35.52-29%2C64.64-64%2C64.9a64%2C64%2C0%2C0%2C1-64-64V56H192ZM232%2C96a24%2C24%2C0%2C0%2C1-24%2C24h-.5a81.81%2C81.81%2C0%2C0%2C0%2C.5-8.9V80h24Z%22/%3E%3C/svg%3E");}
+  .i-check{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M173.66%2C98.34a8%2C8%2C0%2C0%2C1%2C0%2C11.32l-56%2C56a8%2C8%2C0%2C0%2C1-11.32%2C0l-24-24a8%2C8%2C0%2C0%2C1%2C11.32-11.32L112%2C148.69l50.34-50.35A8%2C8%2C0%2C0%2C1%2C173.66%2C98.34ZM232%2C128A104%2C104%2C0%2C1%2C1%2C128%2C24%2C104.11%2C104.11%2C0%2C0%2C1%2C232%2C128Zm-16%2C0a88%2C88%2C0%2C1%2C0-88%2C88A88.1%2C88.1%2C0%2C0%2C0%2C216%2C128Z%22/%3E%3C/svg%3E");}
+  .i-package{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M223.68%2C66.15%2C135.68%2C18a15.88%2C15.88%2C0%2C0%2C0-15.36%2C0l-88%2C48.17a16%2C16%2C0%2C0%2C0-8.32%2C14v95.64a16%2C16%2C0%2C0%2C0%2C8.32%2C14l88%2C48.17a15.88%2C15.88%2C0%2C0%2C0%2C15.36%2C0l88-48.17a16%2C16%2C0%2C0%2C0%2C8.32-14V80.18A16%2C16%2C0%2C0%2C0%2C223.68%2C66.15ZM128%2C32l80.34%2C44-29.77%2C16.3-80.35-44ZM128%2C120%2C47.66%2C76l33.9-18.56%2C80.34%2C44ZM40%2C90l80%2C43.78v85.79L40%2C175.82Zm176%2C85.78h0l-80%2C43.79V133.82l32-17.51V152a8%2C8%2C0%2C0%2C0%2C16%2C0V107.55L216%2C90v85.77Z%22/%3E%3C/svg%3E");}
+  .i-arrow-right{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M221.66%2C133.66l-72%2C72a8%2C8%2C0%2C0%2C1-11.32-11.32L196.69%2C136H40a8%2C8%2C0%2C0%2C1%2C0-16H196.69L138.34%2C61.66a8%2C8%2C0%2C0%2C1%2C11.32-11.32l72%2C72A8%2C8%2C0%2C0%2C1%2C221.66%2C133.66Z%22/%3E%3C/svg%3E");}
+  .i-article{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M216%2C40H40A16%2C16%2C0%2C0%2C0%2C24%2C56V200a16%2C16%2C0%2C0%2C0%2C16%2C16H216a16%2C16%2C0%2C0%2C0%2C16-16V56A16%2C16%2C0%2C0%2C0%2C216%2C40Zm0%2C160H40V56H216V200ZM184%2C96a8%2C8%2C0%2C0%2C1-8%2C8H80a8%2C8%2C0%2C0%2C1%2C0-16h96A8%2C8%2C0%2C0%2C1%2C184%2C96Zm0%2C32a8%2C8%2C0%2C0%2C1-8%2C8H80a8%2C8%2C0%2C0%2C1%2C0-16h96A8%2C8%2C0%2C0%2C1%2C184%2C128Zm0%2C32a8%2C8%2C0%2C0%2C1-8%2C8H80a8%2C8%2C0%2C0%2C1%2C0-16h96A8%2C8%2C0%2C0%2C1%2C184%2C160Z%22/%3E%3C/svg%3E");}
+  .i-browsers{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M216%2C40H72A16%2C16%2C0%2C0%2C0%2C56%2C56V72H40A16%2C16%2C0%2C0%2C0%2C24%2C88V200a16%2C16%2C0%2C0%2C0%2C16%2C16H184a16%2C16%2C0%2C0%2C0%2C16-16V184h16a16%2C16%2C0%2C0%2C0%2C16-16V56A16%2C16%2C0%2C0%2C0%2C216%2C40ZM184%2C88v16H40V88Zm0%2C112H40V120H184v80Zm32-32H200V88a16%2C16%2C0%2C0%2C0-16-16H72V56H216Z%22/%3E%3C/svg%3E");}
+  .i-files{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M213.66%2C66.34l-40-40A8%2C8%2C0%2C0%2C0%2C168%2C24H88A16%2C16%2C0%2C0%2C0%2C72%2C40V56H56A16%2C16%2C0%2C0%2C0%2C40%2C72V216a16%2C16%2C0%2C0%2C0%2C16%2C16H168a16%2C16%2C0%2C0%2C0%2C16-16V200h16a16%2C16%2C0%2C0%2C0%2C16-16V72A8%2C8%2C0%2C0%2C0%2C213.66%2C66.34ZM168%2C216H56V72h76.69L168%2C107.31v84.53c0%2C.06%2C0%2C.11%2C0%2C.16s0%2C.1%2C0%2C.16V216Zm32-32H184V104a8%2C8%2C0%2C0%2C0-2.34-5.66l-40-40A8%2C8%2C0%2C0%2C0%2C136%2C56H88V40h76.69L200%2C75.31Zm-56-32a8%2C8%2C0%2C0%2C1-8%2C8H88a8%2C8%2C0%2C0%2C1%2C0-16h48A8%2C8%2C0%2C0%2C1%2C144%2C152Zm0%2C32a8%2C8%2C0%2C0%2C1-8%2C8H88a8%2C8%2C0%2C0%2C1%2C0-16h48A8%2C8%2C0%2C0%2C1%2C144%2C184Z%22/%3E%3C/svg%3E");}
+  .i-users{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M117.25%2C157.92a60%2C60%2C0%2C1%2C0-66.5%2C0A95.83%2C95.83%2C0%2C0%2C0%2C3.53%2C195.63a8%2C8%2C0%2C1%2C0%2C13.4%2C8.74%2C80%2C80%2C0%2C0%2C1%2C134.14%2C0%2C8%2C8%2C0%2C0%2C0%2C13.4-8.74A95.83%2C95.83%2C0%2C0%2C0%2C117.25%2C157.92ZM40%2C108a44%2C44%2C0%2C1%2C1%2C44%2C44A44.05%2C44.05%2C0%2C0%2C1%2C40%2C108Zm210.14%2C98.7a8%2C8%2C0%2C0%2C1-11.07-2.33A79.83%2C79.83%2C0%2C0%2C0%2C172%2C168a8%2C8%2C0%2C0%2C1%2C0-16%2C44%2C44%2C0%2C1%2C0-16.34-84.87%2C8%2C8%2C0%2C1%2C1-5.94-14.85%2C60%2C60%2C0%2C0%2C1%2C55.53%2C105.64%2C95.83%2C95.83%2C0%2C0%2C1%2C47.22%2C37.71A8%2C8%2C0%2C0%2C1%2C250.14%2C206.7Z%22/%3E%3C/svg%3E");}
+  .i-whatsapp{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M187.58%2C144.84l-32-16a8%2C8%2C0%2C0%2C0-8%2C.5l-14.69%2C9.8a40.55%2C40.55%2C0%2C0%2C1-16-16l9.8-14.69a8%2C8%2C0%2C0%2C0%2C.5-8l-16-32A8%2C8%2C0%2C0%2C0%2C104%2C64a40%2C40%2C0%2C0%2C0-40%2C40%2C88.1%2C88.1%2C0%2C0%2C0%2C88%2C88%2C40%2C40%2C0%2C0%2C0%2C40-40A8%2C8%2C0%2C0%2C0%2C187.58%2C144.84ZM152%2C176a72.08%2C72.08%2C0%2C0%2C1-72-72A24%2C24%2C0%2C0%2C1%2C99.29%2C80.46l11.48%2C23L101%2C118a8%2C8%2C0%2C0%2C0-.73%2C7.51%2C56.47%2C56.47%2C0%2C0%2C0%2C30.15%2C30.15A8%2C8%2C0%2C0%2C0%2C138%2C155l14.61-9.74%2C23%2C11.48A24%2C24%2C0%2C0%2C1%2C152%2C176ZM128%2C24A104%2C104%2C0%2C0%2C0%2C36.18%2C176.88L24.83%2C210.93a16%2C16%2C0%2C0%2C0%2C20.24%2C20.24l34.05-11.35A104%2C104%2C0%2C1%2C0%2C128%2C24Zm0%2C192a87.87%2C87.87%2C0%2C0%2C1-44.06-11.81%2C8%2C8%2C0%2C0%2C0-6.54-.67L40%2C216%2C52.47%2C178.6a8%2C8%2C0%2C0%2C0-.66-6.54A88%2C88%2C0%2C1%2C1%2C128%2C216Z%22/%3E%3C/svg%3E");}
+  .i-envelope{--icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20256%20256%22%20fill%3D%22currentColor%22%3E%3Cpath%20d%3D%22M224%2C48H32a8%2C8%2C0%2C0%2C0-8%2C8V192a16%2C16%2C0%2C0%2C0%2C16%2C16H216a16%2C16%2C0%2C0%2C0%2C16-16V56A8%2C8%2C0%2C0%2C0%2C224%2C48ZM203.43%2C64%2C128%2C133.15%2C52.57%2C64ZM216%2C192H40V74.19l82.59%2C75.71a8%2C8%2C0%2C0%2C0%2C10.82%2C0L216%2C74.19V192Z%22/%3E%3C/svg%3E");}
+
+  /* ---------- nav ---------- */
+  .barra{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--border);border-top:2px solid var(--orange);}
+  .marca-nav{display:flex;align-items:center;gap:10px;}
+  .wordmark{display:inline-flex;align-items:center;justify-content:center;width:38px;height:27px;background:var(--orange);font-family:'Inter',sans-serif;font-weight:800;font-size:10px;color:#FFFFFF;letter-spacing:2px;margin-right:-2px;}
+  .nav-name{font-family:'Inter',sans-serif;font-weight:700;font-size:0.75rem;color:var(--text);}
+  .barra .servicio{font-family:'IBM Plex Mono',monospace;font-size:0.6875rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);}
+
+  /* ---------- hero ---------- */
+  .portada{padding:clamp(48px,9vw,96px) 0 clamp(40px,6vw,64px);}
+  .portada h1{max-width:20ch;}
+  .portada .guia{margin-top:1.8rem;font-size:1.08rem;}
+  .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:2rem;}
+  .badge{
+    display:flex;align-items:center;gap:8px;
+    border:1px solid var(--border);border-radius:100px;
+    padding:8px 16px 8px 12px;
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    color:var(--text-2);background:var(--light);
+  }
+  .badge .icon{width:16px;height:16px;color:var(--orange);}
+
+  /* ---------- botones (componente DESIGN.md) ---------- */
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:0.8125rem;
+    letter-spacing:0.08em;text-transform:uppercase;
+    padding:13px 22px;border-radius:2px;border:1px solid transparent;
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  }
+  .btn-primary{background:var(--orange-btn);color:#fff;}
+  .btn-primary:hover{background:var(--orange-dk);}
+  .btn-outline-white{background:transparent;color:#fff;border-color:rgba(255,255,255,0.28);}
+  .btn-outline-white:hover{border-color:rgba(255,255,255,0.65);}
+  .btn .icon{width:14px;height:14px;}
+  .link-secundario{
+    display:inline-flex;align-items:center;gap:6px;margin-left:14px;
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    color:var(--text-2);text-decoration:none;
+  }
+  .link-secundario .icon{width:14px;height:14px;color:var(--text-3);}
+  .link-secundario:hover{text-decoration:underline;}
+  .link-secundario.claro{color:rgba(240,237,230,0.75);}
+  .link-secundario.claro .icon{color:rgba(240,237,230,0.6);}
+  .cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px;}
+
+  /* ---------- sections ---------- */
+  section{padding:clamp(40px,5.5vw,64px) 0;border-top:1px solid var(--border);}
+  .cabecera{margin-bottom:2.4rem;}
+  .cabecera h2{max-width:24ch;}
+  .cabecera .guia{margin-top:1rem;}
+
+  .publico{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);}
+  .publico div{background:var(--bg);padding:24px 20px;}
+  .publico strong{display:block;font-family:'Inter',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:0.5rem;}
+  .publico p{font-size:0.92rem;color:var(--text-2);}
+
+  /* card grids with a leading icon (formatos, modalidades) */
+  .grid-iconos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);}
+  .card-icono{background:var(--bg);padding:24px 22px;}
+  .card-icono .icon{width:24px;height:24px;color:var(--orange);margin-bottom:0.9rem;}
+  .card-icono h3{margin-bottom:0.5rem;}
+  .card-icono p{font-size:0.92rem;color:var(--text-2);}
+
+  .nota{margin-top:1.6rem;font-size:0.92rem;color:var(--text-3);max-width:62ch;}
+
+  .principios{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px 40px;}
+  .principio{display:flex;gap:14px;}
+  .principio .icon{width:22px;height:22px;color:var(--orange);margin-top:2px;}
+  .principio h3{margin-bottom:0.5rem;}
+  .principio p{font-size:0.94rem;color:var(--text-2);}
+
+  .proceso{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:32px;}
+  .paso .icon{width:22px;height:22px;color:var(--orange);margin-bottom:0.9rem;}
+  .paso h3{margin-bottom:0.5rem;}
+  .paso p{font-size:0.92rem;color:var(--text-2);}
+
+  .lista{list-style:none;margin:0;padding:0;max-width:64ch;}
+  .lista li{display:flex;align-items:flex-start;gap:12px;padding:15px 0;border-bottom:1px solid var(--border);font-size:0.98rem;}
+  .lista li .icon{width:18px;height:18px;color:var(--orange);margin-top:3px;}
+  .lista li:first-child{border-top:1px solid var(--border);}
+
+  /* ---------- testimonios (lista para activar, ver comentario en el HTML) ---------- */
+  .testimonios{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
+  .testimonio{background:var(--light);border-left:3px solid var(--orange);padding:22px 24px;margin:0;}
+  .testimonio p{font-size:1rem;color:var(--text);font-style:italic;}
+  .testimonio cite{
+    display:block;margin-top:0.9rem;font-style:normal;
+    font-family:'IBM Plex Mono',monospace;font-size:0.75rem;
+    letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);
+  }
+
+  .kits{
+    display:flex;align-items:flex-start;gap:20px;
+    background:var(--light);border:1px solid var(--border);
+    padding:28px 24px;
+  }
+  .kits .icon{width:28px;height:28px;color:var(--orange);flex-shrink:0;margin-top:2px;}
+  .kits h3{margin-bottom:0.6rem;}
+  .kits p{font-size:0.94rem;color:var(--text-2);}
+  .kits-link{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:0.9rem;font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    letter-spacing:0.06em;text-transform:uppercase;color:var(--orange-btn);
+    text-decoration:none;
+  }
+  .kits-link .icon{width:14px;height:14px;color:var(--orange-btn);margin:0;}
+  .kits-link:hover{text-decoration:underline;}
+
+  /* ---------- cierre ---------- */
+  .cierre{background:var(--dark);color:#F0EDE6;padding:clamp(40px,5.5vw,60px) clamp(24px,4vw,48px);margin:0 0 clamp(40px,5.5vw,64px);border-top:3px solid var(--orange);}
+  .cierre h2{color:#FFFFFF;max-width:20ch;}
+  .cierre p{color:rgba(240,237,230,0.8);max-width:54ch;margin-top:1.1rem;}
+  .cierre .rotulo{color:rgba(240,237,230,0.55);}
+  .cierre .rotulo::before{background:var(--orange);}
+  .semaforo{display:flex;gap:7px;margin-top:2rem;}
+  .semaforo i{width:10px;height:10px;border-radius:50%;display:block;}
+
+  footer{background:var(--surface);color:#F0EDE6;padding:32px 1.25rem 44px;}
+  @media (min-width:540px){footer{padding-left:2rem;padding-right:2rem;}}
+  @media (min-width:768px){footer{padding-left:3rem;padding-right:3rem;}}
+  .footer-inner{max-width:var(--max);margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap;}
+  .pie-marca{max-width:46ch;display:flex;align-items:flex-start;gap:12px;}
+  .wordmark-sm{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;height:20px;background:var(--orange);font-family:'Inter',sans-serif;font-weight:800;font-size:7px;color:#FFFFFF;letter-spacing:1.5px;margin-right:-1.5px;}
+  .pie-marca-texto strong{font-family:'Inter',sans-serif;font-weight:700;font-size:0.95rem;color:#FFFFFF;display:block;margin-bottom:0.4rem;}
+  .pie-marca-texto p{font-size:0.88rem;color:rgba(240,237,230,0.65);line-height:1.55;}
+  .pie-fundador{font-size:0.78rem;color:rgba(240,237,230,0.5);margin-top:0.6rem;}
+  .pie-fundador a{color:rgba(240,237,230,0.75);}
+  .pie-datos{display:flex;flex-direction:column;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.6875rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,237,230,0.6);text-align:right;}
+  .pie-datos a{color:var(--orange);text-decoration:none;}
+  .pie-datos a:hover{text-decoration:underline;}
+  @media (max-width:620px){.pie-datos{text-align:left;}}
+
+  .entra{opacity:0;transform:translateY(14px);animation:sube 0.7s cubic-bezier(.2,.7,.3,1) forwards;}
+  .entra:nth-child(2){animation-delay:0.08s;}
+  .entra:nth-child(3){animation-delay:0.16s;}
+  @keyframes sube{to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){.entra{animation:none;opacity:1;transform:none;}html{scroll-behavior:auto;}}
+
+  @media (max-width:720px){body{font-size:16px;}}
+
+  @media print{
+    body{background:#fff;font-size:11pt;}
+    .lienzo{max-width:100%;padding:0;}
+    section{padding:20px 0;break-inside:avoid;}
+    .cierre{background:#fff;color:var(--text);border:1px solid var(--border);}
+    .cierre h2,.cierre p,.cierre .rotulo{color:var(--text);}
+    footer{background:#fff;color:var(--text);}
+    .principio,.paso,.publico div,.card-icono{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div class="lienzo">
+
+  <div class="barra">
+    <div class="marca-nav">
+      <span class="wordmark">EVO</span>
+      <span class="nav-name">EVO Communication Lab</span>
+    </div>
+    <span class="servicio">Práctica 1a1</span>
+  </div>
+
+  <header class="portada">
+    <span class="rotulo entra">Práctica 1a1</span>
+    <h1 class="entra">Se aprende <span class="accent">haciendo</span>, no memorizando.</h1>
+    <p class="guia entra">Redes sociales, un blog, la landing de un producto, un dossier: lo que tu negocio necesite comunicar, lo practicamos juntos hasta que te salga sola. <strong>Presencial o por videollamada, en español o en inglés.</strong></p>
+    <div class="badges entra">
+      <span class="badge"><span class="icon i-globe"></span>Español / English</span>
+      <span class="badge"><span class="icon i-house"></span>Presencial</span>
+      <span class="badge"><span class="icon i-video-camera"></span>Remoto</span>
+    </div>
+    <div class="entra cta-row" style="margin-top:2.2rem">
+      <a class="btn btn-primary" href="https://wa.me/56982393697?text=Hola%20Felipe%2C%20quiero%20agendar%20un%20diagn%C3%B3stico%20de%20Pr%C3%A1ctica%201a1." target="_blank" rel="noopener"><span class="icon i-whatsapp" style="background-color:#fff"></span>Agenda tu diagnóstico</a>
+      <a class="link-secundario" href="mailto:info@evo.cl?subject=Práctica%201a1%3A%20diagnóstico"><span class="icon i-envelope"></span>o escribe a info@evo.cl</a>
+    </div>
+  </header>
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">Para quién es</span>
+      <h2>Para quien ya tiene el negocio andando y comunicarlo le queda grande.</h2>
+    </div>
+    <div class="publico">
+      <div>
+        <strong>Ya vendes</strong>
+        <p>Tienes clientes y producto. Lo que falta es que <strong>te encuentren y te entiendan</strong>.</p>
+      </div>
+      <div>
+        <strong>Publicas sin sistema</strong>
+        <p>Subes contenido cuando te acuerdas, sin saber <strong>si sirve de algo</strong>.</p>
+      </div>
+      <div>
+        <strong>Te trabas a mitad de camino</strong>
+        <p>Abres la herramienta, empiezas, y en algún punto <strong>no sabes cómo seguir</strong>.</p>
+      </div>
+      <div>
+        <strong>Quieres hacerlo tú</strong>
+        <p>No buscas delegarlo. Buscas <strong>entenderlo y manejarlo</strong> sin depender de otros.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">Qué podemos practicar</span>
+      <h2>Cualquier pieza que tu negocio necesite comunicar.</h2>
+      <p class="guia">Digital first, pero no excluyente: si algo se resuelve mejor impreso, se resuelve impreso.</p>
+    </div>
+    <div class="grid-iconos">
+      <div class="card-icono">
+        <span class="icon i-users"></span>
+        <h3>Redes sociales</h3>
+        <p>Instagram, LinkedIn, la presencia del día a día.</p>
+      </div>
+      <div class="card-icono">
+        <span class="icon i-article"></span>
+        <h3>Blog y artículos</h3>
+        <p>Escribir con regularidad, encontrar tu voz por escrito.</p>
+      </div>
+      <div class="card-icono">
+        <span class="icon i-browsers"></span>
+        <h3>Landing de un producto</h3>
+        <p>Una página enfocada, para vender algo específico.</p>
+      </div>
+      <div class="card-icono">
+        <span class="icon i-files"></span>
+        <h3>Dossier y catálogos</h3>
+        <p>Documentos de venta, digital o para imprimir.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">Modalidades</span>
+      <h2>Presencial o remoto, tú eliges.</h2>
+    </div>
+    <div class="grid-iconos">
+      <div class="card-icono">
+        <span class="icon i-house"></span>
+        <h3>Presencial</h3>
+        <p>En tu casa o local, en tu propio computador. Útil si prefieres <strong>tener a alguien al lado</strong> mientras practicas.</p>
+      </div>
+      <div class="card-icono">
+        <span class="icon i-video-camera"></span>
+        <h3>Remoto</h3>
+        <p>Por videollamada, compartiendo pantalla. <strong>Mismo método, sin traslado.</strong></p>
+      </div>
+    </div>
+    <p class="nota">El valor varía según la modalidad y, en presencial, según tu ubicación y disponibilidad horaria. <strong>Se conversa en el diagnóstico</strong>, antes de proponer nada.</p>
+  </section>
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">Cómo trabajamos</span>
+      <h2>Cuatro reglas que no cambian.</h2>
+      <p class="guia">El contenido de cada bloque se arma a medida y avanza según lo urgente de cada semana. La forma de trabajar es siempre la misma.</p>
+    </div>
+    <div class="principios">
+      <div class="principio">
+        <span class="icon i-cursor-click"></span>
+        <div>
+          <h3>Tú manejas el computador</h3>
+          <p>Presencial o compartiendo pantalla a distancia. <strong>Lo que hace otro por ti no lo aprendes.</strong></p>
+        </div>
+      </div>
+      <div class="principio">
+        <span class="icon i-signpost"></span>
+        <div>
+          <h3>Un solo camino</h3>
+          <p>Hay cuatro formas de hacer casi todo. <strong>Te enseño una sola</strong> y la repetimos igual cada vez.</p>
+        </div>
+      </div>
+      <div class="principio">
+        <span class="icon i-timer"></span>
+        <div>
+          <h3>Nada de teoría acumulada</h3>
+          <p><strong>Máximo veinte minutos</strong> de explicación antes de que pongas las manos en el teclado.</p>
+        </div>
+      </div>
+      <div class="principio">
+        <span class="icon i-map-pin"></span>
+        <div>
+          <h3>Trabajamos en tu espacio</h3>
+          <p>Todo queda configurado <strong>donde tú vas a seguir trabajando después</strong>, no en un entorno de prueba.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">El proceso</span>
+      <h2>De la primera conversación a la autonomía.</h2>
+    </div>
+    <div class="proceso">
+      <div class="paso">
+        <span class="icon i-chat"></span>
+        <h3>Diagnóstico</h3>
+        <p><strong>Una hora, sin costo</strong>, para revisar qué tienes hoy y qué te está frenando.</p>
+      </div>
+      <div class="paso">
+        <span class="icon i-sliders"></span>
+        <h3>Bloque a medida</h3>
+        <p>Definimos <strong>qué practicar, modalidad, valor y ritmo</strong> de clases.</p>
+      </div>
+      <div class="paso">
+        <span class="icon i-calendar"></span>
+        <h3>Clases, una a una</h3>
+        <p>Se agendan según tu disponibilidad. <strong>Cada clase termina con algo real.</strong></p>
+      </div>
+      <div class="paso">
+        <span class="icon i-trophy"></span>
+        <h3>Cierre y autonomía</h3>
+        <p>Terminas con <strong>capacidad real de seguir sola</strong>. Continuar es decisión tuya.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">Qué te llevas</span>
+      <h2>Cosas concretas, no apuntes.</h2>
+    </div>
+    <ul class="lista">
+      <li><span class="icon i-check"></span><strong>Tus canales y piezas</strong> configurados, conectados y publicados.</li>
+      <li><span class="icon i-check"></span><strong>Tus plantillas</strong> ordenadas y tu identidad visual cargada en las herramientas.</li>
+      <li><span class="icon i-check"></span><strong>Un calendario o cronograma</strong> realista para el tiempo que tienes.</li>
+      <li><span class="icon i-check"></span><strong>Contenido real</strong>, publicado durante el proceso, no ejemplos de prueba.</li>
+      <li><span class="icon i-check"></span><strong>Capacidad real de seguir sola</strong>, revisada juntas en cada clase.</li>
+    </ul>
+  </section>
+
+  <!--
+    SECCIÓN TESTIMONIOS, lista para activar cuando haya 1 o 2 clientes reales dispuestos a dar una cita.
+    Para activarla: sacar este comentario, reemplazar nombre, negocio y la cita textual, agregar más
+    bloques .testimonio si aparecen más casos. No inventar citas mientras esta sección esté vacía.
+
+  <section>
+    <div class="cabecera">
+      <span class="rotulo">Lo que dicen</span>
+      <h2>Personas reales, negocios reales.</h2>
+    </div>
+    <div class="testimonios">
+      <blockquote class="testimonio">
+        <p>"[Cita textual, corta, sobre un resultado concreto que la persona haya notado]"</p>
+        <cite>[Nombre] · [Negocio o rubro]</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  -->
+
+  <section>
+    <div class="kits">
+      <span class="icon i-package"></span>
+      <div>
+        <span class="rotulo" style="margin-bottom:0.5rem">Otra opción</span>
+        <h3>¿Prefieres que lo hagamos nosotros?</h3>
+        <p>Práctica 1a1 es para aprender a hacerlo tú misma. Si en cambio quieres <strong>un resultado terminado sin dedicarle el tiempo</strong>, ahí están los Kits de EVO: Brand Kit, Sitio Web, Presentación, Fichas Técnicas, Papelería.</p>
+        <a class="kits-link" href="https://evo.cl">Ver evo.cl<span class="icon i-arrow-right"></span></a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="lienzo">
+  <div class="cierre">
+    <span class="rotulo">Siguiente paso</span>
+    <h2>Partimos con una conversación de una hora.</h2>
+    <p>Sin costo y sin compromiso, presencial o por videollamada. Revisamos juntos lo que ya tienes, definimos qué practicar, la modalidad que te acomoda y el valor. Si decides seguir, <strong>agendamos la primera clase</strong>.</p>
+    <div class="cta-row" style="margin-top:1.8rem">
+      <a class="btn btn-outline-white" href="https://wa.me/56982393697?text=Hola%20Felipe%2C%20quiero%20agendar%20un%20diagn%C3%B3stico%20de%20Pr%C3%A1ctica%201a1." target="_blank" rel="noopener"><span class="icon i-whatsapp" style="background-color:#fff"></span>Escríbeme por WhatsApp</a>
+      <a class="link-secundario claro" href="mailto:info@evo.cl?subject=Práctica%201a1%3A%20diagnóstico"><span class="icon i-envelope"></span>o por correo</a>
+    </div>
+    <div class="semaforo">
+      <i style="background:#3F8F6B"></i>
+      <i style="background:#E0A21C"></i>
+      <i style="background:#C2543E"></i>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="pie-marca">
+      <span class="wordmark-sm">EVO</span>
+      <div class="pie-marca-texto">
+        <strong>EVO Communication Lab</strong>
+        <p>Consultoría de comunicación y producción digital. Sistemas de marca, canales digitales y herramientas que el negocio puede operar solo.</p>
+        <p class="pie-fundador">Estudio de <a href="https://faguilera.com">Felipe Aguilera</a></p>
+      </div>
+    </div>
+    <div class="pie-datos">
+      <span><a href="https://evo.cl">evo.cl</a></span>
+      <span>Santiago, Chile</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

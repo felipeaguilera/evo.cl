@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta: Reportería CAI Informática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E4572E;
+    --dark:   #111111;
+    --light:  #F5F3EE;
+    --bg:     #FFFFFF;
+    --text:   #111111;
+    --muted:  #5A5A5A;
+    --border: #E5E2DC;
+    --f-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --f-mono:    'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  @page { size: A4; margin: 20mm 18mm; }
+  @media print {
+    * { background: white !important; }
+    .pdf-bar { display: none !important; }
+    body { padding-bottom: 0 !important; }
+    html, body { height: auto !important; }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--f-display);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 32px 20px 96px;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  /* --- HEADER --- */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid var(--orange);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark {
+    height: 28px; width: auto;
+    display: block; flex-shrink: 0;
+  }
+  .brand-name {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    line-height: 1.3;
+  }
+  .brand-sub {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-top: 2px;
+  }
+  .doc-date {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); text-align: right; padding-top: 4px;
+  }
+
+  /* --- PARTIES --- */
+  .parties {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .party { background: var(--bg); padding: 12px 14px; }
+  .party-label {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 5px;
+  }
+  .party-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .party-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* --- SECTION --- */
+  .section { margin-bottom: 28px; }
+  .sec-label {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-label::before {
+    content: ""; display: inline-block;
+    width: 18px; height: 2px; background: var(--orange);
+  }
+
+  p { color: var(--muted); margin-bottom: 10px; font-size: 13px; }
+  p strong { color: var(--text); font-weight: 600; }
+  p:last-child { margin-bottom: 0; }
+
+  .sub-head {
+    font-size: 12px; font-weight: 700; color: var(--text);
+    text-transform: uppercase; letter-spacing: .04em;
+    margin: 14px 0 8px;
+  }
+  .sub-head:first-child { margin-top: 0; }
+
+  .cotiz-tag {
+    display: inline-block;
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: #fff; background: var(--dark);
+    padding: 2px 8px; border-radius: 2px;
+    margin-bottom: 8px;
+  }
+
+  /* --- LIST --- */
+  ul.items { list-style: none; }
+  ul.items li {
+    font-size: 13px; color: var(--muted);
+    padding: 7px 0 7px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative; line-height: 1.5;
+  }
+  ul.items li:last-child { border-bottom: none; }
+  ul.items li::before {
+    content: "";
+    position: absolute; left: 0; top: 14px;
+    width: 7px; height: 7px; background: var(--orange);
+  }
+  ul.items li strong { color: var(--text); font-weight: 600; }
+  ul.items li span { display: block; font-size: 11px; color: #888; margin-top: 1px; }
+
+  /* --- DIAGRAM --- */
+  .diagram-wrap { margin: 12px 0 18px; }
+  .diagram-wrap img {
+    width: 100%; height: auto; display: block;
+    border: 1px solid var(--border);
+  }
+  .diagram-caption {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #888;
+    margin-top: 6px; text-align: center;
+  }
+
+  /* --- TIMELINE --- */
+  .tl { border-left: 2px solid var(--orange); padding-left: 18px; }
+  .tl-item { position: relative; margin-bottom: 16px; }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-item::before {
+    content: "";
+    position: absolute; left: -24px; top: 4px;
+    width: 8px; height: 8px;
+    background: var(--orange); border-radius: 50%;
+  }
+  .tl-when {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 2px;
+  }
+  .tl-what { font-size: 13px; color: var(--text); font-weight: 600; }
+  .tl-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tl-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #aaa;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- PRICE --- */
+  .price-block {
+    background: var(--light);
+    padding: 18px 16px;
+    border-left: 3px solid var(--orange);
+    margin-bottom: 12px;
+  }
+  .price-amount {
+    font-size: 28px; font-weight: 800;
+    color: var(--orange); letter-spacing: -.01em;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .price-amount.pending {
+    font-size: 18px; text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .price-iva {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .price-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .price-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .08em; color: #888;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- PAYMENT TABLE --- */
+  table.pay { width: 100%; border-collapse: collapse; border: 1px solid var(--border); }
+  table.pay td {
+    padding: 7px 12px; font-size: 11px;
+    border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  table.pay tr:last-child td { border-bottom: none; }
+  table.pay td.k {
+    font-family: var(--f-mono); font-size: 8.5px;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); width: 38%; white-space: nowrap;
+  }
+  table.pay td.v { color: var(--text); }
+
+  /* --- FOOTER --- */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 16px;
+  }
+  .foot-brand { display: flex; align-items: center; gap: 8px; }
+  .mark-sm {
+    height: 18px; width: auto;
+    display: block; flex-shrink: 0;
+  }
+  .foot-text {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .foot-right {
+    font-family: var(--f-mono); font-size: 8px;
+    color: #aaa; text-align: right; line-height: 1.5;
+  }
+
+  /* --- PDF BAR --- */
+  .pdf-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--dark);
+    padding: 12px 20px;
+    display: flex; justify-content: center;
+    z-index: 100;
+  }
+  .pdf-btn {
+    background: var(--orange); color: #fff;
+    border: none; cursor: pointer;
+    font-family: var(--f-mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 10px 28px;
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; max-width: 560px;
+    justify-content: center;
+  }
+  .pdf-btn:hover { background: #CC4A24; }
+  .pdf-btn svg { display: none; }
+
+  @media (max-width: 480px) {
+    body { padding: 20px 16px 96px; }
+    .header { flex-direction: column; gap: 12px; }
+    .doc-date { text-align: left; }
+    .parties { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .foot-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark">
+      <div>
+        <div class="brand-name">EVO Communication Lab</div>
+        <div class="brand-sub">Brand &amp; Communication</div>
+      </div>
+    </div>
+    <div class="doc-date">Agosto 2026<br>v1a</div>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="parties">
+    <div class="party">
+      <div class="party-label">Cliente</div>
+      <div class="party-name">José Luis Marco</div>
+      <div class="party-detail">CAI Informática</div>
+    </div>
+    <div class="party">
+      <div class="party-label">Proveedor</div>
+      <div class="party-name">EVO Communication Lab</div>
+      <div class="party-detail">EVO SpA · RUT 77.939.226-0<br>info@evo.cl</div>
+    </div>
+  </div>
+
+  <!-- 01. OBJETIVO -->
+  <div class="section">
+    <div class="sec-label">01 Objetivo</div>
+    <p>
+      Esta propuesta cubre la <strong>reportería</strong> de la plataforma de CAI: las plantillas HTML, el diseño y la administración continua de los reportes que ven los clientes finales. Se construye sobre el motor de la plataforma (conexión de datos, procesamiento, despliegue), que se presenta y se acuerda en una propuesta separada.
+    </p>
+    <p>
+      Felipe Aguilera lidera este componente directamente: diseño, generación y administración de reportes, personalización por cliente, y ajustes de usabilidad.
+    </p>
+  </div>
+
+  <!-- 02. ALCANCE -->
+  <div class="section">
+    <div class="sec-label">02 Alcance</div>
+
+    <div class="sub-head">Qué se construye</div>
+    <p>
+      Las plantillas de reportería (interfaz HTML) se diseñan y construyen aparte del motor, y pueden empezar a desarrollarse en paralelo, incluso antes de que el motor esté funcional. Los reportes que siguen son ejemplos de lo que el Excel actual ya permite, a modo de referencia: <strong>CAI define el catálogo final</strong> de reportes y plantillas según lo que cada cliente necesita.
+    </p>
+    <ul class="items">
+      <li><strong>Dashboard web interactivo</strong><span>Ejemplos: KPIs generales, análisis de margen, ventas por cliente y por categoría, detalle filtrable, flujo de cuentas por cobrar y pagar.</span></li>
+      <li><strong>Personalizado por cliente final</strong><span>Colores y logo propios de cada empresa.</span></li>
+      <li><strong>Responsive</strong><span>Uso desde computador y celular.</span></li>
+    </ul>
+
+    <div class="sub-head">Administración continua</div>
+    <ul class="items">
+      <li><strong>Ajustes y mejoras a los reportes existentes</strong><span>Según prioridades que defina CAI mes a mes.</span></li>
+      <li><strong>Incorporación de nuevos clientes al catálogo</strong><span>Nuevas plantillas para clientes que se suman a la plataforma.</span></li>
+      <li><strong>Soporte de diseño y usabilidad</strong><span>Revisión y ajuste continuo de la experiencia de los reportes.</span></li>
+    </ul>
+  </div>
+
+  <!-- 03. MATERIALES -->
+  <div class="section">
+    <div class="sec-label">03 Materiales a proveer por el cliente</div>
+    <ul class="items">
+      <li><strong>Catálogo de reportes prioritarios</strong><span>Qué reportes y plantillas necesita cada cliente, definido junto a José Luis.</span></li>
+      <li><strong>Marca de cada cliente</strong><span>Colores y logo, para personalizar cada portal.</span></li>
+      <li><strong>Canal de revisión</strong><span>Un punto de contacto en CAI para validar diseños antes de publicar.</span></li>
+    </ul>
+  </div>
+
+  <!-- 04. PLAZOS -->
+  <div class="section">
+    <div class="sec-label">04 Plazos</div>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-when">Al aprobar</div>
+        <div class="tl-what">Aprobación de esta propuesta</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Siguiente paso</div>
+        <div class="tl-what">Definición del primer catálogo de reportes</div>
+        <div class="tl-detail">Con José Luis, según prioridades de los clientes de CAI.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Puede iniciar antes</div>
+        <div class="tl-what">Diseño de las primeras plantillas</div>
+        <div class="tl-detail">No depende de que el motor esté terminado: puede avanzar en paralelo.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">A los 3 meses</div>
+        <div class="tl-what">Revisión conjunta</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">A los 6 meses</div>
+        <div class="tl-what">Evaluación de continuidad</div>
+        <div class="tl-detail">Continuar, ajustar el bloque mensual, o cerrar. Sin renovación automática.</div>
+      </div>
+    </div>
+    <div class="tl-note">Plazos estimados.</div>
+  </div>
+
+  <!-- 05. HONORARIOS -->
+  <div class="section">
+    <div class="sec-label">05 Honorarios</div>
+
+    <div class="sub-head">Reportería (plantillas, diseño y administración)</div>
+    <div class="price-block">
+      <div class="price-amount">$800.000 / mes</div>
+      <div class="price-iva">Valor neto + IVA · compromiso mínimo 6 meses</div>
+      <div class="price-desc">
+        Equivale a un bloque de 32 horas de desarrollo mensuales, a $25.000 la hora (tarifa de referencia de EVO). Una <strong>hora de desarrollo es una unidad de complejidad, no un registro cronométrico</strong>: el mismo criterio que ya usa CAI con sus propios clientes, donde el valor de un reporte depende de su dificultad, no del reloj. CAI prioriza y asigna estas horas cada mes a las plantillas y reportes que necesite.
+      </div>
+      <div class="price-note">
+        Bloque de referencia, ajustable según cuántas plantillas y clientes haya que cubrir cada mes. Revisión conjunta a los 3 meses. Al cumplir los 6 meses, se evalúa en conjunto continuar, ajustar el bloque, o cerrar. Sin renovación automática.
+      </div>
+    </div>
+
+    <div class="sub-head">Qué no incluye</div>
+    <ul class="items">
+      <li><strong>Desarrollo del motor</strong><span>Conexión de datos, procesamiento y despliegue: se cotiza en la propuesta de plataforma.</span></li>
+      <li><strong>Cambios grandes a la arquitectura</strong><span>Se evalúan como parte de la propuesta de plataforma.</span></li>
+    </ul>
+
+    <table class="pay">
+      <tr>
+        <td class="k">Razón social</td>
+        <td class="v">EVO SpA</td>
+      </tr>
+      <tr>
+        <td class="k">RUT</td>
+        <td class="v">77.939.226-0</td>
+      </tr>
+      <tr>
+        <td class="k">Documento</td>
+        <td class="v">Factura electrónica afecta a IVA</td>
+      </tr>
+      <tr>
+        <td class="k">Banco</td>
+        <td class="v">Mercado Pago &nbsp;·&nbsp; Cuenta Vista</td>
+      </tr>
+      <tr>
+        <td class="k">N° de cuenta</td>
+        <td class="v">1025071550</td>
+      </tr>
+      <tr>
+        <td class="k">Email</td>
+        <td class="v">info@evo.cl</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="foot-brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark-sm">
+      <div class="foot-text">EVO Communication Lab &nbsp;·&nbsp; evo.cl</div>
+    </div>
+    <div class="foot-right">
+      Propuesta para CAI Informática<br>
+      Agosto 2026
+    </div>
+  </div>
+
+</div>
+
+<!-- PDF BAR -->
+<div class="pdf-bar">
+  <button class="pdf-btn" onclick="window.print()">
+    ⎙ &nbsp; Guardar como PDF
+  </button>
+</div>
+
+</body>
+</html>

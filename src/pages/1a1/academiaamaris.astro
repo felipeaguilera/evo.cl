@@ -15,6 +15,13 @@ const description = 'Seguimiento de las clases de Práctica 1a1 con Mónica Detr
     <h1 class="section-title" style="margin-top:0.75rem">Tu seguimiento, clase a clase.</h1>
     <p class="p-lead" style="margin-top:1rem;max-width:60ch">Esta es tu página dentro de Práctica 1a1, las clases donde trabajamos temas digitales de Academia Amaris directo en tu computador. Ya tienes el contenido de fondo: eres terapeuta transpersonal, autora del libro Amaris, y tienes un oráculo y sesiones para ofrecer.</p>
     <p class="p-body" style="margin-top:0.75rem;max-width:60ch">Después de la segunda clase decidimos partir por lo más simple: dejar tu Linktree y tu Canva ordenados antes de sumar contenido nuevo. Acá vas a encontrar en qué quedamos cada clase y las guías de apoyo, para que lo tengas siempre a mano desde tu teléfono.</p>
+
+    <div class="accesos">
+      <span class="accesos-label">Tus accesos</span>
+      <a href="https://linktr.ee/academiaamaris" class="btn btn-outline" target="_blank" rel="noopener"><i class="ph ph-link-simple" aria-hidden="true"></i><span>Tu Linktree</span></a>
+      <a href="https://instagram.com/academiaamaris" class="btn btn-outline" target="_blank" rel="noopener"><i class="ph ph-instagram-logo" aria-hidden="true"></i><span>Tu Instagram</span></a>
+      <a href="https://linktr.ee/PabloFloresLaymuns" class="btn btn-outline" target="_blank" rel="noopener" style="opacity:0.75"><i class="ph ph-star" aria-hidden="true"></i><span>Referencia que te gustó</span></a>
+    </div>
   </div>
 
   <!-- TRACKER -->
@@ -39,12 +46,12 @@ const description = 'Seguimiento de las clases de Práctica 1a1 con Mónica Detr
           </div>
           <p class="p-body">Revisamos referencias de Instagram para un reel. Nos sirvió para ver que antes de crear piezas nuevas conviene dejar el Linktree y Canva bien ordenados primero, ese fue el foco que definiste para la siguiente clase.</p>
         </div>
-        <div class="process-item">
+        <div class="process-item process-item-hoy">
           <div class="process-title-col">
-            <div class="process-num">Clase 3 · 10 ago</div>
-            <div class="process-title">Linktree, Flow y Canva.</div>
+            <div class="process-num">Clase 3 · 10 ago <span class="badge-hoy">Hoy</span></div>
+            <div class="process-title">Linktree, brandkit básico y plantilla de ranking.</div>
           </div>
-          <p class="p-body">Ajustamos tu Linktree real (guía abajo) y trabajamos una plantilla de Canva para las diapositivas de tus cursos.</p>
+          <p class="p-body">Esto es lo que trabajamos hoy: ordenar tu Linktree real (guía abajo), definir 3 colores y una fuente como base visual, y armar una plantilla de ranking con esa base. Sin logo diseñado todavía, eso queda para otra clase.</p>
         </div>
         <div class="process-item">
           <div class="process-title-col">
@@ -63,7 +70,7 @@ const description = 'Seguimiento de las clases de Práctica 1a1 con Mónica Detr
       <div class="section-header">
         <p class="label">Guía del profesor · 10 de agosto</p>
         <h2 class="section-title">Plan de la clase de hoy.</h2>
-        <p class="p-lead" style="margin-top:1rem">Meta única: dejar el Linktree organizado con tus productos reales visibles, y una plantilla de Canva iniciada para tus cursos. Hoy no entramos en reels, ideas nuevas de contenido ni referencias de Instagram, si aparece algo de eso se anota aparte para otra clase.</p>
+        <p class="p-lead" style="margin-top:1rem">Meta única: dejar el Linktree organizado con tus productos reales visibles, definir una base visual simple (3 colores y una fuente) y armar una plantilla de ranking con esa base. Hoy no entramos en logo, reels, ideas nuevas de contenido ni referencias de Instagram, si aparece algo de eso se anota aparte para otra clase.</p>
       </div>
       <div class="process-list">
         <div class="process-item">
@@ -82,10 +89,17 @@ const description = 'Seguimiento de las clases de Práctica 1a1 con Mónica Detr
         </div>
         <div class="process-item">
           <div class="process-title-col">
-            <div class="process-num">35-80 min</div>
-            <div class="process-title">Canva, plantilla de curso.</div>
+            <div class="process-num">35-45 min</div>
+            <div class="process-title">Brandkit básico.</div>
           </div>
-          <p class="p-body">Partir de una plantilla existente, un solo método. Meta chica: portada más una diapositiva de contenido, terminadas.</p>
+          <p class="p-body">3 colores de marca y 1 fuente, guardados en el Brand Kit gratis de Canva (hex directo, sin fuentes ni logo subido). Sin logo diseñado hoy.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-title-col">
+            <div class="process-num">45-80 min</div>
+            <div class="process-title">Plantilla de ranking.</div>
+          </div>
+          <p class="p-body">Armar una plantilla de ranking (tipo top 5) usando esos colores y esa fuente, lista para reutilizar.</p>
         </div>
         <div class="process-item">
           <div class="process-title-col">
@@ -135,6 +149,12 @@ const description = 'Seguimiento de las clases de Práctica 1a1 con Mónica Detr
 </Base>
 
 <style>
+  .accesos { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 1.5rem; }
+  .accesos-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-2); margin-right: 4px; }
+
+  .badge-hoy { display: inline-block; background: var(--orange); color: #fff; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+  .process-item-hoy { border-left: 3px solid var(--orange); padding-left: 16px; margin-left: -19px; }
+
   .guia-sub { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); margin: 1.75rem 0 0.5rem; }
 
   .lista { list-style: none; max-width: 64ch; margin-top: 0.5rem; }

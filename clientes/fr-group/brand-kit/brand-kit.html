@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FR Group | Kit de marca, propuesta v1</title>
+<style>
+  @font-face{font-family:'Manrope';font-weight:400;font-style:normal;src:url('assets/fonts/manrope-400.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Manrope';font-weight:600;font-style:normal;src:url('assets/fonts/manrope-600.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Manrope';font-weight:700;font-style:normal;src:url('assets/fonts/manrope-700.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Manrope';font-weight:800;font-style:normal;src:url('assets/fonts/manrope-800.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Inter';font-weight:400;font-style:normal;src:url('assets/fonts/inter-400.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Inter';font-weight:500;font-style:normal;src:url('assets/fonts/inter-500.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Inter';font-weight:600;font-style:normal;src:url('assets/fonts/inter-600.woff2') format('woff2');font-display:swap;}
+  @font-face{font-family:'Inter';font-weight:700;font-style:normal;src:url('assets/fonts/inter-700.woff2') format('woff2');font-display:swap;}
+  @page{margin:0;}
+  :root{
+    --paper:#F7F4EE; --piedra:#EAE3D6; --grafito:#2A2721;
+    --verde:#3B5945; --magenta:#B23368; --line:#DCD5C5; --muted:#6E6558;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--grafito);font-family:'Inter',sans-serif;line-height:1.6;}
+  .sheet{max-width:880px;margin:0 auto;}
+
+  /* PORTADA */
+  .cover{background:var(--grafito);color:var(--paper);padding:90px 56px 70px;}
+  .cover .eyebrow{font-size:12.5px;text-transform:uppercase;letter-spacing:.1em;color:#C9BEA3;margin-bottom:22px;}
+  .cover h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:46px;line-height:1.1;margin:0 0 18px;}
+  .cover .sub{font-size:16.5px;color:#D8D0C0;max-width:520px;margin:0;}
+  .cover .meta{display:flex;gap:48px;margin-top:52px;padding-top:24px;border-top:1px solid #4a463c;}
+  .cover .meta div span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9c9384;margin-bottom:4px;}
+  .cover .meta div strong{font-family:'Manrope',sans-serif;font-weight:600;font-size:14.5px;}
+
+  .content{padding:0 56px;}
+
+  section{padding:56px 0;border-bottom:1px solid var(--line);}
+  .eyebrow-num{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+  h2{font-family:'Manrope',sans-serif;font-size:26px;font-weight:800;margin:0 0 14px;}
+  .dek{font-size:15px;color:var(--muted);max-width:560px;margin:0 0 28px;}
+
+  .prose{font-size:15px;max-width:620px;}
+  .prose p{margin:0 0 14px;}
+  .prose p:last-child{margin-bottom:0;}
+
+  /* PALETA */
+  .color-group{margin-bottom:28px;}
+  .color-group:last-child{margin-bottom:0;}
+  .color-group .g-label{font-family:'Manrope',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:10px;}
+  .color-row{
+    display:grid;grid-template-columns:220px 1fr;align-items:stretch;
+    border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-bottom:8px;cursor:pointer;
+  }
+  .color-row .band{padding:16px 18px;display:flex;flex-direction:column;justify-content:center;}
+  .color-row .band .cname{font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;}
+  .color-row .band .chex{font-size:12px;opacity:.85;margin-top:2px;}
+  .color-row .role{padding:16px 18px;display:flex;align-items:center;font-size:13px;color:var(--grafito);background:#fff;}
+  .copy-note{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+  /* TIPOGRAFIA */
+  .type-spec{border-top:1px solid var(--line);padding:20px 0;}
+  .type-spec:first-of-type{border-top:none;padding-top:0;}
+  .type-spec .t-role{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+  .type-spec .t-sample{font-family:'Manrope',sans-serif;}
+  .type-spec .t-meta{font-size:12px;color:var(--muted);margin-top:8px;}
+
+  /* ISOTIPO */
+  .iso-set{margin-bottom:36px;}
+  .iso-set:last-child{margin-bottom:0;}
+  .iso-set .s-name{font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px;}
+  .iso-set .s-desc{font-size:13.5px;color:var(--muted);max-width:560px;margin:0 0 16px;}
+  .iso-imgs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .iso-imgs figure{margin:0;background:var(--piedra);padding:24px;}
+  .iso-imgs img{width:100%;display:block;}
+  .iso-imgs figcaption{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
+
+  /* PASOS */
+  ol.steps{margin:0;padding-left:22px;font-size:14.5px;max-width:600px;}
+  ol.steps li{margin-bottom:12px;padding-left:6px;}
+  ol.steps li:last-child{margin-bottom:0;}
+  ol.steps strong{font-weight:600;}
+
+  /* FEEDBACK */
+  .feedback ol{margin:0;padding-left:22px;font-size:14.5px;max-width:600px;}
+  .feedback li{margin-bottom:10px;}
+
+  /* CIERRE */
+  .closing{background:var(--grafito);color:var(--paper);padding:56px;text-align:left;}
+  .closing .thanks{font-family:'Manrope',sans-serif;font-weight:800;font-size:24px;margin-bottom:20px;}
+  .closing .signature{display:flex;align-items:center;gap:14px;}
+  .closing .eagle{width:30px;height:auto;opacity:.92;flex-shrink:0;}
+  .closing .contact{font-size:13.5px;color:#C9BEA3;line-height:1.5;}
+  .cover-signature{display:flex;align-items:center;gap:10px;margin-top:18px;}
+  .cover-signature img{width:20px;height:auto;opacity:.85;}
+  .cover-signature span{font-size:12px;color:#C9BEA3;}
+
+  .dl-bar{
+    background:var(--paper);border-bottom:1px solid var(--line);
+    padding:12px 20px;text-align:right;
+  }
+  .dl-bar a{
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:12.5px;
+    color:var(--grafito);text-decoration:none;border-bottom:1.5px solid var(--verde);padding-bottom:1px;
+  }
+  @media print{ .dl-bar{ display:none; } }
+
+  @media (max-width:640px){
+    .cover{padding:56px 24px 44px;}
+    .cover h1{font-size:32px;}
+    .content{padding:0 24px;}
+    .color-row{grid-template-columns:1fr;}
+    .iso-imgs{grid-template-columns:1fr;}
+    .closing{padding:40px 24px;}
+  }
+</style>
+</head>
+<body>
+<div class="dl-bar">
+  <a href="assets/docs/FR-KitMarca-Propuesta-v1a.pdf" download>Descargar PDF ↓</a>
+</div>
+<div class="sheet">
+
+  <div class="cover">
+    <div class="eyebrow">Kit de marca · FR Group</div>
+    <h1>Maceteros<br>para Orquídeas</h1>
+    <p class="sub">Propuesta v1, primera oleada de exploración de identidad visual. Para revisar y decidir juntos antes de pulir la versión final.</p>
+    <div class="meta">
+      <div><span>Versión</span><strong>1.0 — Agosto 2026</strong></div>
+      <div><span>Estado</span><strong>Exploración, no final</strong></div>
+    </div>
+    <div class="cover-signature">
+      <img src="assets/eagle-white.svg" alt="EVO">
+      <span>Felipe Aguilera, EVO Creative Lab</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <section>
+      <div class="eyebrow-num">01 · Marca</div>
+      <h2>Por qué este proyecto</h2>
+      <div class="prose">
+        <p>Maceteros para Orquídeas necesita un sistema de marca consistente antes de la próxima feria: algo que se vea igual de bien en un sticker, en el empaque, y en cualquier pieza que hagamos de acá en adelante. No es solo un logo nuevo, es la base que va a sostener todo lo que venga después.</p>
+        <p>El punto de partida es lo que ya existe: el macetero impreso en 3D, con paredes de malla que dejan respirar la raíz de la orquídea, y el sello que ya identifica cada pieza como original. La marca que estamos armando parte de ahí, no de cero.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow-num">02 · Marca</div>
+      <h2>Personalidad</h2>
+      <div class="prose">
+        <p>Un producto pensado con cuidado real, no solo bonito. La base es técnica y precisa, así es como se diseñó el macetero, y el color entra solo donde importa: en la flor. Esa combinación es la que mejor representa lo que hace especial a este producto, apoya el crecimiento natural de la orquídea con una solución bien pensada, no genérica.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow-num">03 · Marca</div>
+      <h2>Paleta de color</h2>
+      <p class="dek">Los tres primeros colores vienen del producto real, el tono del filamento y el verde de la hoja. El magenta es el color exacto de la flor, y es el único que se usa como acento, nunca como base.</p>
+
+      <div class="color-group">
+        <div class="g-label">Base</div>
+        <div class="color-row" style="background:#EAE3D6;">
+          <div class="band" style="background:#EAE3D6;color:#2A2721;">
+            <span class="cname">Piedra</span>
+            <span class="chex">#EAE3D6</span>
+          </div>
+          <div class="role">Fondos, superficie principal</div>
+        </div>
+        <div class="color-row">
+          <div class="band" style="background:#2A2721;color:#F7F4EE;">
+            <span class="cname">Grafito</span>
+            <span class="chex">#2A2721</span>
+          </div>
+          <div class="role">Texto, fondos de máximo contraste</div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="g-label">Estructura</div>
+        <div class="color-row">
+          <div class="band" style="background:#3B5945;color:#F7F4EE;">
+            <span class="cname">Verde orquídea</span>
+            <span class="chex">#3B5945</span>
+          </div>
+          <div class="role">Isotipo, líneas, elementos de marca</div>
+        </div>
+      </div>
+
+      <div class="color-group">
+        <div class="g-label">Acento, único</div>
+        <div class="color-row">
+          <div class="band" style="background:#B23368;color:#F7F4EE;">
+            <span class="cname">Magenta orquídea</span>
+            <span class="chex">#B23368</span>
+          </div>
+          <div class="role">Solo en el labelo de la flor, nunca como base</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow-num">04 · Marca</div>
+      <h2>Tipografía</h2>
+      <p class="dek">Dos familias, roles distintos: presencia y lectura.</p>
+
+      <div class="type-spec">
+        <div class="t-role">Manrope 800 · títulos y nombre de marca</div>
+        <div class="t-sample" style="font-size:34px;font-weight:800;">Maceteros para Orquídeas</div>
+        <div class="t-meta">Geométrica pero cálida, funciona bien en empaque y stickers.</div>
+      </div>
+      <div class="type-spec">
+        <div class="t-role">Inter 400/500 · texto de apoyo, fichas de producto</div>
+        <div class="t-sample" style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;">Maceteros impresos en 3D, diseñados para que la raíz de la orquídea respire.</div>
+        <div class="t-meta">Legible en tamaños chicos, para etiquetas y ficha técnica.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow-num">05 · Isotipo</div>
+      <h2>Primera oleada</h2>
+      <p class="dek">Dos caminos distintos, ambos parten de la proporción real de una orquídea, ninguno es un dibujo genérico de flor. En cada camino, la Opción A es siempre la versión más simple, nuestra recomendación de mínimo; la Opción B agrega un poco más de detalle para comparar.</p>
+
+      <div class="iso-set">
+        <div class="s-name">Camino técnico, contorno de línea</div>
+        <p class="s-desc">Un solo trazo fino, sin relleno. Se ve premium y funciona bien grabado o impreso en detalle.</p>
+        <div class="iso-imgs">
+          <figure>
+            <img src="assets/logos/isotipo-tecnica-a.png" alt="Isotipo técnico, opción A, versión simple">
+            <figcaption>Opción A · versión simple</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/logos/isotipo-tecnica-c.png" alt="Isotipo técnico, opción B, versión con más detalle">
+            <figcaption>Opción B · versión con más detalle</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="iso-set">
+        <div class="s-name">Camino amistoso, forma sólida</div>
+        <p class="s-desc">Color plano, formas anchas y redondeadas. Se lee mejor de lejos o muy chico, como en un sticker.</p>
+        <div class="iso-imgs">
+          <figure>
+            <img src="assets/logos/isotipo-solida-a.png" alt="Isotipo sólido, opción A, versión limpia">
+            <figcaption>Opción A · versión limpia</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/logos/isotipo-solida-d.png" alt="Isotipo sólido, opción B, con borde texturizado">
+            <figcaption>Opción B · con borde texturizado</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow-num">06 · Siguientes pasos</div>
+      <h2>Cómo seguimos desde acá</h2>
+      <ol class="steps">
+        <li><strong>Ustedes eligen dirección.</strong> Puede ser una completa, o partes de distintas, por ejemplo el trazo de una con el color de otra.</li>
+        <li><strong>Se refina a mano.</strong> La versión elegida se redibuja con precisión (simetría exacta, grosor de línea parejo) y se prueba a los tamaños reales de uso: sticker, empaque, redes.</li>
+        <li><strong>Se arma el kit de marca completo.</strong> Logo en todas sus variantes (color, blanco y negro, vertical, horizontal), y las piezas para la feria: stickers y empaque.</li>
+      </ol>
+    </section>
+
+    <section class="feedback" style="border-bottom:none;">
+      <div class="eyebrow-num">07 · Feedback</div>
+      <h2>Lo que necesitamos de ustedes</h2>
+      <p class="dek">Antes de seguir puliendo, nos sirve mucho saber qué piensan de esta primera oleada.</p>
+      <ol>
+        <li>¿Cuál de los dos caminos representa mejor lo que quieren para la marca, el técnico o el amistoso?</li>
+        <li>Dentro de ese camino, ¿alguna versión puntual les gusta más que otra?</li>
+        <li>¿Hay algo que definitivamente no quieren ver en la versión final?</li>
+        <li>Con eso, ¿nos dan el visto bueno para avanzar a la versión refinada?</li>
+      </ol>
+    </section>
+
+  </div>
+
+  <div class="closing">
+    <div class="thanks">Gracias</div>
+    <div class="signature">
+      <img src="assets/eagle-white.svg" alt="EVO" class="eagle">
+      <div class="contact">Felipe Aguilera · felipe@faguilera.com · WhatsApp +56 9 8239 3697<br>Kit de marca FR Group · Propuesta v1.0, Agosto 2026</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.color-row').forEach(function(row){
+  row.addEventListener('click', function(){
+    var hex = row.querySelector('.chex').textContent.trim();
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(hex);
+      var note = row.querySelector('.chex');
+      var original = note.textContent;
+      note.textContent = 'Copiado';
+      setTimeout(function(){ note.textContent = original; }, 900);
+    }
+  });
+});
+</script>
+</body>
+</html>

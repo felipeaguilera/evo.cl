@@ -176,25 +176,11 @@
   }
   .stage-box .svgwrap svg { max-width: 92%; max-height: 92%; }
   .stage-box canvas { object-fit: contain; cursor: crosshair; }
-  .zoomlens {
-    position: fixed;
-    width: 420px; height: 210px;
-    display: none;
-    pointer-events: none;
-    border: 1px solid var(--ink);
-    border-radius: 6px;
-    overflow: hidden;
-    z-index: 999;
-    background: #fff;
-    box-shadow: 0 4px 14px rgba(0,0,0,.18);
-  }
-  .zoomlens canvas { width: 210px; height: 210px; display: inline-block; vertical-align: top; }
-  .zoomlens .half { position: relative; display: inline-block; }
-  .zoomlens .half span {
-    position: absolute; bottom: 4px; left: 6px;
-    font-size: 12px; color: #fff; background: rgba(0,0,0,.55);
-    padding: 0 3px; border-radius: 3px;
-  }
+  .comparerow { display: flex; align-items: center; gap: 10px; margin-top: -2px; }
+  .comparerow label { font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+  .comparerow input[type=range] { flex: 1; }
+  .comparerow .val { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+  #compareCanvas { z-index: 2; pointer-events: none; cursor: default; }
   .statsbar {
     display: flex; gap: 18px; align-items: center;
     font-size: 12.5px; color: var(--muted);
@@ -304,12 +290,19 @@
       </div>
       <div class="stage-box" id="resBox">
         <span class="tag">Resultado (SVG)</span>
+        <canvas id="compareCanvas" style="opacity:0;"></canvas>
         <div class="svgwrap" id="svgwrap"></div>
       </div>
     </div>
 
+    <div class="comparerow">
+      <label for="compareSlider">Comparar con original</label>
+      <input type="range" id="compareSlider" min="0" max="100" step="1" value="0">
+      <span class="val" id="vCompare">0%</span>
+    </div>
+
     <div class="note">
-      <b>Cómo revisar si quedó "wavy":</b> pasa el mouse sobre el resultado, a la derecha aparece una lupa comparando zona por zona el original contra el trazado. Si ves ondulaciones en curvas que deberían ser rectas, sube "Sensibilidad de esquina" o baja "Simplificación".
+      <b>Cómo revisar si quedó "wavy":</b> mueve el slider de arriba hacia la derecha para superponer el original sobre el resultado en el mismo tamaño. Si al superponerlos los bordes no calzan o ves ondulación, sube "Sensibilidad de esquina" o baja "Simplificación". Los valores por defecto (umbral 0.50, sobremuestreo 3x, esquina 70°, suavidad 0.22) ya están afinados para logos tipo insignia de dos colores planos: no hace falta tocarlos salvo un caso atípico.
       <br><b>Límite de esta v1:</b> pensado para dos colores planos. Insignias con anillo (fondo + borde + figura, como un logo tipo podcast badge) hay que resolverlas en dos pasadas o pedírselo directo a Claude.
     </div>
 
@@ -322,11 +315,6 @@
       <button class="primary" id="btnDownload" type="button" disabled>Descargar SVG</button>
     </div>
   </div>
-</div>
-
-<div class="zoomlens" id="zoomlens">
-  <div class="half"><canvas id="zoomOrig" width="210" height="210"></canvas><span>original</span></div>
-  <div class="half"><canvas id="zoomRes" width="210" height="210"></canvas><span>trazado</span></div>
 </div>
 
 <script>
@@ -366,6 +354,12 @@
       srcCanvas.width = w; srcCanvas.height = h;
       srcCtx.clearRect(0,0,w,h);
       srcCtx.drawImage(img,0,0,w,h);
+      // canvas de comparacion: copia exacta del original, mismo tamaño que
+      // srcCanvas, para superponer con el resultado via el slider (ver
+      // syncCompareCanvas). Se recalcula cada vez que cambia la imagen.
+      const cmp = $('compareCanvas');
+      cmp.width = w; cmp.height = h;
+      cmp.getContext('2d').drawImage(srcCanvas,0,0);
       $('statsbar').innerHTML = '<span>Imagen cargada: ' + w + '×' + h + ' px. Ajusta colores y parámetros, luego "Vectorizar".</span>';
       $('svgwrap').innerHTML = '';
       $('btnDownload').disabled = true;
@@ -887,40 +881,21 @@
     return { left: rect.left+offX, top: rect.top+offY, width: w, height: h };
   }
 
-  // ---------- lupa comparativa ----------
-  function setupZoom(){
-    const lens = $('zoomlens');
-    const zOrig = $('zoomOrig').getContext('2d');
-    const zRes = $('zoomRes').getContext('2d');
-    const resBox = $('resBox');
-    resBox.addEventListener('mousemove', function(e){
-      if (!lastResultCanvas){ lens.style.display='none'; return; }
-      const svgEl = $('svgwrap').querySelector('svg');
-      if (!svgEl) { lens.style.display='none'; return; }
-      const w = srcCanvas.width, h = srcCanvas.height;
-      const rect = getContainedRect(svgEl, w, h);
-      const relX = (e.clientX-rect.left)/rect.width;
-      const relY = (e.clientY-rect.top)/rect.height;
-      if (relX<0||relX>1||relY<0||relY>1){ lens.style.display='none'; return; }
-      const px = relX*w, py = relY*h;
-      const cropSize = 14; // recorte chico = mas zoom real (210/14 = 15x), para pillar ondulaciones finas
-      zOrig.imageSmoothingEnabled = false;
-      zRes.imageSmoothingEnabled = false;
-      zOrig.clearRect(0,0,210,210);
-      zRes.clearRect(0,0,210,210);
-      zOrig.drawImage(srcCanvas, px-cropSize/2, py-cropSize/2, cropSize, cropSize, 0,0,210,210);
-      zRes.drawImage(lastResultCanvas, px-cropSize/2, py-cropSize/2, cropSize, cropSize, 0,0,210,210);
-      // position:fixed -> coordenadas directas del viewport, sin depender de
-      // ningun ancestro posicionado (antes se calculaba relativo a .main,
-      // pero .zoomlens es hermano de .layout en el HTML, no hijo de .main,
-      // asi que ese calculo apuntaba a un origen incorrecto y la lupa nunca
-      // quedaba donde correspondia).
-      const vw = window.innerWidth, vh = window.innerHeight;
-      lens.style.left = Math.min(e.clientX + 20, vw - 424) + 'px';
-      lens.style.top = Math.max(4, Math.min(e.clientY - 110, vh - 214)) + 'px';
-      lens.style.display = 'block';
+  // ---------- comparacion original vs resultado ----------
+  // El intento anterior era una lupa que seguia el mouse y recortaba pixeles
+  // nativos con zoom; en la practica no ayudaba a evaluar "se ve bien el
+  // logo completo" (que es la pregunta real), solo mostraba parches sueltos
+  // y su posicionamiento era fragil. Reemplazado por algo mas simple y
+  // confiable: el canvas original superpuesto al SVG resultado, mismo
+  // tamaño exacto, con un slider de opacidad. Al mover el slider se ve
+  // directamente si los bordes calzan y si el trazado se ve fiel al
+  // original completo, no solo un recorte.
+  function setupCompareSlider(){
+    $('compareSlider').addEventListener('input', function(e){
+      const t = parseInt(e.target.value,10)/100;
+      $('compareCanvas').style.opacity = t;
+      $('vCompare').textContent = e.target.value + '%';
     });
-    resBox.addEventListener('mouseleave', function(){ lens.style.display='none'; });
   }
 
   // ---------- cuentagotas ----------
@@ -1053,7 +1028,7 @@
     setupUpload();
     setupControls();
     setupEyedropper();
-    setupZoom();
+    setupCompareSlider();
     loadDemoImage();
     console.log('vectorizador: init OK');
   } catch (err){

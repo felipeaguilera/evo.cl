@@ -178,7 +178,7 @@
   .stage-box canvas { object-fit: contain; cursor: crosshair; }
   .zoomlens {
     position: fixed;
-    width: 168px; height: 84px;
+    width: 420px; height: 210px;
     display: none;
     pointer-events: none;
     border: 1px solid var(--ink);
@@ -188,11 +188,11 @@
     background: #fff;
     box-shadow: 0 4px 14px rgba(0,0,0,.18);
   }
-  .zoomlens canvas { width: 84px; height: 84px; display: inline-block; vertical-align: top; }
+  .zoomlens canvas { width: 210px; height: 210px; display: inline-block; vertical-align: top; }
   .zoomlens .half { position: relative; display: inline-block; }
   .zoomlens .half span {
-    position: absolute; bottom: 2px; left: 4px;
-    font-size: 9px; color: #fff; background: rgba(0,0,0,.55);
+    position: absolute; bottom: 4px; left: 6px;
+    font-size: 12px; color: #fff; background: rgba(0,0,0,.55);
     padding: 0 3px; border-radius: 3px;
   }
   .statsbar {
@@ -228,7 +228,7 @@
     <h2>1. Imagen</h2>
     <div class="dropzone" id="dropzone">Arrastra un PNG aquí, o haz clic para elegir<br>(o prueba con el ejemplo cargado)</div>
     <input type="file" id="fileInput" accept="image/png,image/webp,image/jpeg" style="display:none">
-    <button class="secondary" id="btnDemo" type="button">Cargar figura de ejemplo</button>
+    <button class="secondary" id="btnDemo" type="button" title="Reemplaza la imagen actual por una figura de prueba generica">Probar con figura de ejemplo</button>
 
     <h2>2. Colores</h2>
     <div class="field">
@@ -325,8 +325,8 @@
 </div>
 
 <div class="zoomlens" id="zoomlens">
-  <div class="half"><canvas id="zoomOrig" width="84" height="84"></canvas><span>original</span></div>
-  <div class="half"><canvas id="zoomRes" width="84" height="84"></canvas><span>trazado</span></div>
+  <div class="half"><canvas id="zoomOrig" width="210" height="210"></canvas><span>original</span></div>
+  <div class="half"><canvas id="zoomRes" width="210" height="210"></canvas><span>trazado</span></div>
 </div>
 
 <script>
@@ -382,24 +382,39 @@
   }
 
   function autoSuggestColors(){
-    // sugiere colorA = color más frecuente en el borde de la imagen (fondo probable)
+    // Detecta los DOS colores mas frecuentes en TODA la imagen (no solo el
+    // borde: un logo tipo insignia circular suele tener las esquinas
+    // transparentes, asi que muestrear solo el borde deja colorA sin poder
+    // detectarse nunca y se queda pegado en lo que haya quedado seteado
+    // antes -por ejemplo el color de la figura de ejemplo-, lo que rompe
+    // el trazado por completo aunque el swatch se vea "razonable" a simple
+    // vista). Se cuentan pixeles opacos cuantizados a un bucket de color, se
+    // toma el mas frecuente como fondo y el mas frecuente que sea claramente
+    // distinto como figura.
     const w = srcCanvas.width, h = srcCanvas.height;
     const data = srcCtx.getImageData(0,0,w,h).data;
     const counts = {};
-    function sample(x,y){
-      const o = (y*w+x)*4;
-      if (data[o+3] < 200) return;
-      const key = (data[o]>>4)+','+(data[o+1]>>4)+','+(data[o+2]>>4);
-      counts[key] = (counts[key]||0) + 1;
+    const step = 2; // muestrea de a 2px para no ser lento en imagenes grandes
+    for (let y=0;y<h;y+=step){
+      for (let x=0;x<w;x+=step){
+        const o=(y*w+x)*4;
+        if (data[o+3] < 200) continue;
+        const key = (data[o]>>4)+','+(data[o+1]>>4)+','+(data[o+2]>>4);
+        counts[key] = (counts[key]||0)+1;
+      }
     }
-    for(let x=0;x<w;x++){ sample(x,0); sample(x,h-1); }
-    for(let y=0;y<h;y++){ sample(0,y); sample(w-1,y); }
-    let best=null, bestN=0;
-    for (const k in counts){ if(counts[k]>bestN){ bestN=counts[k]; best=k; } }
-    if (best){
-      const parts = best.split(',').map(v=>parseInt(v,10)*16+8);
-      $('colorA').value = rgbToHex(parts[0],parts[1],parts[2]);
+    const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    if (entries.length === 0) return;
+    function toRgb(key){ return key.split(',').map(v=>parseInt(v,10)*16+8); }
+    const c0 = toRgb(entries[0][0]);
+    $('colorA').value = rgbToHex(c0[0],c0[1],c0[2]);
+    let c1 = null;
+    for (let i=1;i<entries.length;i++){
+      const cand = toRgb(entries[i][0]);
+      const dist = Math.hypot(cand[0]-c0[0], cand[1]-c0[1], cand[2]-c0[2]);
+      if (dist > 60){ c1 = cand; break; }
     }
+    if (c1) $('colorB').value = rgbToHex(c1[0],c1[1],c1[2]);
   }
 
   // ---------- pipeline: campo de color continuo ----------
@@ -883,21 +898,21 @@
       const relY = (e.clientY-rect.top)/rect.height;
       if (relX<0||relX>1||relY<0||relY>1){ lens.style.display='none'; return; }
       const px = relX*w, py = relY*h;
-      const cropSize = 28;
+      const cropSize = 14; // recorte chico = mas zoom real (210/14 = 15x), para pillar ondulaciones finas
       zOrig.imageSmoothingEnabled = false;
       zRes.imageSmoothingEnabled = false;
-      zOrig.clearRect(0,0,84,84);
-      zRes.clearRect(0,0,84,84);
-      zOrig.drawImage(srcCanvas, px-cropSize/2, py-cropSize/2, cropSize, cropSize, 0,0,84,84);
-      zRes.drawImage(lastResultCanvas, px-cropSize/2, py-cropSize/2, cropSize, cropSize, 0,0,84,84);
+      zOrig.clearRect(0,0,210,210);
+      zRes.clearRect(0,0,210,210);
+      zOrig.drawImage(srcCanvas, px-cropSize/2, py-cropSize/2, cropSize, cropSize, 0,0,210,210);
+      zRes.drawImage(lastResultCanvas, px-cropSize/2, py-cropSize/2, cropSize, cropSize, 0,0,210,210);
       // position:fixed -> coordenadas directas del viewport, sin depender de
       // ningun ancestro posicionado (antes se calculaba relativo a .main,
       // pero .zoomlens es hermano de .layout en el HTML, no hijo de .main,
       // asi que ese calculo apuntaba a un origen incorrecto y la lupa nunca
       // quedaba donde correspondia).
       const vw = window.innerWidth, vh = window.innerHeight;
-      lens.style.left = Math.min(e.clientX + 16, vw - 172) + 'px';
-      lens.style.top = Math.max(4, Math.min(e.clientY - 90, vh - 90)) + 'px';
+      lens.style.left = Math.min(e.clientX + 20, vw - 424) + 'px';
+      lens.style.top = Math.max(4, Math.min(e.clientY - 110, vh - 214)) + 'px';
       lens.style.display = 'block';
     });
     resBox.addEventListener('mouseleave', function(){ lens.style.display='none'; });

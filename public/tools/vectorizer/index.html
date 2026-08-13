@@ -706,8 +706,13 @@
       if (isCorner[(i+1)%n] || isCorner[i]){
         d += " L " + p2[0].toFixed(2) + "," + p2[1].toFixed(2);
       } else {
-        const c1=[p1[0]+(p2[0]-p0[0])*k, p1[1]+(p2[1]-p0[1])*k];
-        const c2=[p2[0]-(p3[0]-p1[0])*k, p2[1]-(p3[1]-p1[1])*k];
+        const seglen = Math.hypot(p2[0]-p1[0], p2[1]-p1[1]);
+        let t1=[p2[0]-p0[0], p2[1]-p0[1]]; const t1n=Math.hypot(t1[0],t1[1]);
+        t1 = t1n>1e-9 ? [t1[0]/t1n, t1[1]/t1n] : [0,0];
+        let t2=[p3[0]-p1[0], p3[1]-p1[1]]; const t2n=Math.hypot(t2[0],t2[1]);
+        t2 = t2n>1e-9 ? [t2[0]/t2n, t2[1]/t2n] : [0,0];
+        const c1=[p1[0]+t1[0]*seglen*k, p1[1]+t1[1]*seglen*k];
+        const c2=[p2[0]-t2[0]*seglen*k, p2[1]-t2[1]*seglen*k];
         d += " C " + c1[0].toFixed(2)+","+c1[1].toFixed(2)+" "+c2[0].toFixed(2)+","+c2[1].toFixed(2)+" "+p2[0].toFixed(2)+","+p2[1].toFixed(2);
       }
     }

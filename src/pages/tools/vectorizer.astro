@@ -61,12 +61,14 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
         <!-- 3. COLORS & DETECTION MODE -->
         <div class="panel-card">
           <h2 data-es="3. Colores y Detección" data-en="3. Colors & Detection">3. Colors & Detection</h2>
+          
           <div class="field">
             <label class="check-line">
               <input type="checkbox" id="includeBg">
               <span data-es="Incluir color de fondo en exportación" data-en="Include background color in export">Incluir color de fondo en exportación</span>
             </label>
           </div>
+
           <div class="field" id="bgColRow" style="display:none; margin-left: 20px;">
             <div class="color-row">
               <input type="color" id="colorA" value="#ffffff">
@@ -74,6 +76,7 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
               <button class="btn-compact" id="pickA" type="button" data-es="Gotero" data-en="Picker">Gotero</button>
             </div>
           </div>
+
           <div class="field">
             <div class="color-row">
               <input type="color" id="colorB" value="#e4572e">
@@ -89,8 +92,8 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
               <option value="silhouette" data-es="Silueta (Recomendado para degradados/colores)" data-en="Silhouette (Recommended for gradients/colors)" selected>Silueta (Recomendado para degradados/colores)</option>
               <option value="colorMatch" data-es="Color específico (Proyección)" data-en="Specific color (Projection)">Color específico (Proyección)</option>
             </select>
-            <div class="help" data-es="El modo Silueta vectoriza todo lo que resalte del fondo, ideal para logos con degradados como Weplay. El modo Color específico aísla solo el tono elegido." data-en="Silhouette mode vectorizes everything different from the background, ideal for gradient logos like Weplay. Specific color mode isolates only the chosen shade.">
-              El modo Silueta vectoriza todo lo que resalte del fondo, ideal para logos con degradados como Weplay. El modo Color específico aísla solo el tono elegido.
+            <div class="help" data-es="El modo Silueta vectoriza todo lo que resalte del fondo, ideal para logotipos con degradados o variaciones tonales continuas. El modo Color específico aísla solo el tono elegido." data-en="Silhouette mode vectorizes everything different from the background, ideal for logos with gradients or continuous tone variations. Specific color mode isolates only the chosen shade.">
+              El modo Silueta vectoriza todo lo que resalte del fondo, ideal para logotipos con degradados o variaciones tonales continuas. El modo Color específico aísla solo el tono elegido.
             </div>
           </div>
 
@@ -239,20 +242,39 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
           <input type="range" min="0" max="100" value="50" class="split-slider-range" id="splitSliderRange">
         </div>
 
-        <!-- STATS BAR -->
-        <div class="stats-bar" id="statsbar">
-          <span data-es="Sin procesar todavía." data-en="Not processed yet.">Sin procesar todavía.</span>
-        </div>
+        <!-- EXPORT PANEL -->
+        <div class="export-panel">
+          <div class="export-main-row">
+            <!-- DOWNLOAD BUTTON -->
+            <button class="btn-download-premium" id="btnDownload" type="button" disabled>
+              <i class="ph ph-arrow-down-to-line" aria-hidden="true"></i>
+              <div class="btn-text-group">
+                <span class="btn-title" data-es="Descargar SVG" data-en="Download SVG">Descargar SVG</span>
+                <span class="btn-subtitle" data-es="Optimizado y listo para producción" data-en="Optimized & production-ready">Optimizado y listo para producción</span>
+              </div>
+            </button>
 
-        <!-- ACTIONS & NOTES -->
-        <div class="footer-row">
-          <p class="help-text" data-es="Los parámetros quedan grabados internamente en el SVG descargado para que puedas recuperarlos si los necesitas en el futuro." data-en="Parameters are saved inside the downloaded SVG metadata, so you can restore them if needed in the future.">
-            Los parámetros quedan grabados internamente en el SVG descargado para que puedas recuperarlos si los necesitas en el futuro.
+            <!-- STATS COUNTERS -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-label" data-es="Formas Trazadas" data-en="Traced Shapes">Formas Trazadas</span>
+                <span class="stat-value" id="statShapes">—</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label" data-es="Fidelidad Visual" data-en="Visual Fidelity">Fidelidad Visual</span>
+                <span class="stat-value" id="statFidelity">—</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label" data-es="Velocidad" data-en="Speed">Velocidad</span>
+                <span class="stat-value" id="statSpeed">—</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SUBTLE METADATA NOTE -->
+          <p class="metadata-note" data-es="Nota: Los parámetros de trazado quedan grabados como metadatos invisibles dentro del archivo SVG para futuras ediciones." data-en="Note: Tracing parameters are saved as invisible metadata inside the SVG file for future reference.">
+            Nota: Los parámetros de trazado quedan grabados como metadatos invisibles dentro del archivo SVG para futuras ediciones.
           </p>
-          <button class="btn btn-primary" id="btnDownload" type="button" disabled>
-            <i class="ph ph-download-simple" aria-hidden="true"></i>
-            <span data-es="Descargar SVG" data-en="Download SVG">Download SVG</span>
-          </button>
         </div>
       </div>
     </div>
@@ -283,10 +305,6 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
 
       // ---------- Dynamic Translation Dictionary ----------
       const messages = {
-        stats: {
-          es: (shapes, pct, dt) => `<span><b>${shapes}</b> formas trazadas</span><span>diferencia vs. original: <b class="${pct < 8 ? 'ok' : ''}">${pct.toFixed(1)}%</b> de píxeles (antialiasing de bordes cuenta)</span><span>${dt} ms</span>`,
-          en: (shapes, pct, dt) => `<span><b>${shapes}</b> shapes traced</span><span>difference vs. original: <b class="${pct < 8 ? 'ok' : ''}">${pct.toFixed(1)}%</b> of pixels (edge antialiasing counts)</span><span>${dt} ms</span>`
-        },
         loaded: {
           es: (w, h) => `<span>Imagen cargada: <b>${w}×${h} px</b>. Ajustes aplicados automáticamente.</span>`,
           en: (w, h) => `<span>Image loaded: <b>${w}×${h} px</b>. Settings automatically applied.</span>`
@@ -734,9 +752,10 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
         // Count shapes by matching MoveTo commands (M/m)
         const numShapes = (pathD.match(/m/gi) || []).length;
 
-        // Render stats
-        const currentLang = getLang();
-        $('statsbar').innerHTML = messages.stats[currentLang](numShapes, pct, dt);
+        // Render stats as dashboard values
+        $('statShapes').textContent = numShapes;
+        $('statFidelity').textContent = (100 - pct).toFixed(1) + '%';
+        $('statSpeed').textContent = dt + ' ms';
         
         isVectorizing = false;
       }
@@ -1473,47 +1492,134 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
     font-weight: 600;
   }
 
-  /* Stats Bar */
-  .stats-bar {
+  /* Export Panel styling */
+  .export-panel {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+  
+  .export-main-row {
     display: flex;
     gap: 1.5rem;
     align-items: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--text-3);
-    border-top: 1px solid var(--border);
-    padding-top: 1rem;
+    justify-content: space-between;
     flex-wrap: wrap;
-    line-height: 1.5;
   }
-  .stats-bar b {
-    color: var(--text);
+  
+  .btn-download-premium {
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 260px;
+    box-shadow: 0 4px 12px rgba(228,87,46,0.2);
   }
-  .stats-bar :global(.ok) {
-    color: #2f7a4f;
+  .btn-download-premium i {
+    font-size: 1.5rem;
+  }
+  .btn-download-premium:hover {
+    background: var(--orange-btn);
+    transform: translateY(-1px);
+  }
+  .btn-download-premium:active {
+    transform: translateY(0);
+  }
+  .btn-download-premium:disabled {
+    background: var(--border);
+    color: var(--text-3);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+  }
+  .btn-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+  }
+  .btn-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .btn-subtitle {
+    font-size: 0.7rem;
+    opacity: 0.85;
+    font-family: 'Krub', sans-serif;
+    margin-top: 2px;
+    text-align: left;
+  }
+  
+  /* Stats Grid */
+  .stats-grid {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 320px;
+  }
+  @media (max-width: 680px) {
+    .stats-grid {
+      justify-content: space-between;
+      width: 100%;
+      min-width: 100%;
+    }
+    .btn-download-premium {
+      width: 100%;
+    }
+  }
+  
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    flex: 1;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-3);
+    margin-bottom: 4px;
     font-weight: 600;
   }
-
-  /* Footer action row */
-  .footer-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
-    flex-wrap: wrap;
+  .stat-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
   }
-  .footer-row .help-text {
+  
+  .metadata-note {
     font-family: 'Krub', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-3);
-    max-width: 60%;
-    line-height: 1.45;
-  }
-  @media (max-width: 600px) {
-    .footer-row .help-text {
-      max-width: 100%;
-    }
+    margin: 0;
+    line-height: 1.4;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
   }
 
   /* Eyedropper notification */

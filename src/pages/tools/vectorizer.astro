@@ -244,37 +244,37 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
 
         <!-- EXPORT PANEL -->
         <div class="export-panel">
-          <div class="export-main-row">
-            <!-- DOWNLOAD BUTTON -->
-            <button class="btn-download-premium" id="btnDownload" type="button" disabled>
-              <i class="ph ph-arrow-down-to-line" aria-hidden="true"></i>
-              <div class="btn-text-group">
-                <span class="btn-title" data-es="Descargar SVG" data-en="Download SVG">Descargar SVG</span>
-                <span class="btn-subtitle" data-es="Optimizado y listo para producción" data-en="Optimized & production-ready">Optimizado y listo para producción</span>
-              </div>
-            </button>
-
-            <!-- STATS COUNTERS -->
-            <div class="stats-grid">
-              <div class="stat-card">
-                <span class="stat-label" data-es="Formas Trazadas" data-en="Traced Shapes">Formas Trazadas</span>
-                <span class="stat-value" id="statShapes">—</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-label" data-es="Fidelidad Visual" data-en="Visual Fidelity">Fidelidad Visual</span>
-                <span class="stat-value" id="statFidelity">—</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-label" data-es="Velocidad" data-en="Speed">Velocidad</span>
-                <span class="stat-value" id="statSpeed">—</span>
-              </div>
+          <!-- STATS COUNTERS -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label" data-es="Formas Trazadas" data-en="Traced Shapes">Formas Trazadas</span>
+              <span class="stat-value" id="statShapes">—</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="Fidelidad Visual" data-en="Visual Fidelity">Fidelidad Visual</span>
+              <span class="stat-value" id="statFidelity">—</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="Velocidad" data-en="Speed">Velocidad</span>
+              <span class="stat-value" id="statSpeed">—</span>
             </div>
           </div>
+
+          <!-- DOWNLOAD BUTTON (FULL WIDTH) -->
+          <button class="btn-download-premium" id="btnDownload" type="button" disabled>
+            <i class="ph ph-download-simple" aria-hidden="true"></i>
+            <span class="btn-title" data-es="DESCARGAR SVG" data-en="DOWNLOAD SVG">DESCARGAR SVG</span>
+          </button>
           
-          <!-- SUBTLE METADATA NOTE -->
-          <p class="metadata-note" data-es="Nota: Los parámetros de trazado quedan grabados como metadatos invisibles dentro del archivo SVG para futuras ediciones." data-en="Note: Tracing parameters are saved as invisible metadata inside the SVG file for future reference.">
-            Nota: Los parámetros de trazado quedan grabados como metadatos invisibles dentro del archivo SVG para futuras ediciones.
-          </p>
+          <!-- SUBTLE EXPLANATION & METADATA NOTE -->
+          <div class="metadata-section">
+            <p class="metadata-note" data-es="¿Qué es un SVG y cómo usarlo? Un SVG (Scalable Vector Graphics) es un formato de imagen vectorial que no pierde resolución ni se pixela al escalarlo o agrandarlo. Es ideal para logotipos, íconos y diseño de interfaces. Se puede abrir y editar directamente en software como Figma o Illustrator, o usarse en código web." data-en="What is an SVG and how to use it? An SVG (Scalable Vector Graphics) is a vector image format that never loses resolution or gets pixelated when scaled. It is ideal for logos, icons, and UI design. You can import and edit it directly in software like Figma or Illustrator, or use it in web code.">
+              ¿Qué es un SVG y cómo usarlo? Un SVG (Scalable Vector Graphics) es un formato de imagen vectorial que no pierde resolución ni se pixela al escalarlo o agrandarlo. Es ideal para logotipos, íconos y diseño de interfaces. Se puede abrir y editar directamente en software como Figma o Illustrator, o usarse en código web.
+            </p>
+            <p class="metadata-note" style="color: var(--text-3);" data-es="Los parámetros de trazado quedan grabados como metadatos invisibles dentro del archivo SVG para futuras ediciones." data-en="Tracing parameters are saved as invisible metadata inside the SVG file for future reference.">
+              Los parámetros de trazado quedan grabados como metadatos invisibles dentro del archivo SVG para futuras ediciones.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -700,7 +700,7 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
           + bgShape + '\n'
           + '<g' + transformAttr + '>\n'
           + '  <path fill-rule="evenodd" fill="'+colorBHex+'" d="'+pathD+'"/>\n'
-          + '</g>\n'
+          + '  </g>\n'
           + '</svg>';
 
         lastSvgString = svgString;
@@ -1501,35 +1501,28 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
     margin-top: 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.02);
   }
   
-  .export-main-row {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-  
   .btn-download-premium {
+    width: 100%;
     background: var(--orange);
     color: white;
     border: none;
     border-radius: 6px;
-    padding: 12px 24px;
+    padding: 14px 24px;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
     transition: background 0.15s, transform 0.1s, opacity 0.15s;
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    min-width: 260px;
+    justify-content: center;
+    gap: 10px;
     box-shadow: 0 4px 12px rgba(228,87,46,0.2);
   }
   .btn-download-premium i {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
   .btn-download-premium:hover {
     background: var(--orange-btn);
@@ -1546,48 +1539,24 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
     opacity: 0.6;
     transform: none;
   }
-  .btn-text-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.2;
-  }
   .btn-title {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 0.95rem;
-  }
-  .btn-subtitle {
-    font-size: 0.7rem;
-    opacity: 0.85;
-    font-family: 'Krub', sans-serif;
-    margin-top: 2px;
-    text-align: left;
+    letter-spacing: 0.05em;
   }
   
   /* Stats Grid */
   .stats-grid {
     display: flex;
     gap: 1rem;
-    flex: 1;
-    justify-content: flex-end;
-    min-width: 320px;
-  }
-  @media (max-width: 680px) {
-    .stats-grid {
-      justify-content: space-between;
-      width: 100%;
-      min-width: 100%;
-    }
-    .btn-download-premium {
-      width: 100%;
-    }
+    width: 100%;
   }
   
   .stat-card {
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px 16px;
+    padding: 10px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1612,14 +1581,19 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
     color: var(--text);
   }
   
+  .metadata-section {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
   .metadata-note {
     font-family: 'Krub', sans-serif;
-    font-size: 0.7rem;
-    color: var(--text-3);
+    font-size: 0.72rem;
+    color: var(--text-2);
     margin: 0;
-    line-height: 1.4;
-    border-top: 1px solid var(--border);
-    padding-top: 10px;
+    line-height: 1.5;
   }
 
   /* Eyedropper notification */

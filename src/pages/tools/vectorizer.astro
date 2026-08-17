@@ -1,0 +1,1690 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Vectorizer — EVO';
+const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpio y optimizado, sin depender de servicios pagados. Corre entero en tu navegador de forma local.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+
+  <!-- Load PotracePlus library from CDN for professional-grade mathematical curve tracing -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/potrace-plus@0.1.3/dist/potrace-plus.min.js"></script>
+
+  <main class="vectorizer-page">
+    <header class="tool-header wrap">
+      <p class="label" data-es="Sistemas y Herramientas" data-en="Systems & Tools">Sistemas y Herramientas</p>
+      <h1 class="tool-title">Vectorizer</h1>
+      <p class="tool-desc" data-es="Convierte un logo o ícono plano (dos colores) en un archivo SVG limpio y optimizado. Todo corre localmente en tu navegador: tus archivos nunca se suben a ningún servidor." data-en="Convert a flat logo or icon (two colors) into a clean, optimized SVG. Everything runs locally in your browser: your files are never uploaded to any server.">
+        Convierte un logo o ícono plano (dos colores) en un archivo SVG limpio y optimizado. Todo corre localmente en tu navegador: tus archivos nunca se suben a ningún servidor.
+      </p>
+    </header>
+
+    <div class="tool-grid wrap">
+      <!-- SIDEBAR CONTROLS -->
+      <div class="sidebar">
+        <!-- 1. IMAGE UPLOAD & URL SOURCE -->
+        <div class="panel-card">
+          <h2 data-es="1. Imagen" data-en="1. Image">1. Imagen</h2>
+          <div class="field">
+            <div class="dropzone" id="dropzone" data-es="Arrastra un PNG/JPG aquí, o haz clic para elegir" data-en="Drag a PNG/JPG here, or click to browse">
+              Arrastra un PNG/JPG aquí, o haz clic para elegir
+            </div>
+            <input type="file" id="fileInput" accept="image/png,image/webp,image/jpeg" style="display:none">
+          </div>
+          
+          <button class="btn-compact btn-full" id="btnDemo" type="button" title="Cargar el logotipo de EVO como demostración" data-es="Cargar logo de ejemplo" data-en="Load demo logo">
+            Cargar logo de ejemplo
+          </button>
+
+        </div>
+
+        <!-- 2. SUGGESTED SETTINGS & PRESETS -->
+        <div class="panel-card">
+          <h2 data-es="2. Ajustes sugeridos" data-en="2. Suggested settings">2. Suggested settings</h2>
+          <div class="field">
+            <label for="presetSelector" data-es="Preajuste" data-en="Preset">Preajuste</label>
+            <select id="presetSelector">
+              <option value="default" data-es="Estándar (Equilibrado)" data-en="Standard (Balanced)" selected>Estándar (Equilibrado)</option>
+              <option value="geometric" data-es="Geométrico (Esquinas duras)" data-en="Geometric (Sharp corners)">Geométrico (Esquinas duras)</option>
+              <option value="organic" data-es="Orgánico (Curvas suaves)" data-en="Organic (Smooth curves)">Orgánico (Curvas suaves)</option>
+              <option value="detail" data-es="Detalles pequeños / Texto" data-en="Small details / Text">Detalles pequeños / Texto</option>
+              <option value="noise" data-es="Imagen JPG / Con ruido" data-en="JPG image / With noise">Imagen JPG / Con ruido</option>
+            </select>
+            <div class="help" data-es="Los ajustes se optimizan automáticamente al subir una imagen, pero puedes cambiarlos en cualquier momento." data-en="Settings optimize automatically on upload, but you can change them at any time.">
+              Los ajustes se optimizan automáticamente al subir una imagen, pero puedes cambiarlos en cualquier momento.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. COLORS & DETECTION MODE -->
+        <div class="panel-card">
+          <h2 data-es="3. Colores y Detección" data-en="3. Colors & Detection">3. Colors & Detection</h2>
+          <div class="field">
+            <div class="color-row">
+              <input type="color" id="colorA" value="#ffffff">
+              <span class="swatch-label" data-es="Fondo" data-en="Background">Fondo</span>
+              <button class="btn-compact" id="pickA" type="button" data-es="Gotero" data-en="Picker">Gotero</button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="color-row">
+              <input type="color" id="colorB" value="#e4572e">
+              <span class="swatch-label" data-es="Figura" data-en="Shape">Figura</span>
+              <button class="btn-compact" id="pickB" type="button" data-es="Gotero" data-en="Picker">Gotero</button>
+            </div>
+          </div>
+          
+          <!-- DETECTION MODE SELECTOR -->
+          <div class="field" style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px;">
+            <label for="detectionMode" data-es="Modo de detección" data-en="Detection mode">Modo de detección</label>
+            <select id="detectionMode">
+              <option value="silhouette" data-es="Silueta (Recomendado para degradados/colores)" data-en="Silhouette (Recommended for gradients/colors)" selected>Silueta (Recomendado para degradados/colores)</option>
+              <option value="colorMatch" data-es="Color específico (Proyección)" data-en="Specific color (Projection)">Color específico (Proyección)</option>
+            </select>
+            <div class="help" data-es="El modo Silueta vectoriza todo lo que resalte del fondo, ideal para logos con degradados como Weplay. El modo Color específico aísla solo el tono elegido." data-en="Silhouette mode vectorizes everything different from the background, ideal for gradient logos like Weplay. Specific color mode isolates only the chosen shade.">
+              El modo Silueta vectoriza todo lo que resalte del fondo, ideal para logos con degradados como Weplay. El modo Color específico aísla solo el tono elegido.
+            </div>
+          </div>
+
+          <div class="eyedrop-status" id="eyedropStatus">
+            <i class="ph ph-info" aria-hidden="true"></i>
+            <span id="eyedropStatusText"></span>
+          </div>
+          <div class="help" data-es="Usa el gotero y haz clic en la imagen original para extraer los colores exactos." data-en="Use the eyedropper and click the original image to pick exact colors.">
+            Usa el gotero y haz clic en la imagen original para extraer los colores exactos.
+          </div>
+        </div>
+
+        <!-- 4. ADVANCED SETTINGS (COLLAPSIBLE ACCORDION) -->
+        <details class="advanced-details" id="advancedPanel">
+          <summary>
+            <span data-es="Ajustes Avanzados" data-en="Advanced Settings">Ajustes Avanzados</span>
+          </summary>
+          <div class="advanced-content">
+            <!-- BACKGROUND SHAPE -->
+            <h3 style="font-family:'Inter',sans-serif; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-3); margin:0 0 10px; font-weight:700;" data-es="Forma del fondo" data-en="Background Shape">Forma del fondo</h3>
+            
+            <div class="field">
+              <label class="check-line">
+                <input type="checkbox" id="circularMode">
+                <span data-es="El fondo es un círculo perfecto" data-en="Background is a perfect circle">El fondo es un círculo perfecto</span>
+              </label>
+            </div>
+
+            <div id="circleControls" style="display:none; margin-bottom: 1.25rem;">
+              <div style="margin-bottom:8px;">
+                <button class="btn-compact btn-full" id="btnDetectCircle" type="button" data-es="Detectar automáticamente" data-en="Auto-detect circle">
+                  Detectar automáticamente
+                </button>
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom:8px;">
+                <div class="field">
+                  <label>Centro X <span class="val" id="vCx"></span></label>
+                  <input type="number" id="circleCx">
+                </div>
+                <div class="field">
+                  <label>Centro Y <span class="val" id="vCy"></span></label>
+                  <input type="number" id="circleCy">
+                </div>
+              </div>
+              <div class="field">
+                <label>Radio / Radius <span class="val" id="vR"></span></label>
+                <input type="number" id="circleR">
+              </div>
+              <div class="help" id="ringWarning" style="display:none; color:var(--orange); font-weight:500;"></div>
+            </div>
+            
+            <div class="help" id="noCircleHelp" style="margin-bottom: 1.5rem;" data-es="Si no se marca, se vectoriza sobre toda el área rectangular de la imagen." data-en="If unchecked, vectorization runs over the entire rectangular area.">
+              Si no se marca, se vectoriza sobre toda el área rectangular de la imagen.
+            </div>
+
+            <!-- TRACING PARAMETERS -->
+            <h3 style="font-family:'Inter',sans-serif; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-3); margin:15px 0 10px; font-weight:700; border-top: 1px solid var(--border); padding-top:12px;" data-es="Parámetros de trazado" data-en="Tracing parameters">Parámetros de trazado</h3>
+            
+            <div class="field">
+              <label>
+                <span data-es="Umbral (B/N)" data-en="Threshold (B/W)">Umbral (B/N)</span>
+                <span class="val" id="vThresh">0.50</span>
+              </label>
+              <input type="range" id="threshold" min="0.05" max="0.95" step="0.01" value="0.5">
+              <div class="help" data-es="Controla el límite blanco/negro. Ajústalo si la figura se ve muy delgada o muy gruesa." data-en="Controls the black/white boundary. Adjust it if the shape looks too thin or too thick."></div>
+            </div>
+
+            <div class="field">
+              <label>
+                <span data-es="Sobremuestreo" data-en="Supersampling">Sobremuestreo</span>
+                <span class="val" id="vScale">3x</span>
+              </label>
+              <input type="range" id="scale" min="1" max="4" step="1" value="3">
+              <div class="help" data-es="Escala la imagen antes de trazar. Valores altos dan curvas más limpias pero tardan más." data-en="Scales the image before tracing. Higher values yield cleaner curves but take longer."></div>
+            </div>
+
+            <div class="field">
+              <label>
+                <span data-es="Filtro de ruido" data-en="Noise filter">Filtro de ruido</span>
+                <span class="val" id="vDespeckle">2 px²</span>
+              </label>
+              <input type="range" id="despeckle" min="0" max="80" step="1" value="2">
+              <div class="help" data-es="Elimina manchas o pixeles sueltos. Útil para limpiar la suciedad de imágenes JPG." data-en="Removes dust or loose pixels. Useful for cleaning up noise in JPG images."></div>
+            </div>
+
+            <div class="field">
+              <label>
+                <span data-es="Simplificación" data-en="Simplification">Simplificación</span>
+                <span class="val" id="vSimplify">1.00</span>
+              </label>
+              <input type="range" id="simplify" min="0.1" max="4" step="0.05" value="1.0">
+              <div class="help" data-es="Qué tan fiel sigue a los píxeles. Valores altos quitan nodos para dar trazos más rectos." data-en="How closely it follows pixels. Higher values remove nodes to yield straighter paths."></div>
+            </div>
+
+            <div class="field">
+              <label>
+                <span data-es="Sensibilidad de esquina" data-en="Corner sensitivity">Sensibilidad de esquina</span>
+                <span class="val" id="vCorner">70°</span>
+              </label>
+              <input type="range" id="corner" min="5" max="90" step="1" value="70">
+              <div class="help" data-es="Ángulo para considerar una esquina viva. Valores bajos producen curvas más angulares." data-en="Angle to consider a sharp corner. Lower values produce more angular curves."></div>
+            </div>
+
+            <div class="field" style="display:none;">
+              <input type="range" id="smooth" min="0.05" max="0.45" step="0.01" value="0.22">
+            </div>
+          </div>
+        </details>
+
+        <!-- Hidden manual run fallback (usually automatic) -->
+        <button class="btn-compact btn-full" id="btnRun" type="button" style="margin-top:1rem; display:none;" data-es="Vectorizar" data-en="Vectorize">
+          Vectorizar
+        </button>
+      </div>
+
+      <!-- MAIN WORKSPACE AREA -->
+      <div class="canvas-area">
+        <!-- VIEW MODE SWITCHER TABS -->
+        <div class="view-tabs">
+          <button class="tab-btn active" id="tabSplit" type="button" data-es="Vista Deslizar (Comparar)" data-en="Split View (Compare)">Vista Deslizar (Comparar)</button>
+          <button class="tab-btn" id="tabSide" type="button" data-es="Vista Lado a Lado" data-en="Side-by-Side View">Vista Lado a Lado</button>
+        </div>
+
+        <!-- STAGE 1: DRAGGABLE SPLIT COMPARISON SLIDER -->
+        <div class="stage-box-comparison" id="splitViewContainer" style="--split-pos: 50%;">
+          <div class="layer-original">
+            <span class="tag" style="left: 10px; right: auto;" data-es="ORIGINAL" data-en="ORIGINAL">ORIGINAL</span>
+            <canvas id="splitSrcCanvas"></canvas>
+          </div>
+          <div class="layer-result" id="splitResultLayer">
+            <span class="tag" style="right: 10px; left: auto;" data-es="RESULTADO (SVG)" data-en="RESULT (SVG)">RESULT (SVG)</span>
+            <div id="splitSvgWrap"></div>
+          </div>
+          <div class="split-divider" id="splitDivider">
+            <div class="split-handle">
+              <i class="ph ph-caret-left" aria-hidden="true"></i>
+              <i class="ph ph-caret-right" aria-hidden="true"></i>
+            </div>
+          </div>
+          <input type="range" min="0" max="100" value="50" class="split-slider-range" id="splitSliderRange">
+        </div>
+
+        <!-- STAGE 2: SIDE-BY-SIDE CANVASES -->
+        <div class="stage" id="sideViewContainer" style="display:none;">
+          <div class="stage-box" id="srcBox">
+            <span class="tag" data-es="ORIGINAL" data-en="ORIGINAL">ORIGINAL</span>
+            <canvas id="srcCanvas"></canvas>
+          </div>
+          <div class="stage-box" id="resBox">
+            <span class="tag" data-es="RESULTADO (SVG)" data-en="RESULT (SVG)">RESULT (SVG)</span>
+            <canvas id="compareCanvas" style="opacity:0;"></canvas>
+            <div class="svgwrap" id="svgwrap"></div>
+          </div>
+        </div>
+
+        <!-- COMPARE SLIDER (FOR SIDE-BY-SIDE ONLY) -->
+        <div class="compare-control">
+          <div class="compare-row">
+            <label for="compareSlider" data-es="Comparar con original" data-en="Compare with original">Comparar con original</label>
+            <input type="range" id="compareSlider" min="0" max="100" step="1" value="0">
+            <span class="val" id="vCompare">0%</span>
+          </div>
+        </div>
+
+        <!-- STATS BAR -->
+        <div class="stats-bar" id="statsbar">
+          <span data-es="Sin procesar todavía." data-en="Not processed yet.">Sin procesar todavía.</span>
+        </div>
+
+        <!-- ACTIONS & NOTES -->
+        <div class="footer-row">
+          <p class="help-text" data-es="Los parámetros quedan grabados internamente en el SVG descargado para que puedas recuperarlos si los necesitas en el futuro." data-en="Parameters are saved inside the downloaded SVG metadata, so you can restore them if needed in the future.">
+            Los parámetros quedan grabados internamente en el SVG descargado para que puedas recuperarlos si los necesitas en el futuro.
+          </p>
+          <button class="btn btn-primary" id="btnDownload" type="button" disabled>
+            <i class="ph ph-download-simple" aria-hidden="true"></i>
+            <span data-es="Descargar SVG" data-en="Download SVG">Download SVG</span>
+          </button>
+        </div>
+
+        <div class="note-banner">
+          <b data-es="Consejo para evaluar fidelidad:" data-en="Tip for evaluating fidelity:">Consejo para evaluar fidelidad:</b>
+          <span data-es=" En el modo deslizar, arrastra la barra divisora hacia los lados para contrastar los bordes vectorizados contra el original. En el modo lado a lado, usa el deslizador de comparación." data-en=" In split view, drag the divider bar sideways to contrast the vectorized paths directly against the original. In side-by-side view, use the opacity comparison slider.">
+            En el modo deslizar, arrastra la barra divisora hacia los lados para contrastar los bordes vectorizados contra el original. En el modo lado a lado, usa el deslizador de comparación.
+          </span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script is:inline src="/scripts/nav.js"></script>
+
+  <script>
+    (function(){
+      "use strict";
+
+      // ---------- State & Elements ----------
+      let srcImage = null;
+      let imgHasTransparency = false; // Tracks if loaded image contains transparent pixels
+      
+      const srcCanvas = document.getElementById('srcCanvas');
+      const srcCtx = srcCanvas.getContext('2d', {willReadFrequently:true});
+      
+      const splitSrcCanvas = document.getElementById('splitSrcCanvas');
+      const splitSrcCtx = splitSrcCanvas.getContext('2d', {willReadFrequently:true});
+
+      let lastSvgString = "";
+      let lastResultCanvas = null;
+      let eyedropTarget = null; // 'A' or 'B'
+      let currentFile = null;   // To calculate optimal presets on upload
+      let isVectorizing = false;
+
+      const $ = (id) => document.getElementById(id);
+
+      // ---------- Dynamic Translation Dictionary ----------
+      const messages = {
+        stats: {
+          es: (shapes, pct, dt) => `<span><b>${shapes}</b> formas trazadas</span><span>diferencia vs. original: <b class="${pct < 8 ? 'ok' : ''}">${pct.toFixed(1)}%</b> de píxeles (antialiasing de bordes cuenta)</span><span>${dt} ms</span>`,
+          en: (shapes, pct, dt) => `<span><b>${shapes}</b> shapes traced</span><span>difference vs. original: <b class="${pct < 8 ? 'ok' : ''}">${pct.toFixed(1)}%</b> of pixels (edge antialiasing counts)</span><span>${dt} ms</span>`
+        },
+        loaded: {
+          es: (w, h) => `<span>Imagen cargada: <b>${w}×${h} px</b>. Ajustes aplicados automáticamente.</span>`,
+          en: (w, h) => `<span>Image loaded: <b>${w}×${h} px</b>. Settings automatically applied.</span>`
+        },
+        warningRing: {
+          es: (outer, inner) => `Se detectó un anillo exterior (radio ${outer.toFixed(0)}px) distinto del disco interior (radio ${inner.toFixed(0)}px). Se usó el radio interior para no arrastrar el anillo; dibújalo aparte en tu editor de vectores.`,
+          en: (outer, inner) => `An outer ring was detected (radius ${outer.toFixed(0)}px) distinct from the inner disk (radius ${inner.toFixed(0)}px). The inner radius was used to avoid dragging it; draw it separately in your vector editor.`
+        },
+        eyedropperActive: {
+          es: (target) => `Gotero activo para <b>${target === 'A' ? 'Fondo' : 'Figura'}</b>. Haz clic en la imagen de la izquierda.`,
+          en: (target) => `Eyedropper active for <b>${target === 'A' ? 'Background' : 'Shape'}</b>. Click on the left image.`
+        }
+      };
+
+      function getLang() {
+        return document.documentElement.getAttribute('data-lang') || 'es';
+      }
+
+      // ---------- Color Utilities ----------
+      function hexToRgb(hex){
+        const v = hex.replace('#','');
+        return [parseInt(v.slice(0,2),16), parseInt(v.slice(2,4),16), parseInt(v.slice(4,6),16)];
+      }
+      function rgbToHex(r,g,b){
+        return '#' + [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+      }
+
+      // ---------- Preset Constants ----------
+      const PRESETS = {
+        default: { threshold: 0.50, scale: 3, despeckle: 2, simplify: 1.00, corner: 70 },
+        geometric: { threshold: 0.50, scale: 3, despeckle: 2, simplify: 0.70, corner: 40 },
+        organic: { threshold: 0.50, scale: 3, despeckle: 3, simplify: 1.40, corner: 80 },
+        detail: { threshold: 0.50, scale: 4, despeckle: 1, simplify: 0.50, corner: 65 },
+        noise: { threshold: 0.50, scale: 3, despeckle: 6, simplify: 1.20, corner: 75 }
+      };
+
+      function applyPreset(name) {
+        const p = PRESETS[name];
+        if (!p) return;
+        
+        $('threshold').value = p.threshold;
+        $('vThresh').textContent = p.threshold.toFixed(2);
+        
+        $('scale').value = p.scale;
+        $('vScale').textContent = p.scale + 'x';
+        
+        $('despeckle').value = p.despeckle;
+        $('vDespeckle').textContent = p.despeckle + ' px²';
+        
+        $('simplify').value = p.simplify;
+        $('vSimplify').textContent = p.simplify.toFixed(2);
+        
+        $('corner').value = p.corner;
+        $('vCorner').textContent = p.corner + '°';
+      }
+
+      // ---------- Image Loader ----------
+      function loadImageFromSrc(src){
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // CRITICAL: prevents taining the canvas so we can do getImageData
+        img.onload = function(){
+          srcImage = img;
+          const maxDim = 1400;
+          let w = img.naturalWidth, h = img.naturalHeight;
+          if (Math.max(w,h) > maxDim){
+            const s = maxDim/Math.max(w,h);
+            w = Math.round(w*s); h = Math.round(h*s);
+          }
+          
+          srcCanvas.width = w; srcCanvas.height = h;
+          srcCtx.clearRect(0,0,w,h);
+          srcCtx.drawImage(img,0,0,w,h);
+
+          splitSrcCanvas.width = w; splitSrcCanvas.height = h;
+          splitSrcCtx.clearRect(0,0,w,h);
+          splitSrcCtx.drawImage(img,0,0,w,h);
+          
+          const cmp = $('compareCanvas');
+          cmp.width = w; cmp.height = h;
+          cmp.getContext('2d').drawImage(srcCanvas,0,0);
+          
+          $('svgwrap').innerHTML = '';
+          $('splitSvgWrap').innerHTML = '';
+          $('btnDownload').disabled = true;
+
+          // Auto-suggest settings based on file type and dimensions
+          autoSuggestSettings(currentFile, w, h);
+          autoSuggestColors();
+          
+          // If circle mode was checked, auto detect circle
+          if ($('circularMode').checked) {
+            detectCircleAndFill();
+          }
+
+          try {
+            runVectorize();
+            console.log('vectorizador: auto-run OK,', w+'x'+h, 'px');
+          } catch (err){
+            console.error('vectorizador: fallo auto-run', err);
+          }
+        };
+        img.onerror = function(err){ console.error('vectorizador: fallo cargando imagen', err); };
+        img.src = src;
+      }
+
+      // ---------- Smart Auto-Settings Calculations ----------
+      function autoSuggestSettings(file, width, height) {
+        let preset = 'default';
+        if (file) {
+          const name = file.name.toLowerCase();
+          const isJpg = file.type === 'image/jpeg' || name.endsWith('.jpg') || name.endsWith('.jpeg');
+          if (isJpg) {
+            preset = 'noise';
+          } else if (width < 350 || height < 350) {
+            preset = 'detail';
+          }
+        } else {
+          // If no file (e.g. initial demo logo which is an SVG)
+          if (width < 350 || height < 350) {
+            preset = 'detail';
+          }
+        }
+        $('presetSelector').value = preset;
+        applyPreset(preset);
+      }
+
+      function autoSuggestColors(){
+        const w = srcCanvas.width, h = srcCanvas.height;
+        const data = srcCtx.getImageData(0,0,w,h).data;
+        const counts = {};
+        let hasTransparent = false;
+        const step = 2;
+
+        for (let y=0; y<h; y+=step){
+          for (let x=0; x<w; x+=step){
+            const o=(y*w+x)*4;
+            if (data[o+3] < 128) {
+              hasTransparent = true;
+              continue;
+            }
+            const key = (data[o]>>4)+','+(data[o+1]>>4)+','+(data[o+2]>>4);
+            counts[key] = (counts[key]||0)+1;
+          }
+        }
+
+        imgHasTransparency = hasTransparent; // Save to global state
+
+        const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+        if (entries.length === 0) return;
+
+        function toRgb(key){ return key.split(',').map(v=>parseInt(v,10)*16+8); }
+
+        if (hasTransparent) {
+          // Transparent logos: Fondo = white, Figura = dominant color
+          $('colorA').value = '#ffffff';
+          const c0 = toRgb(entries[0][0]);
+          $('colorB').value = rgbToHex(c0[0],c0[1],c0[2]);
+        } else {
+          // Solid background logos: suggest the two most common colors
+          const c0 = toRgb(entries[0][0]);
+          $('colorA').value = rgbToHex(c0[0],c0[1],c0[2]);
+          let c1 = null;
+          for (let i=1; i<entries.length; i++){
+            const cand = toRgb(entries[i][0]);
+            const dist = Math.hypot(cand[0]-c0[0], cand[1]-c0[1], cand[2]-c0[2]);
+            if (dist > 60){ c1 = cand; break; }
+          }
+          if (c1) {
+            $('colorB').value = rgbToHex(c1[0],c1[1],c1[2]);
+          } else {
+            $('colorB').value = '#e4572e';
+          }
+        }
+      }
+
+      // ---------- Vectorization Preprocessing ----------
+      function buildField(imageData, colorA, colorB, regionFn, mode, hasTransparency){
+        const w = imageData.width, h = imageData.height, data = imageData.data;
+        const field = new Float32Array(w*h);
+        
+        if (mode === 'colorMatch') {
+          // Classic projection logic: checks alignment with colorA -> colorB vector
+          const dr = colorB[0]-colorA[0], dg = colorB[1]-colorA[1], db = colorB[2]-colorA[2];
+          const denom = (dr*dr+dg*dg+db*db) || 1;
+          for (let y=0; y<h; y++){
+            for (let x=0; x<w; x++){
+              const idx = y*w+x, o = idx*4;
+              const alpha = data[o+3];
+              if (alpha < 128 || (regionFn && !regionFn(x,y))) { field[idx]=0; continue; }
+              const r=data[o], g=data[o+1], bl=data[o+2];
+              let t = ((r-colorA[0])*dr + (g-colorA[1])*dg + (bl-colorA[2])*db) / denom;
+              if (t<0) t=0; else if (t>1) t=1;
+              field[idx]=t;
+            }
+          }
+        } else {
+          // Silhouette mode
+          if (hasTransparency) {
+            // For transparent images, the alpha channel defines the shape perfectly!
+            // No color projection needed, completely resolving gradient-clipping issues
+            for (let y=0; y<h; y++){
+              for (let x=0; x<w; x++){
+                const idx = y*w+x, o = idx*4;
+                if (regionFn && !regionFn(x,y)) { field[idx]=0; continue; }
+                const alpha = data[o+3];
+                field[idx] = alpha / 255;
+              }
+            }
+          } else {
+            // For solid images, measure distance from background colorA
+            const distAB = Math.hypot(colorB[0]-colorA[0], colorB[1]-colorA[1], colorB[2]-colorA[2]) || 1;
+            for (let y=0; y<h; y++){
+              for (let x=0; x<w; x++){
+                const idx = y*w+x, o = idx*4;
+                if (regionFn && !regionFn(x,y)) { field[idx]=0; continue; }
+                const r=data[o], g=data[o+1], bl=data[o+2];
+                const distPixel = Math.hypot(r-colorA[0], g-colorA[1], bl-colorA[2]);
+                let t = distPixel / distAB;
+                if (t>1) t=1;
+                field[idx]=t;
+              }
+            }
+          }
+        }
+        return {field, w, h};
+      }
+
+      function supersampleField(field, w, h, scale){
+        if (scale === 1) return {field, w, h};
+        const src = document.createElement('canvas');
+        src.width = w; src.height = h;
+        const sctx = src.getContext('2d');
+        const imgData = sctx.createImageData(w,h);
+        for (let i=0; i<w*h; i++){
+          const v = Math.max(0, Math.min(255, Math.round(field[i]*255)));
+          imgData.data[i*4]=v; imgData.data[i*4+1]=v; imgData.data[i*4+2]=v; imgData.data[i*4+3]=255;
+        }
+        sctx.putImageData(imgData,0,0);
+        const W = w*scale, H = h*scale;
+        const dst = document.createElement('canvas');
+        dst.width = W; dst.height = H;
+        const dctx = dst.getContext('2d');
+        dctx.imageSmoothingEnabled = true;
+        dctx.imageSmoothingQuality = 'high';
+        dctx.drawImage(src, 0, 0, W, H);
+        const out = dctx.getImageData(0,0,W,H).data;
+        const outField = new Float32Array(W*H);
+        for (let i=0; i<W*H; i++) outField[i] = out[i*4]/255;
+        return {field: outField, w: W, h: H};
+      }
+
+      // Box Blur Function for float arrays to smooth out blocky upscaled pixel stairs
+      function boxBlurField(field, w, h, radius) {
+        if (radius <= 0) return;
+        const temp = new Float32Array(w * h);
+        
+        // Horizontal pass
+        for (let y = 0; y < h; y++) {
+          const rowOffset = y * w;
+          for (let x = 0; x < w; x++) {
+            let sum = 0;
+            let count = 0;
+            const start = Math.max(0, x - radius);
+            const end = Math.min(w - 1, x + radius);
+            for (let nx = start; nx <= end; nx++) {
+              sum += field[rowOffset + nx];
+              count++;
+            }
+            temp[rowOffset + x] = sum / count;
+          }
+        }
+        
+        // Vertical pass
+        for (let x = 0; x < w; x++) {
+          for (let y = 0; y < h; y++) {
+            let sum = 0;
+            let count = 0;
+            const start = Math.max(0, y - radius);
+            const end = Math.min(h - 1, y + radius);
+            for (let ny = start; ny <= end; ny++) {
+              sum += temp[ny * w + x];
+              count++;
+            }
+            field[y * w + x] = sum / count;
+          }
+        }
+      }
+
+      function binarize(field, threshold){
+        const n = field.length;
+        const mask = new Uint8Array(n);
+        for (let i=0; i<n; i++) mask[i] = field[i] > threshold ? 1 : 0;
+        return mask;
+      }
+
+      // ---------- Professional Potrace Curve Tracing Async pipeline ----------
+      async function runVectorize(){
+        if (!srcImage || isVectorizing){ return; }
+        isVectorizing = true;
+        
+        const t0 = performance.now();
+        const w = srcCanvas.width, h = srcCanvas.height;
+        const imageData = srcCtx.getImageData(0,0,w,h);
+        const colorA = hexToRgb($('colorA').value);
+        const colorB = hexToRgb($('colorB').value);
+        const threshold = parseFloat($('threshold').value);
+        const scale = parseInt($('scale').value,10);
+        const despeckle = parseFloat($('despeckle').value);
+        const simplifyTol = parseFloat($('simplify').value);
+        const cornerDeg = parseFloat($('corner').value);
+        const circular = $('circularMode').checked;
+        const detectionMode = $('detectionMode').value;
+
+        let regionFn = null;
+        let circle = null;
+        if (circular){
+          const cx = parseFloat($('circleCx').value) || w/2;
+          const cy = parseFloat($('circleCy').value) || h/2;
+          const r = parseFloat($('circleR').value) || Math.min(w,h)/2;
+          circle = {cx,cy,r};
+          regionFn = (x,y)=> ((x-cx)*(x-cx)+(y-cy)*(y-cy)) < (r-2)*(r-2);
+        }
+
+        // 1. Build difference field (Silhouette checks imgHasTransparency)
+        const built = buildField(imageData, colorA, colorB, regionFn, detectionMode, imgHasTransparency);
+        
+        // 2. Supersample & Box Blur
+        const ss = supersampleField(built.field, built.w, built.h, scale);
+        if (scale > 1) {
+          boxBlurField(ss.field, ss.w, ss.h, scale - 1);
+        }
+        
+        // 3. Binarize to binary mask
+        const mask = binarize(ss.field, threshold);
+
+        // 4. Create binary canvas (black shape on white background) to feed to PotracePlus
+        const binCanvas = document.createElement('canvas');
+        binCanvas.width = ss.w;
+        binCanvas.height = ss.h;
+        const bCtx = binCanvas.getContext('2d');
+        const bData = bCtx.createImageData(ss.w, ss.h);
+        const bd = bData.data;
+        for (let i = 0; i < mask.length; i++) {
+          const val = mask[i] === 1 ? 0 : 255;
+          const idx = i * 4;
+          bd[idx] = val;
+          bd[idx+1] = val;
+          bd[idx+2] = val;
+          bd[idx+3] = 255;
+        }
+        bCtx.putImageData(bData, 0, 0);
+
+        // Map settings to Potrace options
+        const alphamax = (cornerDeg / 90) * 1.33;
+        const opttolerance = simplifyTol * 0.2;
+        const options = {
+          turdsize: despeckle * scale * scale,
+          alphamax: alphamax,
+          optcurve: true,
+          opttolerance: opttolerance,
+          crop: false
+        };
+
+        // 5. Call PotracePlus Library
+        let traced = null;
+        try {
+          if (typeof window.PotracePlus !== 'undefined') {
+            traced = await window.PotracePlus(binCanvas, options);
+          } else {
+            console.warn("PotracePlus is not loaded yet. Retrying in 100ms...");
+            setTimeout(runVectorize, 100);
+            isVectorizing = false;
+            return;
+          }
+        } catch (e) {
+          console.error("Potrace tracing failed:", e);
+          isVectorizing = false;
+          return;
+        }
+
+        const pathD = traced && traced.d ? traced.d : "";
+        const colorAHex = $('colorA').value;
+        const colorBHex = $('colorB').value;
+
+        let bgShape;
+        if (circular){
+          bgShape = '<circle cx="'+circle.cx.toFixed(2)+'" cy="'+circle.cy.toFixed(2)+'" r="'+circle.r.toFixed(2)+'" fill="'+colorAHex+'"/>';
+        } else {
+          bgShape = '<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="'+colorAHex+'"/>';
+        }
+
+        const metadataComment = `<!-- VectorizerParams: preset=${$('presetSelector').value} mode=${detectionMode} threshold=${threshold} scale=${scale} despeckle=${despeckle} simplify=${simplifyTol} corner=${cornerDeg} -->`;
+
+        // Scale paths down back to the viewport coordinates via group transform
+        const scaleFactor = 1 / scale;
+        const transformAttr = scale > 1 ? ` transform="scale(${scaleFactor.toFixed(5)})"` : '';
+
+        const svgString = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'">\n'
+          + metadataComment + '\n'
+          + bgShape + '\n'
+          + '<g' + transformAttr + '>\n'
+          + '  <path fill-rule="evenodd" fill="'+colorBHex+'" d="'+pathD+'"/>\n'
+          + '</g>\n'
+          + '</svg>';
+
+        lastSvgString = svgString;
+        
+        $('svgwrap').innerHTML = svgString;
+        $('splitSvgWrap').innerHTML = svgString;
+        $('btnDownload').disabled = false;
+
+        // 6. Rasterize result to compareCanvas for overlay slider (with correct scaling)
+        const resCanvas = document.createElement('canvas');
+        resCanvas.width = w; resCanvas.height = h;
+        const rctx = resCanvas.getContext('2d', {willReadFrequently:true});
+        if (circular){
+          rctx.fillStyle = colorAHex;
+          rctx.beginPath();
+          rctx.arc(circle.cx, circle.cy, circle.r, 0, Math.PI*2);
+          rctx.fill();
+        } else {
+          rctx.fillStyle = colorAHex;
+          rctx.fillRect(0,0,w,h);
+        }
+        rctx.fillStyle = colorBHex;
+        try {
+          rctx.save();
+          if (scale > 1) {
+            rctx.scale(1/scale, 1/scale);
+          }
+          rctx.fill(new Path2D(pathD), 'evenodd');
+          rctx.restore();
+        } catch(e){ console.error('Error drawing result path', e); }
+        lastResultCanvas = resCanvas;
+
+        // Sync compareCanvas
+        const cmpCtx = $('compareCanvas').getContext('2d');
+        cmpCtx.clearRect(0,0,w,h);
+        cmpCtx.drawImage(resCanvas,0,0);
+
+        // Approximate similarity metrics
+        const orig = imageData.data;
+        const res = rctx.getImageData(0,0,w,h).data;
+        let total=0, diff=0;
+        for (let i=0; i<w*h; i++){
+          const o = i*4;
+          if (orig[o+3] < 200) continue;
+          total++;
+          const dr = Math.abs(orig[o]-res[o]), dg=Math.abs(orig[o+1]-res[o+1]), db=Math.abs(orig[o+2]-res[o+2]);
+          if (Math.max(dr,dg,db) > 40) diff++;
+        }
+        const pct = total>0 ? (100*diff/total) : 0;
+        const dt = (performance.now()-t0).toFixed(0);
+
+        // Count shapes by matching MoveTo commands (M/m)
+        const numShapes = (pathD.match(/m/gi) || []).length;
+
+        // Render stats
+        const currentLang = getLang();
+        $('statsbar').innerHTML = messages.stats[currentLang](numShapes, pct, dt);
+        
+        isVectorizing = false;
+      }
+
+      let debounceTimeout = null;
+      function runVectorizeDebounced() {
+        if (debounceTimeout) clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+          runVectorize().catch(console.error);
+        }, 100);
+      }
+
+      // ---------- Circle Auto-Detection Algorithm ----------
+      function detectCircle(imageData){
+        const w=imageData.width, h=imageData.height, data=imageData.data;
+        let minX=w, maxX=-1, minY=h, maxY=-1;
+        for (let y=0; y<h; y++){
+          for (let x=0; x<w; x++){
+            if (data[(y*w+x)*4+3] > 128){
+              if (x<minX) minX=x; if (x>maxX) maxX=x;
+              if (y<minY) minY=y; if (y>maxY) maxY=y;
+            }
+          }
+        }
+        if (maxX<0) return {cx:w/2, cy:h/2, r:Math.min(w,h)/2, hadRing:false};
+        const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+        const outerR=((maxX-minX)+(maxY-minY))/4;
+
+        const edgeIdx = (Math.round(cy)*w + Math.min(w-1, Math.round(cx+outerR-4)))*4;
+        const edgeColor = [data[edgeIdx], data[edgeIdx+1], data[edgeIdx+2]];
+        const radii = [];
+        for (let deg=0; deg<360; deg+=3){
+          const rad = deg*Math.PI/180;
+          const dx=Math.cos(rad), dy=Math.sin(rad);
+          for (let rr=outerR-3; rr>outerR*0.3; rr-=1){
+            const x=Math.round(cx+dx*rr), y=Math.round(cy+dy*rr);
+            if (x<0||x>=w||y<0||y>=h) continue;
+            const o=(y*w+x)*4;
+            if (data[o+3] < 128) continue;
+            const dr=data[o]-edgeColor[0], dg=data[o+1]-edgeColor[1], db=data[o+2]-edgeColor[2];
+            if (Math.sqrt(dr*dr+dg*dg+db*db) > 45){ radii.push(rr); break; }
+          }
+        }
+        let innerR = null, hadRing = false;
+        if (radii.length > 60){
+          radii.sort((a,b)=>a-b);
+          const median = radii[Math.floor(radii.length/2)];
+          if (median < outerR*0.97){ innerR = median; hadRing = true; }
+        }
+        return {cx, cy, r: hadRing ? innerR : outerR, outerR, hadRing};
+      }
+
+      function detectCircleAndFill(){
+        if (!srcImage) return;
+        const w = srcCanvas.width, h = srcCanvas.height;
+        const imgData = srcCtx.getImageData(0,0,w,h);
+        const {cx, cy, r, outerR, hadRing} = detectCircle(imgData);
+        $('circleCx').value = cx.toFixed(1); $('vCx').textContent = cx.toFixed(1);
+        $('circleCy').value = cy.toFixed(1); $('vCy').textContent = cy.toFixed(1);
+        $('circleR').value = r.toFixed(1); $('vR').textContent = r.toFixed(1);
+        
+        const warn = $('ringWarning');
+        if (hadRing){
+          const lang = getLang();
+          warn.style.display = 'block';
+          warn.innerHTML = messages.warningRing[lang](outerR, r);
+        } else {
+          warn.style.display = 'none';
+        }
+      }
+
+      // ---------- Contained Rectangle (Object-Fit Math) ----------
+      function getContainedRect(el, naturalW, naturalH){
+        const rect = el.getBoundingClientRect();
+        if (!naturalW || !naturalH || !rect.width || !rect.height) return rect;
+        const elRatio = rect.width/rect.height, natRatio = naturalW/naturalH;
+        let w, h, offX=0, offY=0;
+        if (natRatio > elRatio){
+          w = rect.width; h = rect.width/natRatio; offY = (rect.height-h)/2;
+        } else {
+          h = rect.height; w = rect.height*natRatio; offX = (rect.width-w)/2;
+        }
+        return { left: rect.left+offX, top: rect.top+offY, width: w, height: h };
+      }
+
+      // ---------- Eyedropper Interaction ----------
+      function setupEyedropper(){
+        function handleCanvasEyedrop(e, canvas, ctx) {
+          if (!eyedropTarget) return;
+          const rect = getContainedRect(canvas, canvas.width, canvas.height);
+          const x = Math.round((e.clientX-rect.left) * (canvas.width/rect.width));
+          const y = Math.round((e.clientY-rect.top) * (canvas.height/rect.height));
+          if (x<0||x>=canvas.width||y<0||y>=canvas.height) return;
+          const d = ctx.getImageData(x,y,1,1).data;
+          const hex = rgbToHex(d[0],d[1],d[2]);
+          if (eyedropTarget==='A') {
+            $('colorA').value = hex;
+          } else {
+            $('colorB').value = hex;
+          }
+          
+          eyedropTarget = null;
+          srcCanvas.classList.remove('eyedrop-active-canvas');
+          splitSrcCanvas.classList.remove('eyedrop-active-canvas');
+          srcCanvas.style.cursor = 'crosshair';
+          splitSrcCanvas.style.cursor = 'crosshair';
+          $('pickA').classList.remove('active');
+          $('pickB').classList.remove('active');
+          $('eyedropStatus').style.display = 'none';
+          
+          runVectorize().catch(console.error);
+        }
+
+        srcCanvas.addEventListener('click', (e) => handleCanvasEyedrop(e, srcCanvas, srcCtx));
+        splitSrcCanvas.addEventListener('click', (e) => handleCanvasEyedrop(e, splitSrcCanvas, splitSrcCtx));
+
+        function triggerEyedropper(target) {
+          eyedropTarget = target;
+          srcCanvas.classList.add('eyedrop-active-canvas');
+          splitSrcCanvas.classList.add('eyedrop-active-canvas');
+          srcCanvas.style.cursor = 'copy';
+          splitSrcCanvas.style.cursor = 'copy';
+          
+          const lang = getLang();
+          $('eyedropStatusText').innerHTML = messages.eyedropperActive[lang](target);
+          $('eyedropStatus').style.display = 'flex';
+          
+          if (target === 'A') {
+            $('pickA').classList.add('active');
+            $('pickB').classList.remove('active');
+          } else {
+            $('pickB').classList.add('active');
+            $('pickA').classList.remove('active');
+          }
+        }
+
+        $('pickA').addEventListener('click', () => triggerEyedropper('A'));
+        $('pickB').addEventListener('click', () => triggerEyedropper('B'));
+      }
+
+      // ---------- File Drag & Drop + Upload ----------
+      function setupUpload(){
+        const dz = $('dropzone');
+        dz.addEventListener('click', () => $('fileInput').click());
+        
+        $('fileInput').addEventListener('change', function(e){
+          const f = e.target.files[0];
+          if (!f) return;
+          currentFile = f;
+          const reader = new FileReader();
+          reader.onload = (ev) => loadImageFromSrc(ev.target.result);
+          reader.readAsDataURL(f);
+        });
+
+        ['dragenter','dragover'].forEach(ev => {
+          dz.addEventListener(ev, function(e){
+            e.preventDefault();
+            dz.classList.add('drag');
+          });
+        });
+
+        ['dragleave','drop'].forEach(ev => {
+          dz.addEventListener(ev, function(e){
+            e.preventDefault();
+            dz.classList.remove('drag');
+          });
+        });
+
+        dz.addEventListener('drop', function(e){
+          const f = e.dataTransfer.files[0];
+          if (!f) return;
+          currentFile = f;
+          const reader = new FileReader();
+          reader.onload = (ev) => loadImageFromSrc(ev.target.result);
+          reader.readAsDataURL(f);
+        });
+
+      }
+
+      // ---------- Sliders, Presets & Controls Event Binding ----------
+      function setupControls(){
+        $('threshold').addEventListener('input', e => {
+          $('vThresh').textContent = parseFloat(e.target.value).toFixed(2);
+          runVectorizeDebounced();
+        });
+        $('scale').addEventListener('input', e => {
+          $('vScale').textContent = e.target.value + 'x';
+          runVectorizeDebounced();
+        });
+        $('despeckle').addEventListener('input', e => {
+          $('vDespeckle').textContent = e.target.value + ' px²';
+          runVectorizeDebounced();
+        });
+        $('simplify').addEventListener('input', e => {
+          $('vSimplify').textContent = parseFloat(e.target.value).toFixed(2);
+          runVectorizeDebounced();
+        });
+        $('corner').addEventListener('input', e => {
+          $('vCorner').textContent = e.target.value + '°';
+          runVectorizeDebounced();
+        });
+
+        $('colorA').addEventListener('input', runVectorizeDebounced);
+        $('colorB').addEventListener('input', runVectorizeDebounced);
+        $('detectionMode').addEventListener('change', () => { runVectorize().catch(console.error); });
+
+        $('circularMode').addEventListener('change', function(){
+          const on = this.checked;
+          $('circleControls').style.display = on ? 'block' : 'none';
+          $('noCircleHelp').style.display = on ? 'none' : 'block';
+          if (on && srcImage) {
+            detectCircleAndFill();
+          }
+          runVectorize().catch(console.error);
+        });
+        $('btnDetectCircle').addEventListener('click', () => {
+          detectCircleAndFill();
+          runVectorize().catch(console.error);
+        });
+
+        $('circleCx').addEventListener('input', e => {
+          $('vCx').textContent = e.target.value;
+          runVectorizeDebounced();
+        });
+        $('circleCy').addEventListener('input', e => {
+          $('vCy').textContent = e.target.value;
+          runVectorizeDebounced();
+        });
+        $('circleR').addEventListener('input', e => {
+          $('vR').textContent = e.target.value;
+          runVectorizeDebounced();
+        });
+
+        $('presetSelector').addEventListener('change', function(){
+          applyPreset(this.value);
+          runVectorize().catch(console.error);
+        });
+
+        $('btnRun').addEventListener('click', () => { runVectorize().catch(console.error); });
+        $('btnDemo').addEventListener('click', () => {
+          currentFile = null;
+          loadImageFromSrc('/assets/EVO-logo.svg');
+        });
+
+        $('compareSlider').addEventListener('input', function(e){
+          const val = parseInt(e.target.value, 10);
+          $('compareCanvas').style.opacity = val / 100;
+          $('vCompare').textContent = val + '%';
+        });
+
+        $('splitSliderRange').addEventListener('input', function(e) {
+          const val = e.target.value;
+          $('splitViewContainer').style.setProperty('--split-pos', val + '%');
+        });
+
+        const compControl = document.querySelector('.compare-control');
+        compControl.style.display = 'none';
+
+        $('tabSplit').addEventListener('click', function() {
+          this.classList.add('active');
+          $('tabSide').classList.remove('active');
+          $('splitViewContainer').style.display = 'block';
+          $('sideViewContainer').style.display = 'none';
+          compControl.style.display = 'none';
+        });
+
+        $('tabSide').addEventListener('click', function() {
+          this.classList.add('active');
+          $('tabSplit').classList.remove('active');
+          $('sideViewContainer').style.display = 'grid';
+          $('splitViewContainer').style.display = 'none';
+          compControl.style.display = 'block';
+        });
+
+        $('btnDownload').addEventListener('click', function(){
+          if (!lastSvgString) return;
+          const blob = new Blob([lastSvgString], {type:'image/svg+xml'});
+          const url = URL.createObjectURL(blob);
+          
+          const now = new Date();
+          const yyyy = now.getFullYear();
+          const mm = String(now.getMonth() + 1).padStart(2, '0');
+          const dd = String(now.getDate()).padStart(2, '0');
+          const hh = String(now.getHours()).padStart(2, '0');
+          const min = String(now.getMinutes()).padStart(2, '0');
+          const filename = `EVO-vectorizer-${yyyy}${mm}${dd}-${hh}${min}.svg`;
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+        });
+      }
+
+      function setupLangObserver() {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-lang') {
+              if ($('circularMode').checked && srcImage) {
+                detectCircleAndFill();
+              }
+              if (eyedropTarget) {
+                const lang = getLang();
+                $('eyedropStatusText').innerHTML = messages.eyedropperActive[lang](eyedropTarget);
+              }
+              runVectorize().catch(console.error);
+            }
+          });
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+      }
+
+      // ---------- Initializer ----------
+      try {
+        setupUpload();
+        setupControls();
+        setupEyedropper();
+        setupLangObserver();
+        
+        loadImageFromSrc('/assets/EVO-logo.svg');
+        console.log('vectorizador: init OK');
+      } catch (err){
+        console.error('vectorizador: fallo en init', err);
+      }
+    })();
+  </script>
+</Base>
+
+<style>
+  /* Layout structure */
+  .vectorizer-page {
+    padding-top: 2.5rem;
+    padding-bottom: 4rem;
+    background: var(--bg);
+  }
+  .tool-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+  .tool-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0.5rem 0 1rem;
+    color: var(--text);
+  }
+  .tool-desc {
+    font-family: 'Krub', sans-serif;
+    font-size: clamp(0.95rem, 3vw, 1.05rem);
+    color: var(--text-2);
+    max-width: 780px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  
+  @media (max-width: 992px) {
+    .tool-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Cards and Sidebar panels */
+  .panel-card {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  
+  .panel-card h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  /* Form Elements */
+  .field {
+    margin-bottom: 1.25rem;
+  }
+  .field:last-child {
+    margin-bottom: 0;
+  }
+  
+  .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--text);
+  }
+  
+  .field label .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--orange);
+    font-weight: 600;
+  }
+  
+  select, input[type=number], input[type=text] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  select:focus, input[type=number]:focus, input[type=text]:focus {
+    border-color: var(--orange);
+    outline: none;
+  }
+  
+  .btn-compact {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 7px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-compact:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: var(--light);
+  }
+  
+  .btn-compact.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+  }
+  
+  .btn-compact:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  
+  .btn-full {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .color-row input[type=color] {
+    width: 42px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  
+  .swatch-label {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.85rem;
+    flex: 1;
+    color: var(--text-2);
+  }
+
+  .help {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    line-height: 1.45;
+    margin-top: 0.25rem;
+  }
+
+  /* Dropzone */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 2rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+    color: var(--text-3);
+    font-family: 'Krub', sans-serif;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--orange);
+    background: rgba(228, 87, 46, 0.05);
+    color: var(--text);
+  }
+
+  /* Range Slider Custom Styling */
+  input[type=range] {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    margin: 8px 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--orange);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    background: var(--orange-btn);
+    transform: scale(1.15);
+  }
+
+  /* Collapsible Advanced Settings Accordion */
+  .advanced-details {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--light);
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+  .advanced-details summary {
+    padding: 12px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--light);
+    color: var(--text-2);
+    user-select: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+  }
+  .advanced-details[open] summary {
+    border-bottom: 1px solid var(--border);
+    background: var(--border);
+    color: var(--text);
+  }
+  .advanced-details summary::-webkit-details-marker {
+    display: none;
+  }
+  .advanced-details summary::after {
+    content: '+';
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  .advanced-details[open] summary::after {
+    content: '−';
+  }
+  .advanced-content {
+    padding: 1.5rem 1.25rem;
+    background: var(--bg);
+  }
+
+  /* View switcher tabs */
+  .view-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tab-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-3);
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .tab-btn:hover {
+    color: var(--text);
+  }
+  .tab-btn.active {
+    color: var(--orange);
+    border-color: var(--border);
+    background: var(--light);
+  }
+
+  /* Stage / Canvas Area styling */
+  .canvas-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 680px) {
+    .stage {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+  
+  .stage-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg);
+    background-image: 
+      linear-gradient(45deg, var(--border) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--border) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--border) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--border) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+  }
+
+  /* Split screen slider layout styles */
+  .stage-box-comparison {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 4/3;
+    background-color: var(--bg);
+    background-image: 
+      linear-gradient(45deg, var(--border) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--border) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--border) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--border) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+  }
+  
+  .layer-original, .layer-result {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .layer-result #splitSvgWrap,
+  .stage-box .svgwrap {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+  }
+  
+  .layer-original canvas, 
+  .layer-result #splitSvgWrap :global(svg),
+  .stage-box canvas,
+  .stage-box .svgwrap :global(svg) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 12px;
+    box-sizing: border-box;
+    display: block;
+  }
+  
+  .layer-result {
+    clip-path: inset(0 0 0 var(--split-pos, 50%));
+    background-color: var(--bg);
+    background-image: 
+      linear-gradient(45deg, var(--border) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--border) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--border) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--border) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  }
+
+  .split-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--split-pos, 50%);
+    width: 2px;
+    background: var(--orange);
+    z-index: 5;
+    pointer-events: none;
+    transform: translateX(-50%);
+  }
+
+  .split-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--orange);
+    border: 3px solid white;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    font-size: 14px;
+    gap: 2px;
+  }
+  
+  .split-slider-range {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0;
+    cursor: col-resize;
+    z-index: 8;
+    margin: 0 !important;
+    -webkit-appearance: none;
+  }
+  
+  .stage-box .tag, .layer-original .tag, .layer-result .tag {
+    position: absolute;
+    top: 10px;
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-2);
+    z-index: 10;
+    font-weight: 600;
+  }
+
+  .stage-box .tag {
+    left: 10px;
+  }
+
+  /* Compare control */
+  .compare-control {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+  }
+  .compare-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .compare-row label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .compare-row input[type=range] {
+    flex: 1;
+  }
+  .compare-row .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-2);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-3);
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    flex-wrap: wrap;
+    line-height: 1.5;
+  }
+  .stats-bar b {
+    color: var(--text);
+  }
+  .stats-bar :global(.ok) {
+    color: #2f7a4f;
+    font-weight: 600;
+  }
+
+  /* Footer action row */
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .footer-row .help-text {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-3);
+    max-width: 60%;
+    line-height: 1.45;
+  }
+  @media (max-width: 600px) {
+    .footer-row .help-text {
+      max-width: 100%;
+    }
+  }
+
+  /* Note banner */
+  .note-banner {
+    background: var(--light);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 4px 4px 0;
+    padding: 1rem 1.25rem;
+    font-family: 'Krub', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+  .note-banner b {
+    color: var(--text);
+  }
+
+  /* Eyedropper notification */
+  .eyedrop-status {
+    background: var(--orange);
+    color: white;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-family: 'Krub', sans-serif;
+    margin-top: 8px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(228,87,46,0.25);
+  }
+  .eyedrop-status b {
+    color: white;
+  }
+  
+  .eyedrop-active-canvas {
+    outline: 2px solid var(--orange) !important;
+    outline-offset: -2px;
+  }
+
+  /* Checkbox customizations */
+  .check-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Krub', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-2);
+    cursor: pointer;
+  }
+  .check-line input[type=checkbox] {
+    accent-color: var(--orange);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+</style>

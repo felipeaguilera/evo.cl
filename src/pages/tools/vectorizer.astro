@@ -62,6 +62,12 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
         <div class="panel-card">
           <h2 data-es="3. Colores y Detección" data-en="3. Colors & Detection">3. Colors & Detection</h2>
           <div class="field">
+            <label class="check-line">
+              <input type="checkbox" id="includeBg">
+              <span data-es="Incluir color de fondo en exportación" data-en="Include background color in export">Incluir color de fondo en exportación</span>
+            </label>
+          </div>
+          <div class="field" id="bgColRow" style="display:none; margin-left: 20px;">
             <div class="color-row">
               <input type="color" id="colorA" value="#ffffff">
               <span class="swatch-label" data-es="Fondo" data-en="Background">Fondo</span>
@@ -651,15 +657,17 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
           return;
         }
 
-        const pathD = traced && traced.d ? traced.d : "";
+        const includeBg = $('includeBg').checked;
         const colorAHex = $('colorA').value;
         const colorBHex = $('colorB').value;
 
-        let bgShape;
-        if (circular){
-          bgShape = '<circle cx="'+circle.cx.toFixed(2)+'" cy="'+circle.cy.toFixed(2)+'" r="'+circle.r.toFixed(2)+'" fill="'+colorAHex+'"/>';
-        } else {
-          bgShape = '<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="'+colorAHex+'"/>';
+        let bgShape = '';
+        if (includeBg) {
+          if (circular){
+            bgShape = '<circle cx="'+circle.cx.toFixed(2)+'" cy="'+circle.cy.toFixed(2)+'" r="'+circle.r.toFixed(2)+'" fill="'+colorAHex+'"/>\n';
+          } else {
+            bgShape = '<rect x="0" y="0" width="'+w+'" height="'+h+'" fill="'+colorAHex+'"/>\n';
+          }
         }
 
         const metadataComment = `<!-- VectorizerParams: preset=${$('presetSelector').value} mode=${detectionMode} threshold=${threshold} scale=${scale} despeckle=${despeckle} simplify=${simplifyTol} corner=${cornerDeg} -->`;
@@ -685,14 +693,17 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
         const resCanvas = document.createElement('canvas');
         resCanvas.width = w; resCanvas.height = h;
         const rctx = resCanvas.getContext('2d', {willReadFrequently:true});
-        if (circular){
-          rctx.fillStyle = colorAHex;
-          rctx.beginPath();
-          rctx.arc(circle.cx, circle.cy, circle.r, 0, Math.PI*2);
-          rctx.fill();
-        } else {
-          rctx.fillStyle = colorAHex;
-          rctx.fillRect(0,0,w,h);
+        rctx.clearRect(0,0,w,h);
+        if (includeBg){
+          if (circular){
+            rctx.fillStyle = colorAHex;
+            rctx.beginPath();
+            rctx.arc(circle.cx, circle.cy, circle.r, 0, Math.PI*2);
+            rctx.fill();
+          } else {
+            rctx.fillStyle = colorAHex;
+            rctx.fillRect(0,0,w,h);
+          }
         }
         rctx.fillStyle = colorBHex;
         try {
@@ -924,6 +935,11 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
         $('colorA').addEventListener('input', runVectorizeDebounced);
         $('colorB').addEventListener('input', runVectorizeDebounced);
         $('detectionMode').addEventListener('change', () => { runVectorize().catch(console.error); });
+
+        $('includeBg').addEventListener('change', function() {
+          $('bgColRow').style.display = this.checked ? 'block' : 'none';
+          runVectorize().catch(console.error);
+        });
 
         $('circularMode').addEventListener('change', function(){
           const on = this.checked;
@@ -1328,7 +1344,7 @@ const description = 'Convierte un logo o ícono plano (dos colores) en SVG limpi
     display: flex;
     align-items: center;
     gap: 8px;
-    max-width: 480px;
+    flex: 1;
     box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   }
   .note-banner-compact i {

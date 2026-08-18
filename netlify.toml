@@ -10,3 +10,10 @@
   to = "/.netlify/functions/contact"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/api/funko-lookup"
+  to = "/.netlify/functions/funko-lookup"
+  status = 200
+  force = true
+

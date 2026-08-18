@@ -1,0 +1,2744 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Funko Pop! Scraper — EVO';
+const description = 'Consulta masiva de figuras Funko Pop! por código de barras (UPC) o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas de fotos y exporta directo a Shopify CSV, Tabla HTML y ZIP de fotos.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+
+  <!-- Load JSZip for client-side image ZIP generation -->
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <main class="funko-page">
+    <!-- TOOL HEADER -->
+    <header class="tool-header wrap">
+      <p class="label" data-es="Sistemas y Herramientas" data-en="Systems & Tools">Sistemas y Herramientas</p>
+      <h1 class="tool-title">Funko Pop! Catalog Scraper</h1>
+      <p class="tool-desc" data-es="Consulta masiva de figuras Funko Pop! por código de barras (UPC) o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas de fotos y exporta en formato CSV oficial para Shopify, Tabla para copiar y pegar directo en Sheets, o ZIP de fotos nombradas." data-en="Bulk Funko Pop! figure lookup by barcode (UPC) or SKU. Extracts official titles, collections, box numbers, complete photo galleries, and exports directly to official Shopify CSV, copy-paste table for Sheets, or named photos ZIP.">
+        Consulta masiva de figuras Funko Pop! por código de barras (UPC) o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas de fotos y exporta en formato CSV oficial para Shopify, Tabla para copiar y pegar directo en Sheets, o ZIP de fotos nombradas.
+      </p>
+    </header>
+
+    <div class="tool-grid wrap">
+      <!-- SIDEBAR CONTROLS -->
+      <div class="sidebar">
+        <!-- 1. INPUT CODES & PRIMARY ACTION -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 data-es="1. Lista de Códigos" data-en="1. Code List">1. Lista de Códigos</h2>
+            <span class="badge-count" id="codeCounter">0 códigos</span>
+          </div>
+          
+          <div class="field">
+            <label for="codesInput">
+              <span data-es="Códigos de Barra (UPC) o SKUs" data-en="Barcodes (UPC) or SKUs">Códigos de Barra (UPC) o SKUs</span>
+            </label>
+            <textarea
+              id="codesInput"
+              class="codes-textarea"
+              placeholder="889698818704&#10;889698725767&#10;889698907804&#10;95805&#10;83964"
+              rows="6"
+              spellcheck="false"
+            ></textarea>
+            <div class="help" data-es="Ingresa UPCs (12 dígitos) o SKUs (4-6 dígitos), separados por saltos de línea." data-en="Enter UPCs (12 digits) or SKUs (4-6 digits), separated by newlines.">
+              Ingresa UPCs (12 dígitos) o SKUs (4-6 dígitos), separados por saltos de línea.
+            </div>
+          </div>
+
+          <!-- PRIMARY ACTION BUTTONS -->
+          <div style="margin-bottom: 0.75rem;">
+            <button class="btn-primary btn-full" id="btnStart" type="button">
+              <i class="ph ph-play" aria-hidden="true"></i>
+              <span data-es="Iniciar Búsqueda" data-en="Start Search">Iniciar Búsqueda</span>
+            </button>
+            <div class="button-row" style="margin-top: 8px;">
+              <button class="btn-compact btn-half" id="btnPause" type="button" disabled>
+                <i class="ph ph-pause" aria-hidden="true"></i>
+                <span data-es="Pausar" data-en="Pause">Pausar</span>
+              </button>
+              <button class="btn-compact btn-half" id="btnReset" type="button" disabled>
+                <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                <span data-es="Reiniciar" data-en="Reset">Reiniciar</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SAMPLE BUTTONS -->
+          <div class="button-stack">
+            <button class="btn-compact btn-full" id="btnLoadSample" type="button">
+              <i class="ph ph-sparkle" aria-hidden="true"></i>
+              <span data-es="Cargar 84 códigos de ejemplo" data-en="Load 84 sample codes">Cargar 84 códigos de ejemplo</span>
+            </button>
+            <button class="btn-compact btn-full" id="btnClearInput" type="button">
+              <i class="ph ph-trash" aria-hidden="true"></i>
+              <span data-es="Limpiar lista" data-en="Clear list">Limpiar lista</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. SEARCH SETTINGS & PACING -->
+        <div class="panel-card">
+          <h2 data-es="2. Ritmo de Consulta" data-en="2. Query Pacing">2. Ritmo de Consulta</h2>
+          <div class="field">
+            <label for="batchPacing">
+              <span data-es="Velocidad de Lote" data-en="Batch Speed">Velocidad de Lote</span>
+            </label>
+            <select id="batchPacing">
+              <option value="fast" selected data-es="Rápida y Concurrente (3 req / 200ms — Recomendada)" data-en="Fast & Concurrent (3 req / 200ms — Recommended)">Rápida y Concurrente (3 req / 200ms — Recomendada)</option>
+              <option value="moderate" data-es="Moderada (2 req / 400ms)" data-en="Moderate (2 req / 400ms)">Moderada (2 req / 400ms)</option>
+              <option value="safe" data-es="Estable (1 req / 800ms)" data-en="Stable (1 req / 800ms)">Estable (1 req / 800ms)</option>
+            </select>
+            <div class="help" data-es="Evita bloqueos de cuota o time-outs al consultar grandes lotes." data-en="Prevents rate limiting or time-outs when querying large batches.">
+              Evita bloqueos de cuota o time-outs al consultar grandes lotes.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. LOCAL PERSISTENT INDEX -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 data-es="3. Índice Local EVO" data-en="3. EVO Local Index">3. Índice Local EVO</h2>
+            <span class="badge-count" id="localCatalogBadge">0 figuras</span>
+          </div>
+          <p class="help" style="margin-bottom: 0.85rem;" data-es="Las figuras consultadas se guardan de forma permanente para responder en 0ms y no gastar cuotas de red." data-en="Queried figures are stored permanently for 0ms responses and zero network quotas.">
+            Las figuras consultadas se guardan de forma permanente para responder en 0ms y no gastar cuotas de red.
+          </p>
+          <div class="button-stack">
+            <button class="btn-compact btn-full" id="btnExportLocalCatalog" type="button" title="Descargar copia de seguridad de la base local en formato JSON">
+              <i class="ph ph-download-simple" aria-hidden="true"></i>
+              <span data-es="Exportar Base Local (JSON)" data-en="Export Local Index (JSON)">Exportar Base Local (JSON)</span>
+            </button>
+            <button class="btn-compact btn-full" id="btnClearLocalCatalog" type="button" title="Vaciar la memoria local para reiniciar búsquedas limpias">
+              <i class="ph ph-trash" aria-hidden="true"></i>
+              <span data-es="Limpiar Base Local" data-en="Clear Local Index">Limpiar Base Local</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE -->
+      <div class="workspace-area">
+        <!-- PROGRESS & METRICS -->
+        <div class="panel-card metrics-card">
+          <div class="progress-header">
+            <div class="status-indicator">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText" data-es="Listo para iniciar" data-en="Ready to start">Listo para iniciar</span>
+            </div>
+            <div class="progress-right-wrap">
+              <span class="progress-percent" id="progressPercent">0%</span>
+              <span class="progress-total-badge" id="statTotalBadge">(0 códigos)</span>
+            </div>
+          </div>
+
+          <!-- PROMINENT PROGRESS BAR -->
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+          </div>
+
+          <!-- STATS GRID (BALANCED 4-CARD DASHBOARD) -->
+          <div class="stats-grid stats-grid-4">
+            <div class="stat-card">
+              <span class="stat-label" data-es="Índice Local (0ms)" data-en="Local Index (0ms)">Índice Local (0ms)</span>
+              <span class="stat-num text-teal" id="statLocal">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="Funko US (Oficial)" data-en="Funko US (Official)">Funko US (Oficial)</span>
+              <span class="stat-num text-primary" id="statFunko">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="Índice UPC / Dist." data-en="UPC Index / Dist.">Índice UPC / Dist.</span>
+              <span class="stat-num text-success" id="statUpc">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="No Encontrados" data-en="Not Found">No Encontrados</span>
+              <span class="stat-num text-warning" id="statNotFound">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW MODE TABS (PERMANENTLY AT THE TOP) -->
+        <div class="view-mode-tabs-bar" id="viewModeTabsBar" style="display: none;">
+          <div class="view-tabs-group">
+            <button class="view-tab-btn active" id="tabViewCards" type="button">
+              <i class="ph ph-squares-four"></i> <span>Listado de Figuras</span>
+            </button>
+            <button class="view-tab-btn" id="tabViewCollections" type="button">
+              <i class="ph ph-folders"></i> <span id="tabCollectionsLabel">Colecciones (0)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- POST-BATCH REPORT SUMMARY (VISUAL COLLECTIONS BREAKDOWN) -->
+        <div class="panel-card report-summary-card" id="reportSummaryCard" style="display: none;">
+          <div class="report-header">
+            <div class="report-title-wrap">
+              <div class="report-icon-badge">
+                <i class="ph ph-squares-four"></i>
+              </div>
+              <div>
+                <h3 data-es="Colecciones y Figuras Identificadas" data-en="Identified Collections & Figures">Colecciones y Figuras Identificadas</h3>
+                <p id="reportSummarySubtitle">Desglose agrupado por licencias del lote consultado. Haz clic en una para filtrar.</p>
+              </div>
+            </div>
+
+            <!-- ONE-CLICK EXPORT ACTIONS -->
+            <div class="report-actions">
+              <button class="btn-compact btn-accent" id="btnReportExportShopifyEs" type="button" title="Descargar archivo CSV estructurado con descripciones en Español para Shopify">
+                <i class="ph ph-shopify-logo"></i>
+                <span data-es="CSV Shopify (ES)" data-en="Shopify CSV (ES)">CSV Shopify (ES)</span>
+              </button>
+              <button class="btn-compact btn-secondary-accent" id="btnReportCopyHtml" type="button" title="Copiar tabla para pegar directo con Ctrl+V en Google Sheets, Word o Notion">
+                <i class="ph ph-copy"></i>
+                <span data-es="Copiar Tabla (Sheets)" data-en="Copy Table (Sheets)">Copiar Tabla (Sheets)</span>
+              </button>
+              <button class="btn-compact" id="btnReportExportZip" type="button" title="Descargar paquete ZIP con fotos nombradas por SKU">
+                <i class="ph ph-file-zip"></i>
+                <span data-es="ZIP Fotos (SKU)" data-en="Photos ZIP (SKU)">ZIP Fotos (SKU)</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- COLLECTIONS GRID -->
+          <div class="collections-grid" id="reportCollectionsGrid"></div>
+        </div>
+
+        <!-- TOOLBAR & FILTERS -->
+        <div class="results-toolbar">
+          <div class="filter-group">
+            <div class="search-input-wrap">
+              <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+              <input
+                type="text"
+                id="filterSearch"
+                placeholder="Filtrar por título, licencia, caja..."
+                data-es-ph="Filtrar por título, licencia, caja..."
+                data-en-ph="Filter by title, license, box number..."
+              />
+            </div>
+
+            <select id="filterStatus" class="select-compact">
+              <option value="all" data-es="Todos los estados" data-en="All statuses">Todos los estados</option>
+              <option value="found" data-es="Solo encontrados" data-en="Only found">Solo encontrados</option>
+              <option value="not_found" data-es="Solo no encontrados" data-en="Only not found">Solo no encontrados</option>
+            </select>
+          </div>
+
+          <div class="actions-group">
+            <!-- EXPORT BUTTONS -->
+            <div class="export-dropdown-wrap">
+              <button class="btn-compact btn-accent" id="btnExportShopify" type="button" title="CSV listo para importar directo a Shopify (Descripciones en Español)">
+                <i class="ph ph-shopify-logo" aria-hidden="true"></i>
+                <span data-es="CSV Shopify (ES)" data-en="Shopify CSV (ES)">CSV Shopify (ES)</span>
+              </button>
+              <button class="btn-compact" id="btnExportShopifyEn" type="button" title="CSV con descripciones originales en Inglés">
+                <i class="ph ph-globe" aria-hidden="true"></i>
+                <span>CSV (EN)</span>
+              </button>
+              <button class="btn-compact" id="btnCopyHtmlTable" type="button" title="Copiar tabla para pegar con Ctrl+V en Google Sheets">
+                <i class="ph ph-copy" aria-hidden="true"></i>
+                <span data-es="Copiar Tabla" data-en="Copy Table">Copiar Tabla</span>
+              </button>
+              <button class="btn-compact" id="btnExportZip" type="button" title="Descargar paquete ZIP con todas las fotos de lote">
+                <i class="ph ph-file-zip" aria-hidden="true"></i>
+                <span data-es="ZIP Todas las Fotos" data-en="ZIP All Photos">ZIP Lote</span>
+              </button>
+              <button class="btn-compact" id="btnExportCsv" type="button" title="CSV general con todas las URLs">
+                <i class="ph ph-file-csv" aria-hidden="true"></i>
+                <span data-es="CSV General" data-en="General CSV">CSV</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTS CONTAINER -->
+        <div class="results-container">
+          <!-- EMPTY STATE -->
+          <div class="panel-card empty-state" id="emptyState">
+            <div class="empty-icon-wrap">
+              <i class="ph ph-barcode" aria-hidden="true"></i>
+            </div>
+            <h3 data-es="Sin productos consultados" data-en="No products queried yet">Sin productos consultados</h3>
+            <p data-es="Ingresa una lista de códigos en el panel lateral o presiona 'Cargar 84 códigos de ejemplo'." data-en="Enter a list of codes on the sidebar or click 'Load 84 sample codes'.">
+              Ingresa una lista de códigos en el panel lateral o presiona 'Cargar 84 códigos de ejemplo'.
+            </p>
+          </div>
+
+          <!-- 2-STAGE PRODUCT CARDS LIST (DEFAULT GALLERY + EXPANDABLE FICHA) -->
+          <div class="product-cards-list" id="productCardsList" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZIP PROGRESS MODAL -->
+    <div class="modal-overlay" id="zipProgressModal" style="display:none;">
+      <div class="modal-card zip-modal-card">
+        <h3 style="margin-top:0; font-family:'Inter',sans-serif; font-size:1.15rem;" data-es="Generando Archivo ZIP..." data-en="Generating ZIP File...">Generando Archivo ZIP...</h3>
+        <p id="zipProgressText" style="font-size:0.875rem; color:var(--text-2); margin-bottom:1rem;">Descargando fotografías en alta resolución...</p>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="zipProgressFill" style="width:0%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toastNotification">
+      <i class="ph ph-check-circle" id="toastIcon"></i>
+      <span id="toastMsg">Acción completada</span>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script is:inline>
+    // SAMPLE BARCODES FROM USER BRIEF
+    const SAMPLE_CODES = [
+      "889698725767", "889698725774", "889698725781", "889698725798",
+      "889698725804", "889698725811", "889698725828", "889698725699",
+      "889698725705", "889698725712", "889698725729", "889698725736",
+      "889698725743", "889698725750", "889698907804", "889698901451",
+      "889698901468", "889698901475", "889698906432", "889698839648",
+      "889698844499", "889698903417", "889698944120", "889698944137",
+      "889698932066", "889698932059", "889698932042", "889698928687",
+      "889698928694", "889698928700", "889698932776", "889698932783",
+      "889698932790", "889698932806", "889698936897", "889698951302",
+      "889698929561", "889698929578", "889698929585", "889698929592",
+      "889698923064", "889698935661", "889698930178", "889698863681",
+      "889698932295", "889698933964", "889698933858", "889698933865",
+      "889698941440", "889698932745", "889698932752", "889698932769",
+      "889698922753", "889698922760", "889698922791", "889698922777",
+      "889698928816", "889698928823", "889698828830", "889698928847",
+      "889698940498", "889698940481", "889698940030", "889698920339",
+      "889698920346", "889698940306", "889698941716", "889698939959",
+      "889698925938", "889698925945", "889698939317", "889698939294",
+      "889698939348", "889698920377", "889698907972", "889698941099",
+      "889698855334", "889698906678", "889698657921", "849803039912",
+      "889698881500", "889698836869", "889698722360", "889698818704"
+    ];
+
+    // STATE
+    let productsList = [];
+    let isRunning = false;
+    let isPaused = false;
+    const expandedProductIds = new Set();
+
+    // DOM ELEMENTS
+    const codesInput = document.getElementById('codesInput');
+    const codeCounter = document.getElementById('codeCounter');
+    const btnLoadSample = document.getElementById('btnLoadSample');
+    const btnClearInput = document.getElementById('btnClearInput');
+    const btnStart = document.getElementById('btnStart');
+    const btnPause = document.getElementById('btnPause');
+    const btnReset = document.getElementById('btnReset');
+    const batchPacing = document.getElementById('batchPacing');
+
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const statTotalBadge = document.getElementById('statTotalBadge');
+    const statLocal = document.getElementById('statLocal');
+    const statFunko = document.getElementById('statFunko');
+    const statUpc = document.getElementById('statUpc');
+    const statNotFound = document.getElementById('statNotFound');
+
+    const viewModeTabsBar = document.getElementById('viewModeTabsBar');
+    const tabViewCards = document.getElementById('tabViewCards');
+    const tabViewCollections = document.getElementById('tabViewCollections');
+    const tabCollectionsLabel = document.getElementById('tabCollectionsLabel');
+
+    const localCatalogBadge = document.getElementById('localCatalogBadge');
+    const btnExportLocalCatalog = document.getElementById('btnExportLocalCatalog');
+    const btnClearLocalCatalog = document.getElementById('btnClearLocalCatalog');
+
+    const reportSummaryCard = document.getElementById('reportSummaryCard');
+    const reportSummarySubtitle = document.getElementById('reportSummarySubtitle');
+    const reportCollectionsGrid = document.getElementById('reportCollectionsGrid');
+    const btnReportExportShopifyEs = document.getElementById('btnReportExportShopifyEs');
+    const btnReportCopyHtml = document.getElementById('btnReportCopyHtml');
+    const btnReportExportZip = document.getElementById('btnReportExportZip');
+
+    const filterSearch = document.getElementById('filterSearch');
+    const filterStatus = document.getElementById('filterStatus');
+    const btnExportShopify = document.getElementById('btnExportShopify');
+    const btnExportShopifyEn = document.getElementById('btnExportShopifyEn');
+    const btnCopyHtmlTable = document.getElementById('btnCopyHtmlTable');
+    const btnExportZip = document.getElementById('btnExportZip');
+    const btnExportCsv = document.getElementById('btnExportCsv');
+
+    const emptyState = document.getElementById('emptyState');
+    const productCardsList = document.getElementById('productCardsList');
+
+    const zipProgressModal = document.getElementById('zipProgressModal');
+    const zipProgressText = document.getElementById('zipProgressText');
+    const zipProgressFill = document.getElementById('zipProgressFill');
+
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // =======================================================
+    // LOCAL CATALOG STORAGE SYSTEM (PERSISTENT CLIENT-SIDE INDEX)
+    // =======================================================
+    const LOCAL_CATALOG_KEY = 'evo_funko_local_catalog_v1';
+
+    function getLocalCatalog() {
+      try {
+        const raw = localStorage.getItem(LOCAL_CATALOG_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveToLocalCatalog(item) {
+      if (!item || item.status !== 'found') return;
+      try {
+        const catalog = getLocalCatalog();
+        const cleanItem = { ...item, source: item.source || 'local_index' };
+        if (item.query) catalog[item.query] = cleanItem;
+        if (item.sku) catalog[item.sku] = cleanItem;
+        if (item.upc) catalog[item.upc] = cleanItem;
+        localStorage.setItem(LOCAL_CATALOG_KEY, JSON.stringify(catalog));
+        updateLocalCatalogBadge();
+      } catch (e) {
+        console.warn('Error saving to local catalog:', e);
+      }
+    }
+
+    function getFromLocalCatalog(query) {
+      if (!query) return null;
+      const catalog = getLocalCatalog();
+      return catalog[query] || null;
+    }
+
+    function updateLocalCatalogBadge() {
+      const catalog = getLocalCatalog();
+      // Count unique figures by SKU / Title
+      const uniqueSkus = new Set(Object.values(catalog).map((it) => (it && (it.sku || it.query || it.title))));
+      const count = uniqueSkus.size;
+      if (localCatalogBadge) {
+        localCatalogBadge.textContent = `${count} ${count === 1 ? 'figura' : 'figuras'}`;
+      }
+    }
+
+    if (btnExportLocalCatalog) {
+      btnExportLocalCatalog.addEventListener('click', () => {
+        const catalog = getLocalCatalog();
+        const count = Object.keys(catalog).length;
+        if (count === 0) {
+          alert('La base local está vacía. Consulta códigos para indexar figuras.');
+          return;
+        }
+        const blob = new Blob([JSON.stringify(catalog, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `evo-funko-local-catalog-${new Date().toISOString().slice(0, 10)}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Base de datos local exportada en JSON');
+      });
+    }
+
+    if (btnClearLocalCatalog) {
+      btnClearLocalCatalog.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que deseas vaciar el catálogo local guardado en este navegador?')) {
+          localStorage.removeItem(LOCAL_CATALOG_KEY);
+          updateLocalCatalogBadge();
+          showToast('Base local eliminada.');
+        }
+      });
+    }
+
+    // UTILITY HELPERS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/"/g, '&quot;')
+        .replace(/\n/g, ' ');
+    }
+
+    function generateHandle(title, fallback) {
+      const base = title || fallback || 'funko-pop';
+      return base
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    // CLEAN INPUT CODES
+    function getCleanCodes() {
+      const raw = codesInput.value;
+      if (!raw.trim()) return [];
+      return raw
+        .split(/[\r\n,;\s]+/)
+        .map(c => c.trim().replace(/[^\w-]/g, ''))
+        .filter(c => c.length >= 4);
+    }
+
+    function updateInputCount() {
+      const count = getCleanCodes().length;
+      codeCounter.textContent = `${count} ${count === 1 ? 'código' : 'códigos'}`;
+    }
+
+    codesInput.addEventListener('input', updateInputCount);
+
+    btnLoadSample.addEventListener('click', () => {
+      codesInput.value = SAMPLE_CODES.join('\n');
+      updateInputCount();
+      showToast(`Cargados ${SAMPLE_CODES.length} códigos de ejemplo`);
+    });
+
+    btnClearInput.addEventListener('click', () => {
+      codesInput.value = '';
+      updateInputCount();
+    });
+
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toastNotification.classList.add('show');
+      setTimeout(() => toastNotification.classList.remove('show'), 3200);
+    }
+
+    // FETCH SINGLE CODE WITH LOCAL CACHE + TIMEOUT
+    async function fetchCodeWithRetry(query, forceRefresh = false, retryCount = 1) {
+      // 1. Check local browser database first (instant 0ms response)
+      if (!forceRefresh) {
+        const cached = getFromLocalCatalog(query);
+        if (cached && cached.status === 'found') {
+          return { ...cached, query, source: 'local_index' };
+        }
+      }
+
+      const endpoints = ['/api/funko-lookup', '/.netlify/functions/funko-lookup'];
+      
+      for (const ep of endpoints) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+          const res = await fetch(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, forceRefresh }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          
+          if (res.ok) {
+            const data = await res.json();
+            if (data.items && data.items.length > 0) {
+              const item = data.items[0];
+              if (item.status === 'found') {
+                saveToLocalCatalog(item);
+              }
+              return item;
+            }
+          } else if (res.status === 429 || res.status === 408) {
+            if (retryCount > 0) {
+              await new Promise(r => setTimeout(r, 1500));
+              return fetchCodeWithRetry(query, forceRefresh, retryCount - 1);
+            }
+          }
+        } catch (e) {
+          console.warn(`[Funko Tool] Error en ${ep} para ${query}:`, e.message);
+        }
+      }
+
+      const sku = query.length <= 6 ? query : (query.startsWith('889698') ? query.substring(6, 11) : '');
+      let diagnosis = 'Código no indexado en catálogo comercial';
+      if (query.startsWith('889698')) diagnosis = 'Vaulted / Fuera de catálogo Funko';
+
+      return {
+        query,
+        upc: query.length === 12 ? query : '',
+        sku,
+        title: `Item #${sku || query}`,
+        license: 'Funko',
+        image: '',
+        gallery: [],
+        source: 'not_found',
+        status: 'not_found',
+        diagnosis
+      };
+    }
+
+    // REFRESH SINGLE CARD INDIVIDUALLY ON DEMAND
+    async function refreshSingleProduct(item, cardElem) {
+      const q = item.query || item.sku || item.upc;
+      showToast(`Refrescando datos desde la red para ${item.sku || q}...`);
+      
+      const refreshBtn = cardElem.querySelector('.btn-refresh-card');
+      if (refreshBtn) {
+        refreshBtn.classList.add('loading');
+        refreshBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> <span>Actualizando...</span>';
+      }
+
+      const updated = await fetchCodeWithRetry(q, true); // forceRefresh = true
+
+      // Update in productsList
+      const idx = productsList.findIndex(p => p.query === item.query || (p.sku && p.sku === item.sku));
+      if (idx !== -1) {
+        productsList[idx] = updated;
+      }
+
+      saveToLocalCatalog(updated);
+      renderResults();
+      showToast(`¡Ficha de ${updated.sku || q} actualizada exitosamente!`);
+    }
+
+    // BATCH QUEUE RUNNER
+    async function runBatch() {
+      const codes = getCleanCodes();
+      if (codes.length === 0) {
+        alert('Por favor ingresa al menos un código de barras o SKU.');
+        return;
+      }
+
+      isRunning = true;
+      isPaused = false;
+      btnStart.disabled = true;
+      btnPause.disabled = false;
+      btnReset.disabled = false;
+      codesInput.disabled = true;
+      btnLoadSample.disabled = true;
+      btnClearInput.disabled = true;
+      reportSummaryCard.style.display = 'none';
+
+      statusDot.className = 'status-dot active';
+      statusText.textContent = 'Procesando lista...';
+      progressBarFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+
+      productsList = [];
+      if (statTotalBadge) statTotalBadge.textContent = `(${codes.length} códigos)`;
+      if (statLocal) statLocal.textContent = '0';
+      statFunko.textContent = '0';
+      statUpc.textContent = '0';
+      statNotFound.textContent = '0';
+      renderResults();
+
+      const pacing = batchPacing ? batchPacing.value : 'fast';
+      let chunkSize = 3;
+      let delayMs = 200;
+
+      if (pacing === 'moderate') {
+        chunkSize = 2;
+        delayMs = 400;
+      } else if (pacing === 'safe') {
+        chunkSize = 1;
+        delayMs = 800;
+      }
+
+      let completed = 0;
+
+      for (let i = 0; i < codes.length; i += chunkSize) {
+        if (!isRunning) break;
+
+        while (isPaused) {
+          await new Promise(r => setTimeout(r, 200));
+          if (!isRunning) break;
+        }
+
+        const chunk = codes.slice(i, i + chunkSize);
+        statusText.textContent = `⚡ Procesando ${Math.min(i + chunkSize, codes.length)} de ${codes.length}...`;
+
+        try {
+          const results = await Promise.all(chunk.map(c => fetchCodeWithRetry(c)));
+
+          for (const item of results) {
+            productsList.push(item);
+            completed++;
+          }
+        } catch(batchErr) {
+          console.warn('Batch chunk error:', batchErr);
+          chunk.forEach(c => {
+            productsList.push({
+              query: c,
+              upc: c.length === 12 ? c : '',
+              sku: c.length <= 6 ? c : '',
+              title: `Item #${c}`,
+              license: 'Funko',
+              image: '',
+              gallery: [],
+              source: 'not_found',
+              status: 'not_found',
+              diagnosis: 'Error de conexión'
+            });
+            completed++;
+          });
+        }
+
+        const pct = Math.round((completed / codes.length) * 100);
+        progressPercent.textContent = `${pct}%`;
+        progressBarFill.style.width = `${pct}%`;
+
+        const localCount = productsList.filter(p => p.source === 'local_index').length;
+        const funkoCount = productsList.filter(p => p.source === 'funko_storefront').length;
+        const upcCount = productsList.filter(p => p.source === 'upc_database').length;
+        const notFoundCount = productsList.filter(p => p.status !== 'found').length;
+
+        if (statLocal) statLocal.textContent = localCount;
+        statFunko.textContent = funkoCount;
+        statUpc.textContent = upcCount;
+        statNotFound.textContent = notFoundCount;
+
+        try {
+          renderResults();
+        } catch(rErr) {
+          console.warn('Render error:', rErr);
+        }
+
+        if (delayMs > 0 && i + chunkSize < codes.length) {
+          await new Promise(r => setTimeout(r, delayMs));
+        }
+      }
+
+      isRunning = false;
+      btnStart.disabled = false;
+      btnPause.disabled = true;
+      codesInput.disabled = false;
+      btnLoadSample.disabled = false;
+      btnClearInput.disabled = false;
+
+      statusDot.className = 'status-dot';
+      statusText.textContent = 'Búsqueda completada';
+      showToast(`Completado: ${productsList.length} productos procesados`);
+
+      showBatchSummary();
+    }
+
+    btnStart.addEventListener('click', runBatch);
+
+    btnPause.addEventListener('click', () => {
+      if (!isRunning) return;
+      isPaused = !isPaused;
+      btnPause.innerHTML = isPaused
+        ? '<i class="ph ph-play" aria-hidden="true"></i><span>Reanudar</span>'
+        : '<i class="ph ph-pause" aria-hidden="true"></i><span>Pausar</span>';
+      statusText.textContent = isPaused ? 'Pausado' : 'Procesando lista...';
+    });
+
+    btnReset.addEventListener('click', () => {
+      isRunning = false;
+      isPaused = false;
+      productsList = [];
+      expandedProductIds.clear();
+      btnStart.disabled = false;
+      btnPause.disabled = true;
+      btnReset.disabled = true;
+      codesInput.disabled = false;
+      btnLoadSample.disabled = false;
+      btnClearInput.disabled = false;
+      reportSummaryCard.style.display = 'none';
+      if (viewModeTabsBar) viewModeTabsBar.style.display = 'none';
+
+      progressBarFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+      if (statTotalBadge) statTotalBadge.textContent = '(0 códigos)';
+      if (statLocal) statLocal.textContent = '0';
+      statFunko.textContent = '0';
+      statUpc.textContent = '0';
+      statNotFound.textContent = '0';
+      statusDot.className = 'status-dot';
+      statusText.textContent = 'Listo para iniciar';
+
+      renderResults();
+    });
+
+    // VIEW MODE TABS LOGIC
+    const resultsToolbarElem = document.querySelector('.results-toolbar');
+
+    if (tabViewCards && tabViewCollections) {
+      tabViewCards.addEventListener('click', () => {
+        tabViewCards.classList.add('active');
+        tabViewCollections.classList.remove('active');
+        reportSummaryCard.style.display = 'none';
+        if (resultsToolbarElem) resultsToolbarElem.style.display = 'flex';
+        if (productCardsList) productCardsList.style.display = 'flex';
+        renderResults();
+      });
+
+      tabViewCollections.addEventListener('click', () => {
+        tabViewCollections.classList.add('active');
+        tabViewCards.classList.remove('active');
+        reportSummaryCard.style.display = 'block';
+        if (resultsToolbarElem) resultsToolbarElem.style.display = 'none';
+        if (productCardsList) productCardsList.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
+      });
+    }
+
+    // POST BATCH REPORT SUMMARY
+    function showBatchSummary() {
+      if (productsList.length === 0) return;
+
+      const total = productsList.length;
+      const foundItems = productsList.filter(p => p.status === 'found');
+      const totalFound = foundItems.length;
+
+      reportSummarySubtitle.textContent = `Se identificaron ${totalFound} de ${total} productos (${Math.round((totalFound/total)*100)}%). Haz clic en una colección para filtrar.`;
+
+      const collectionsMap = {};
+      foundItems.forEach(item => {
+        const lic = item.license || item.fandom || 'Otras Figuras';
+        if (!collectionsMap[lic]) {
+          collectionsMap[lic] = [];
+        }
+        collectionsMap[lic].push(item);
+      });
+
+      const totalCollections = Object.keys(collectionsMap).length;
+      if (tabCollectionsLabel) {
+        tabCollectionsLabel.textContent = `Colecciones (${totalCollections})`;
+      }
+      if (viewModeTabsBar) {
+        viewModeTabsBar.style.display = 'flex';
+      }
+
+      let collectionsHtml = '';
+      const sortedEntries = Object.entries(collectionsMap).sort((a, b) => b[1].length - a[1].length);
+
+      for (const [licName, items] of sortedEntries) {
+        const boxNumbers = items.map(it => it.boxNumber).filter(Boolean);
+        const boxesStr = boxNumbers.length > 0 ? `Cajas: ${boxNumbers.join(', ')}` : `${items.length} ${items.length === 1 ? 'figura' : 'figuras'}`;
+
+        let thumbsHtml = '';
+        items.slice(0, 6).forEach(it => {
+          const src = it.image || '/assets/favicon.svg';
+          thumbsHtml += `
+            <div style="width:34px; height:34px; min-width:34px; aspect-ratio:1/1; background:#fff; border:1px solid var(--border); border-radius:4px; padding:2px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+              <img src="${escapeAttr(src)}" alt="" style="width:100%; height:100%; object-fit:contain; display:block;" onerror="this.src='/assets/favicon.svg'">
+            </div>
+          `;
+        });
+
+        collectionsHtml += `
+          <div class="collection-card" data-lic="${escapeAttr(licName)}" style="cursor:pointer;" title="Clic para filtrar por ${escapeAttr(licName)}">
+            <div class="collection-card-header">
+              <span class="collection-name">${escapeHtml(licName)}</span>
+              <span class="collection-badge">${items.length}</span>
+            </div>
+            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; margin:4px 0;">
+              ${thumbsHtml}
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--text-3);">${escapeHtml(boxesStr)}</span>
+          </div>
+        `;
+      }
+
+      reportCollectionsGrid.innerHTML = collectionsHtml || '<p style="color:var(--text-3); font-size:0.84rem;">Sin figuras encontradas en este lote.</p>';
+      
+      // Filter click on collections: switches to cards list and applies filter
+      reportCollectionsGrid.querySelectorAll('.collection-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const lic = card.getAttribute('data-lic') || '';
+          filterSearch.value = lic;
+          if (tabViewCards && tabViewCollections) {
+            tabViewCards.classList.add('active');
+            tabViewCollections.classList.remove('active');
+            reportSummaryCard.style.display = 'none';
+            if (productCardsList) productCardsList.style.display = 'flex';
+          }
+          renderResults();
+          showToast(`Filtrando por colección: ${lic}`);
+        });
+      });
+
+      // Keep default tab as Cards View so results list is immediately visible
+      if (tabViewCards && tabViewCollections) {
+        tabViewCards.classList.add('active');
+        tabViewCollections.classList.remove('active');
+        reportSummaryCard.style.display = 'none';
+        if (productCardsList) productCardsList.style.display = 'flex';
+      }
+    }
+
+    // FILTERING
+    function getFilteredProducts() {
+      const q = filterSearch.value.trim().toLowerCase();
+      const st = filterStatus.value;
+
+      return productsList.filter(item => {
+        if (st === 'found' && item.status !== 'found') return false;
+        if (st === 'not_found' && item.status === 'found') return false;
+
+        if (!q) return true;
+        const haystack = `${item.query} ${item.upc || ''} ${item.sku || ''} ${item.title || ''} ${item.license || ''} ${item.fandom || ''} ${item.boxNumber || ''} ${item.diagnosis || ''}`.toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+
+    filterSearch.addEventListener('input', renderResults);
+    filterStatus.addEventListener('change', renderResults);
+
+    function renderResults() {
+      const filtered = getFilteredProducts();
+
+      if (productsList.length === 0) {
+        emptyState.style.display = 'block';
+        productCardsList.style.display = 'none';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      productCardsList.style.display = 'flex';
+      renderProductCards(filtered);
+    }
+
+    // BUILD STANDARD PRODUCT SHEET HTML (ES or EN)
+    function getProductSheetHtml(item, lang = 'es') {
+      if (lang === 'en' && item.descriptionHtml_en) return item.descriptionHtml_en;
+      if (lang === 'es' && item.descriptionHtml) return item.descriptionHtml;
+      
+      const isEs = lang === 'es';
+      const desc = isEs ? (item.description_es || item.description || 'Figura coleccionable oficial de la marca Funko.') : (item.description || 'Official collectible figure by Funko.');
+      const cleanDesc = desc
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<\/?[^>]+(>|$)/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (isEs) {
+        return `
+<div class="evo-product-sheet">
+  <p class="sheet-desc">${escapeHtml(cleanDesc)}</p>
+  <ul class="sheet-specs" style="list-style-type: none; padding-left: 0; margin-top: 1rem; line-height: 1.6;">
+    ${item.license ? `<li><strong>Colección / Licencia:</strong> ${escapeHtml(item.license)}</li>` : ''}
+    ${item.fandom ? `<li><strong>Fandom / Universo:</strong> ${escapeHtml(item.fandom)}</li>` : ''}
+    ${item.boxNumber ? `<li><strong>Número de Caja:</strong> ${escapeHtml(item.boxNumber)}</li>` : ''}
+    ${item.sku ? `<li><strong>Número de Ítem / SKU:</strong> ${escapeHtml(item.sku)}</li>` : ''}
+    ${item.upc ? `<li><strong>Código de Barras (UPC):</strong> ${escapeHtml(item.upc)}</li>` : ''}
+    <li><strong>Material:</strong> Vinilo de alta calidad</li>
+    <li><strong>Fabricante:</strong> Funko LLC</li>
+    <li><strong>Condición:</strong> Nuevo en caja original sellada</li>
+  </ul>
+</div>`.trim();
+      }
+
+      return `
+<div class="evo-product-sheet">
+  <p class="sheet-desc">${escapeHtml(cleanDesc)}</p>
+  <ul class="sheet-specs" style="list-style-type: none; padding-left: 0; margin-top: 1rem; line-height: 1.6;">
+    ${item.license ? `<li><strong>Collection / License:</strong> ${escapeHtml(item.license)}</li>` : ''}
+    ${item.fandom ? `<li><strong>Fandom / Universe:</strong> ${escapeHtml(item.fandom)}</li>` : ''}
+    ${item.boxNumber ? `<li><strong>Box Number:</strong> ${escapeHtml(item.boxNumber)}</li>` : ''}
+    ${item.sku ? `<li><strong>Item Number / SKU:</strong> ${escapeHtml(item.sku)}</li>` : ''}
+    ${item.upc ? `<li><strong>Barcode (UPC):</strong> ${escapeHtml(item.upc)}</li>` : ''}
+    <li><strong>Material:</strong> High quality collectible vinyl</li>
+    <li><strong>Manufacturer:</strong> Funko LLC</li>
+    <li><strong>Condition:</strong> Brand new in original window box</li>
+  </ul>
+</div>`.trim();
+    }
+
+    // BUILD STANDARD PRODUCT SHEET PLAIN TEXT (ES or EN)
+    function getProductSheetText(item, lang = 'es') {
+      const isEs = lang === 'es';
+      const desc = isEs ? (item.description_es || item.description || 'Figura coleccionable oficial de la marca Funko.') : (item.description || 'Official collectible figure by Funko.');
+      const cleanDesc = desc
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<\/?[^>]+(>|$)/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (isEs) {
+        return `
+${item.title || 'Funko Pop!'}
+
+DESCRIPCIÓN:
+${cleanDesc}
+
+ESPECIFICACIONES:
+- Colección / Licencia: ${item.license || 'Funko'}
+${item.fandom ? `- Fandom / Universo: ${item.fandom}\n` : ''}${item.boxNumber ? `- Número de Caja: ${item.boxNumber}\n` : ''}- Número de Ítem / SKU: ${item.sku || item.query}
+- Código de Barras (UPC): ${item.upc || item.query}
+- Material: Vinilo coleccionable oficial
+- Fabricante: Funko LLC
+- Condición: Nuevo en caja original sellada
+`.trim();
+      }
+
+      return `
+${item.title || 'Funko Pop!'}
+
+DESCRIPTION:
+${cleanDesc}
+
+SPECIFICATIONS:
+- Collection / License: ${item.license || 'Funko'}
+${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? `- Box Number: ${item.boxNumber}\n` : ''}- Item Number / SKU: ${item.sku || item.query}
+- Barcode (UPC): ${item.upc || item.query}
+- Material: Official collectible vinyl
+- Manufacturer: Funko LLC
+- Condition: Brand new in original window box
+`.trim();
+    }
+
+    // COPY PRODUCT SHEET TO CLIPBOARD
+    async function copyProductSheet(item, format = 'html', lang = 'es') {
+      const htmlContent = getProductSheetHtml(item, lang);
+      const textContent = getProductSheetText(item, lang);
+
+      if (format === 'html') {
+        try {
+          const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+          const blobText = new Blob([textContent], { type: 'text/plain' });
+          const clipboardItem = new ClipboardItem({
+            'text/html': blobHtml,
+            'text/plain': blobText
+          });
+          await navigator.clipboard.write([clipboardItem]);
+          showToast(`¡Ficha de ${item.sku || item.query} copiada en Español!`);
+        } catch (e) {
+          await navigator.clipboard.writeText(textContent);
+          showToast(`Ficha copiada en texto plano`);
+        }
+      } else {
+        await navigator.clipboard.writeText(textContent);
+        showToast(`Ficha copiada en texto plano`);
+      }
+    }
+
+    // =======================================================
+    // HELPER: FETCH IMAGE BLOB SAFELY WITH SERVER PROXY FALLBACK (NO CORS 22-BYTE EMPTY ZIP)
+    // =======================================================
+    async function fetchImageBlob(imgUrl) {
+      if (!imgUrl) return null;
+
+      // 1. Try direct fetch
+      try {
+        const res = await fetch(imgUrl);
+        if (res.ok) {
+          const blob = await res.blob();
+          if (blob.size > 200) return blob;
+        }
+      } catch (e) {
+        // Direct fetch failed (e.g. CORS block from image CDN)
+      }
+
+      // 2. Fallback to server proxy
+      const proxyUrls = [
+        `/.netlify/functions/funko-lookup?img=${encodeURIComponent(imgUrl)}`,
+        `/api/funko-lookup?img=${encodeURIComponent(imgUrl)}`
+      ];
+
+      for (const purl of proxyUrls) {
+        try {
+          const res = await fetch(purl);
+          if (res.ok) {
+            const blob = await res.blob();
+            if (blob.size > 200) return blob;
+          }
+        } catch (err) {
+          console.warn('Proxy fetch failed:', err);
+        }
+      }
+
+      return null;
+    }
+
+    // DOWNLOAD SINGLE PRODUCT PHOTOS AS ZIP (ROBUST WITH SERVER PROXY)
+    async function downloadSingleProductZip(item) {
+      if (typeof JSZip === 'undefined') {
+        alert('Librería ZIP cargando... Por favor reintenta en 1 segundo.');
+        return;
+      }
+
+      const gallery = (item.gallery && item.gallery.length > 0) ? item.gallery : (item.image ? [item.image] : []);
+      if (gallery.length === 0) {
+        alert('No hay fotografías disponibles para este producto.');
+        return;
+      }
+
+      const sku = item.sku || item.upc || item.query;
+      showToast(`Descargando ${gallery.length} fotos de ${sku}...`);
+
+      const zip = new JSZip();
+      let savedPhotos = 0;
+
+      for (let idx = 0; idx < gallery.length; idx++) {
+        const imgUrl = gallery[idx];
+        try {
+          const blob = await fetchImageBlob(imgUrl);
+          if (blob) {
+            const ext = imgUrl.includes('.png') ? 'png' : 'jpg';
+            zip.file(`${sku}_${String(idx + 1).padStart(2, '0')}.${ext}`, blob);
+            savedPhotos++;
+          }
+        } catch(e) {
+          console.warn('Error downloading single photo:', e);
+        }
+      }
+
+      if (savedPhotos === 0) {
+        alert('No fue posible descargar las imágenes de este producto.');
+        return;
+      }
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `funko-${sku}-photos.zip`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`ZIP descargado: ${savedPhotos} fotos de ${sku}`);
+    }
+
+    // =======================================================
+    // 2-STAGE PRODUCT CARDS RENDERER (DEFAULT GALLERY + COLLAPSIBLE FICHA)
+    // =======================================================
+    function renderProductCards(items) {
+      if (!productCardsList) return;
+      productCardsList.innerHTML = '';
+      
+      if (items.length === 0) {
+        productCardsList.innerHTML = `<div class="panel-card" style="text-align:center; padding:2.5rem; color:var(--text-3); width:100%;">No hay coincidencias con el filtro aplicado</div>`;
+        return;
+      }
+
+      items.forEach((item, index) => {
+        const cardId = `pcard-${item.query || index}-${index}`;
+        const isExpanded = expandedProductIds.has(cardId);
+        const imgSrc = item.image || '/assets/favicon.svg';
+        const gallery = (item.gallery && item.gallery.length > 0) ? item.gallery : (item.image ? [item.image] : []);
+        const photosCount = gallery.length;
+
+        let sourceBadge = '';
+        if (item.source === 'local_index') {
+          sourceBadge = `<span class="badge-source source-local" title="Recuperado desde el índice persistente local (0ms)"><i class="ph ph-hard-drive"></i> Índice Local</span>`;
+        } else if (item.source === 'funko_storefront') {
+          sourceBadge = `<span class="badge-source source-funko"><i class="ph ph-check-circle"></i> Funko US (Oficial)</span>`;
+        } else if (item.source === 'upc_database') {
+          sourceBadge = `<span class="badge-source source-upc"><i class="ph ph-barcode"></i> UPC Index</span>`;
+        } else {
+          sourceBadge = `<span class="badge-source source-none"><i class="ph ph-warning-circle"></i> No Encontrado</span>`;
+        }
+
+        const funkoSearchUrl = `https://funko.com/search/?q=${encodeURIComponent(item.sku || item.query)}&vault=true`;
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent('Funko Pop ' + (item.sku || item.query) + ' ' + (item.title || ''))}`;
+        const weplaySearchUrl = `https://www.weplay.cl/catalogsearch/result/?q=${encodeURIComponent(item.sku || item.query)}`;
+
+        const card = document.createElement('div');
+        card.className = `funko-product-card ${isExpanded ? 'is-expanded' : ''}`;
+        card.id = cardId;
+
+        // Subfotos / Thumbnails strip
+        let thumbsStripHtml = '';
+        gallery.forEach((url, gIdx) => {
+          thumbsStripHtml += `
+            <div class="card-thumb-item ${gIdx === 0 ? 'active' : ''}" data-url="${escapeAttr(url)}">
+              <img src="${escapeAttr(url)}" alt="Vista ${gIdx + 1}" onerror="this.src='/assets/favicon.svg'">
+            </div>
+          `;
+        });
+
+        const cleanDescEs = (item.description_es || item.description || 'Figura coleccionable oficial de la marca Funko.')
+          .replace(/<br\s*\/?>/gi, ' ')
+          .replace(/<\/?[^>]+(>|$)/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        const cleanDescEn = (item.description || 'Official collectible figure by Funko.')
+          .replace(/<br\s*\/?>/gi, ' ')
+          .replace(/<\/?[^>]+(>|$)/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        // 2-Column Compressed View + Full-Width Expandable Drawer
+        card.innerHTML = `
+          <div class="card-main-grid">
+            <!-- LEFT COLUMN: DEFAULT GALLERY VIEWER (MAIN PHOTO + SUBPHOTOS) -->
+            <div class="card-gallery-col">
+              <div class="card-hero-img-box">
+                <img class="card-active-img" src="${escapeAttr(gallery[0] || imgSrc)}" alt="${escapeAttr(item.title || '')}" onerror="this.src='/assets/favicon.svg'">
+                ${item.boxNumber ? `<span class="card-box-badge">${escapeHtml(item.boxNumber)}</span>` : ''}
+              </div>
+
+              ${gallery.length > 1 ? `<div class="card-thumbs-strip">${thumbsStripHtml}</div>` : ''}
+
+              <div class="card-gallery-footer">
+                <span class="card-photo-count"><i class="ph ph-image"></i> ${photosCount} ${photosCount === 1 ? 'foto HD' : 'fotos HD'}</span>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: PRODUCT INFO & UNIFIED ACTIONS -->
+            <div class="card-content-col">
+              <!-- TOP TAGS & CODES -->
+              <div class="card-top-meta">
+                <div class="card-pills-row">
+                  ${item.license ? `<span class="badge-tag badge-license">${escapeHtml(item.license)}</span>` : ''}
+                  ${item.fandom ? `<span class="badge-tag">${escapeHtml(item.fandom)}</span>` : ''}
+                  ${sourceBadge}
+                </div>
+                <div class="card-codes-row">
+                  <span class="mono-code-badge"><i class="ph ph-barcode"></i> UPC: <strong>${escapeHtml(item.upc || item.query)}</strong></span>
+                  ${item.sku ? `<span class="mono-code-badge"><i class="ph ph-tag"></i> SKU: <strong>${escapeHtml(item.sku)}</strong></span>` : ''}
+                </div>
+              </div>
+
+              <!-- OFFICIAL TITLE -->
+              <h3 class="card-title">${escapeHtml(item.title || 'Sin título')}</h3>
+
+              <!-- SHORT DESCRIPTION SNIPPET -->
+              <p class="card-desc-snippet">${escapeHtml(cleanDescEs)}</p>
+
+              <!-- UNIFIED ACTION TOOLBAR (ALL ACTIONS IN ONE CLEAN ROW) -->
+              <div class="card-unified-actions">
+                <button class="btn-compact btn-accent btn-copy-html-card" type="button" title="Copiar HTML formateado para Shopify / Web">
+                  <i class="ph ph-copy"></i> <span>Copiar Ficha (HTML)</span>
+                </button>
+                <button class="btn-compact btn-copy-text-card" type="button" title="Copiar ficha en texto plano">
+                  <i class="ph ph-clipboard-text"></i> <span>Copiar Texto</span>
+                </button>
+                ${photosCount > 0 ? `
+                  <button class="btn-compact btn-single-zip" type="button" title="Descargar paquete ZIP con fotos HD">
+                    <i class="ph ph-file-zip"></i> <span>ZIP Fotos (${photosCount})</span>
+                  </button>
+                ` : ''}
+                <button class="btn-compact btn-refresh-card" type="button" title="Forzar re-consulta a la red externa">
+                  <i class="ph ph-arrows-clockwise"></i> <span>Refrescar</span>
+                </button>
+              </div>
+
+              <!-- EXPAND ACTION BUTTON (CLEAN & MINIMALIST) -->
+              <div class="card-actions-wrapper">
+                <button class="btn-expand-ficha-full ${isExpanded ? 'active' : ''}" type="button">
+                  <div class="btn-expand-inner">
+                    <i class="ph ${isExpanded ? 'ph-caret-up' : 'ph-caret-down'}"></i>
+                    <span>${isExpanded ? 'Ocultar Ficha y Especificaciones' : 'Ver Ficha Completa y Especificaciones'}</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- FULL-WIDTH EXPANDED FICHA DRAWER (COLLAPSIBLE INSTANCE) -->
+          <div class="card-expanded-drawer" style="display: ${isExpanded ? 'block' : 'none'};">
+            <div class="expanded-sheet-box">
+              <div class="expanded-sheet-header">
+                <div class="drawer-lang-selector">
+                  <button class="drawer-lang-btn active" data-lang="es" type="button">🇪🇸 Español (Recomendado)</button>
+                  <button class="drawer-lang-btn" data-lang="en" type="button">🇺🇸 English (Original)</button>
+                </div>
+                <div class="expanded-external-links-top">
+                  ${item.link ? `<a href="${escapeAttr(item.link)}" target="_blank" rel="noopener" class="btn-compact btn-accent"><i class="ph ph-arrow-square-out"></i> Funko US Oficial</a>` : `<a href="${escapeAttr(funkoSearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-magnifying-glass"></i> Funko US</a>`}
+                  <a href="${escapeAttr(weplaySearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-shopping-bag"></i> WePlay</a>
+                  <a href="${escapeAttr(googleSearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-google-logo"></i> Google</a>
+                </div>
+              </div>
+
+              <div class="expanded-sheet-body">
+                <p class="expanded-sheet-desc" data-desc-es="${escapeAttr(cleanDescEs)}" data-desc-en="${escapeAttr(cleanDescEn)}">${escapeHtml(cleanDescEs)}</p>
+                
+                <ul class="expanded-sheet-specs">
+                  ${item.license ? `<li><strong>Colección / Licencia:</strong> <span>${escapeHtml(item.license)}</span></li>` : ''}
+                  ${item.fandom ? `<li><strong>Fandom / Universo:</strong> <span>${escapeHtml(item.fandom)}</span></li>` : ''}
+                  ${item.boxNumber ? `<li><strong>Número de Caja:</strong> <span>${escapeHtml(item.boxNumber)}</span></li>` : ''}
+                  <li><strong>Número de Ítem / SKU:</strong> <span>${escapeHtml(item.sku || item.query)}</span></li>
+                  ${item.upc ? `<li><strong>Código de Barras (UPC):</strong> <span>${escapeHtml(item.upc)}</span></li>` : ''}
+                  <li><strong>Material:</strong> <span>Vinilo coleccionable oficial</span></li>
+                  <li><strong>Fabricante:</strong> <span>Funko LLC</span></li>
+                  <li><strong>Condición:</strong> <span>Nuevo en caja original sellada</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+
+        productCardsList.appendChild(card);
+
+        // 1. Hook thumbnail interaction
+        const cardActiveImg = card.querySelector('.card-active-img');
+        const thumbs = card.querySelectorAll('.card-thumb-item');
+        thumbs.forEach(th => {
+          th.addEventListener('click', () => {
+            thumbs.forEach(t => t.classList.remove('active'));
+            th.classList.add('active');
+            if (cardActiveImg) cardActiveImg.src = th.dataset.url;
+          });
+        });
+
+        // 2. Hook Single Product ZIP Download
+        card.querySelector('.btn-single-zip')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          downloadSingleProductZip(item);
+        });
+
+        // 3. Hook Refresh Action
+        card.querySelector('.btn-refresh-card')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          refreshSingleProduct(item, card);
+        });
+
+        // 4. Hook Unified Copy Actions (Card Toolbar)
+        let currentLang = 'es';
+        card.querySelector('.btn-copy-html-card')?.addEventListener('click', () => copyProductSheet(item, 'html', currentLang));
+        card.querySelector('.btn-copy-text-card')?.addEventListener('click', () => copyProductSheet(item, 'text', currentLang));
+
+        // 5. Hook Expand / Collapse Action
+        const btnExpand = card.querySelector('.btn-expand-ficha-full');
+        const drawer = card.querySelector('.card-expanded-drawer');
+        if (btnExpand && drawer) {
+          btnExpand.addEventListener('click', () => {
+            const willExpand = !expandedProductIds.has(cardId);
+            if (willExpand) {
+              expandedProductIds.add(cardId);
+              card.classList.add('is-expanded');
+              btnExpand.classList.add('active');
+              drawer.style.display = 'block';
+              const icon = btnExpand.querySelector('.btn-expand-inner i');
+              const span = btnExpand.querySelector('.btn-expand-inner span');
+              if (icon) icon.className = 'ph ph-caret-up';
+              if (span) span.textContent = 'Ocultar Ficha y Especificaciones';
+            } else {
+              expandedProductIds.delete(cardId);
+              card.classList.remove('is-expanded');
+              btnExpand.classList.remove('active');
+              drawer.style.display = 'none';
+              const icon = btnExpand.querySelector('.btn-expand-inner i');
+              const span = btnExpand.querySelector('.btn-expand-inner span');
+              if (icon) icon.className = 'ph ph-caret-down';
+              if (span) span.textContent = 'Ver Ficha Completa y Especificaciones';
+            }
+          });
+        }
+
+        // 6. Hook Bilingual Toggle in Drawer
+        const langBtns = card.querySelectorAll('.drawer-lang-btn');
+        const descElem = card.querySelector('.expanded-sheet-desc');
+        langBtns.forEach(b => {
+          b.addEventListener('click', () => {
+            langBtns.forEach(t => t.classList.remove('active'));
+            b.classList.add('active');
+            currentLang = b.dataset.lang;
+            if (descElem) {
+              if (currentLang === 'en') {
+                descElem.textContent = descElem.getAttribute('data-desc-en') || cleanDescEn;
+              } else {
+                descElem.textContent = descElem.getAttribute('data-desc-es') || cleanDescEs;
+              }
+            }
+          });
+        });
+      });
+    }
+
+    // EXPORT 1: OFFICIAL SHOPIFY CSV (WITH BILINGUAL OPTION)
+    function exportShopifyCsv(lang = 'es') {
+      if (productsList.length === 0) {
+        alert('No hay productos para exportar.');
+        return;
+      }
+
+      const foundItems = productsList.filter(p => p.status === 'found');
+      if (foundItems.length === 0) {
+        alert('No se encontraron productos con éxito para exportar a Shopify.');
+        return;
+      }
+
+      const headers = [
+        'Handle', 'Title', 'Body (HTML)', 'Vendor', 'Product Category', 'Type',
+        'Tags', 'Published', 'Option1 Name', 'Option1 Value', 'Option2 Name', 'Option2 Value',
+        'Option3 Name', 'Option3 Value', 'Variant SKU', 'Variant Grams', 'Variant Inventory Tracker',
+        'Variant Inventory Qty', 'Variant Inventory Policy', 'Variant Fulfillment Service',
+        'Variant Price', 'Variant Compare At Price', 'Variant Requires Shipping', 'Variant Taxable',
+        'Variant Barcode', 'Image Src', 'Image Position', 'Image Alt Text', 'Gift Card',
+        'SEO Title', 'SEO Description', 'Google Shopping / Google Product Category',
+        'Google Shopping / Gender', 'Google Shopping / Age Group', 'Google Shopping / MPN',
+        'Google Shopping / Condition', 'Google Shopping / Custom Product', 'Google Shopping / Custom Label 0',
+        'Google Shopping / Custom Label 1', 'Google Shopping / Custom Label 2', 'Google Shopping / Custom Label 3',
+        'Google Shopping / Custom Label 4', 'Variant Image', 'Variant Weight Unit', 'Variant Tax Code',
+        'Cost per item', 'Status'
+      ];
+
+      const rows = [];
+
+      foundItems.forEach(item => {
+        const handle = generateHandle(item.title, item.sku || item.query);
+        const title = item.title || `Funko Pop! #${item.sku || item.query}`;
+        const vendor = 'Funko';
+        const type = 'Pop! Vinyl Figure';
+        const tagsList = ['Funko', 'Pop!', item.license, item.fandom, item.boxNumber].filter(Boolean).join(', ');
+        const sku = item.sku || item.query;
+        const barcode = item.upc || (item.query.length === 12 ? item.query : '');
+        const price = (item.price || '14.99').replace('$', '').trim();
+        const bodyHtml = getProductSheetHtml(item, lang);
+        
+        const gallery = (item.gallery && item.gallery.length > 0) ? item.gallery : (item.image ? [item.image] : []);
+
+        if (gallery.length === 0) {
+          rows.push([
+            `"${handle}"`, `"${title.replace(/"/g, '""')}"`, `"${bodyHtml.replace(/"/g, '""')}"`,
+            `"${vendor}"`, '"Toys & Games > Toys > Action Figures & Statuettes"', `"${type}"`,
+            `"${tagsList.replace(/"/g, '""')}"`, 'TRUE', '"Title"', '"Default Title"', '', '', '', '',
+            `"${sku}"`, '150', 'shopify', '1', 'deny', 'manual',
+            `"${price}"`, '', 'TRUE', 'TRUE', `"${barcode}"`, '', '', '', 'FALSE',
+            `"${title.replace(/"/g, '""')}"`, `"${title.replace(/"/g, '""')}"`, '', '', '', `"${sku}"`,
+            'new', 'FALSE', `"${item.license || ''}"`, `"${item.boxNumber || ''}"`, '', '', '', '', 'g', '', '', 'active'
+          ]);
+        } else {
+          gallery.forEach((imgUrl, imgIdx) => {
+            if (imgIdx === 0) {
+              rows.push([
+                `"${handle}"`, `"${title.replace(/"/g, '""')}"`, `"${bodyHtml.replace(/"/g, '""')}"`,
+                `"${vendor}"`, '"Toys & Games > Toys > Action Figures & Statuettes"', `"${type}"`,
+                `"${tagsList.replace(/"/g, '""')}"`, 'TRUE', '"Title"', '"Default Title"', '', '', '', '',
+                `"${sku}"`, '150', 'shopify', '1', 'deny', 'manual',
+                `"${price}"`, '', 'TRUE', 'TRUE', `"${barcode}"`, `"${imgUrl}"`, '1', `"${title.replace(/"/g, '""')}"`, 'FALSE',
+                `"${title.replace(/"/g, '""')}"`, `"${title.replace(/"/g, '""')}"`, '', '', '', `"${sku}"`,
+                'new', 'FALSE', `"${item.license || ''}"`, `"${item.boxNumber || ''}"`, '', '', '', '', 'g', '', '', 'active'
+              ]);
+            } else {
+              const emptyCols = new Array(headers.length).fill('""');
+              emptyCols[0] = `"${handle}"`;
+              emptyCols[25] = `"${imgUrl}"`;
+              emptyCols[26] = `"${imgIdx + 1}"`;
+              emptyCols[27] = `"${title.replace(/"/g, '""')} - Vista ${imgIdx + 1}"`;
+              rows.push(emptyCols);
+            }
+          });
+        }
+      });
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `shopify-funko-${lang}-${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`CSV para Shopify (${lang.toUpperCase()}) descargado`);
+    }
+
+    btnExportShopify.addEventListener('click', () => exportShopifyCsv('es'));
+    btnExportShopifyEn.addEventListener('click', () => exportShopifyCsv('en'));
+    btnReportExportShopifyEs.addEventListener('click', () => exportShopifyCsv('es'));
+
+    // EXPORT 2: COPY RICH HTML TABLE DIRECTLY TO CLIPBOARD
+    async function copyTableHtml() {
+      const foundItems = productsList.filter(p => p.status === 'found');
+      if (foundItems.length === 0) {
+        alert('No hay productos encontrados para copiar.');
+        return;
+      }
+
+      let html = `<table border="1" style="border-collapse:collapse; font-family:sans-serif; font-size:13px; width:100%;">
+        <thead>
+          <tr style="background:#f1f5f9; text-align:left;">
+            <th style="padding:8px;">Foto</th>
+            <th style="padding:8px;">SKU</th>
+            <th style="padding:8px;">Código UPC</th>
+            <th style="padding:8px;">Título Oficial</th>
+            <th style="padding:8px;">Licencia / Colección</th>
+            <th style="padding:8px; text-align:center;"># Caja</th>
+            <th style="padding:8px;">Fuente</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      let tsv = "Foto\tSKU\tUPC\tTítulo\tLicencia\t# Caja\tFuente\n";
+
+      foundItems.forEach(item => {
+        const imgTag = item.image ? `<img src="${item.image}" width="40" height="40" style="object-fit:contain; vertical-align:middle;" />` : '';
+        html += `<tr>
+          <td style="padding:6px; text-align:center;">${imgTag}</td>
+          <td style="padding:6px; font-weight:bold; font-family:monospace;">${escapeHtml(item.sku || item.query)}</td>
+          <td style="padding:6px; font-family:monospace;">${escapeHtml(item.upc || item.query)}</td>
+          <td style="padding:6px; font-weight:bold;">${escapeHtml(item.title || '')}</td>
+          <td style="padding:6px;">${escapeHtml(item.license || '—')}</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${escapeHtml(item.boxNumber || '—')}</td>
+          <td style="padding:6px;">${escapeHtml(item.source === 'funko_storefront' ? 'Funko US' : 'UPC Index')}</td>
+        </tr>`;
+
+        tsv += `${item.image || ''}\t${item.sku || item.query}\t${item.upc || item.query}\t${item.title || ''}\t${item.license || ''}\t${item.boxNumber || ''}\t${item.source}\n`;
+      });
+
+      html += `</tbody></table>`;
+
+      try {
+        const blobHtml = new Blob([html], { type: 'text/html' });
+        const blobText = new Blob([tsv], { type: 'text/plain' });
+        const clipboardItem = new ClipboardItem({
+          'text/html': blobHtml,
+          'text/plain': blobText
+        });
+        await navigator.clipboard.write([clipboardItem]);
+        showToast('¡Tabla copiada! Pégala con Ctrl+V directo en Google Sheets o Notion');
+      } catch (e) {
+        await navigator.clipboard.writeText(tsv);
+        showToast('Datos copiados en formato tabla (TSV) para pegar directo en Sheets');
+      }
+    }
+
+    btnCopyHtmlTable.addEventListener('click', copyTableHtml);
+    btnReportCopyHtml.addEventListener('click', copyTableHtml);
+
+    // EXPORT 3: FULL BATCH ZIP ARCHIVE OF IMAGES
+    async function exportImagesZip() {
+      if (typeof JSZip === 'undefined') {
+        alert('Librería ZIP cargando... Por favor intenta en 2 segundos.');
+        return;
+      }
+
+      const itemsWithImages = productsList.filter(p => (p.gallery && p.gallery.length > 0) || p.image);
+      if (itemsWithImages.length === 0) {
+        alert('No hay imágenes disponibles para empaquetar.');
+        return;
+      }
+
+      zipProgressModal.style.display = 'flex';
+      zipProgressFill.style.width = '0%';
+      zipProgressText.textContent = 'Iniciando descarga de fotografías del lote...';
+
+      const zip = new JSZip();
+      let totalImages = 0;
+      itemsWithImages.forEach(p => {
+        const g = (p.gallery && p.gallery.length > 0) ? p.gallery : (p.image ? [p.image] : []);
+        totalImages += g.length;
+      });
+
+      let downloadedCount = 0;
+
+      for (const item of itemsWithImages) {
+        const sku = item.sku || item.upc || item.query;
+        const gallery = (item.gallery && item.gallery.length > 0) ? item.gallery : (item.image ? [item.image] : []);
+
+        for (let idx = 0; idx < gallery.length; idx++) {
+          const imgUrl = gallery[idx];
+          try {
+            const blob = await fetchImageBlob(imgUrl);
+            if (blob) {
+              const ext = imgUrl.includes('.png') ? 'png' : 'jpg';
+              const filename = `${sku}_${String(idx + 1).padStart(2, '0')}.${ext}`;
+              zip.file(filename, blob);
+              downloadedCount++;
+            }
+          } catch (e) {
+            console.warn(`Error downloading image ${imgUrl}:`, e);
+          }
+
+          const pct = Math.round((downloadedCount / totalImages) * 100);
+          zipProgressFill.style.width = `${pct}%`;
+          zipProgressText.textContent = `Descargando imagen ${downloadedCount} de ${totalImages} (${pct}%)...`;
+        }
+      }
+
+      if (downloadedCount === 0) {
+        zipProgressModal.style.display = 'none';
+        alert('No fue posible descargar imágenes del lote.');
+        return;
+      }
+
+      zipProgressText.textContent = 'Comprimiendo archivo ZIP...';
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `funko-photos-sku-${new Date().toISOString().slice(0, 10)}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      zipProgressModal.style.display = 'none';
+      showToast(`ZIP descargado con ${downloadedCount} fotos del lote`);
+    }
+
+    btnExportZip.addEventListener('click', exportImagesZip);
+    btnReportExportZip.addEventListener('click', exportImagesZip);
+
+    // EXPORT 4: GENERAL CSV
+    btnExportCsv.addEventListener('click', () => {
+      if (productsList.length === 0) {
+        alert('No hay productos para exportar.');
+        return;
+      }
+
+      const headers = ['Query', 'UPC', 'SKU', 'Title', 'License', 'Fandom', 'BoxNumber', 'Price', 'Source', 'Status', 'Diagnosis', 'Description_ES', 'Description_EN', 'Gallery_URLs', 'MainImageURL', 'FunkoLink'];
+      const rows = productsList.map(p => [
+        `"${(p.query || '').replace(/"/g, '""')}"`,
+        `"${(p.upc || '').replace(/"/g, '""')}"`,
+        `"${(p.sku || '').replace(/"/g, '""')}"`,
+        `"${(p.title || '').replace(/"/g, '""')}"`,
+        `"${(p.license || '').replace(/"/g, '""')}"`,
+        `"${(p.fandom || '').replace(/"/g, '""')}"`,
+        `"${(p.boxNumber || '').replace(/"/g, '""')}"`,
+        `"${(p.price || '').replace(/"/g, '""')}"`,
+        `"${(p.source || '').replace(/"/g, '""')}"`,
+        `"${(p.status || '').replace(/"/g, '""')}"`,
+        `"${(p.diagnosis || '').replace(/"/g, '""')}"`,
+        `"${(p.description_es || '').replace(/"/g, '""')}"`,
+        `"${(p.description || '').replace(/"/g, '""')}"`,
+        `"${((p.gallery && p.gallery.length > 0) ? p.gallery.join(' | ') : (p.image || '')).replace(/"/g, '""')}"`,
+        `"${(p.image || '').replace(/"/g, '""')}"`,
+        `"${(p.link || '').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `funko-catalog-general-${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Archivo CSV General exportado');
+    });
+
+    // INITIALIZE
+    updateInputCount();
+    updateLocalCatalogBadge();
+  </script>
+</Base>
+
+<style is:global>
+  /* Layout structure matching EVO design system */
+  .funko-page {
+    padding-top: 2.5rem;
+    padding-bottom: 4rem;
+    background: var(--bg);
+  }
+  
+  .funko-page .tool-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+  
+  .funko-page .tool-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0.5rem 0 1rem;
+    color: var(--text);
+  }
+  
+  .funko-page .tool-desc {
+    font-family: 'Krub', sans-serif;
+    font-size: clamp(0.95rem, 3vw, 1.05rem);
+    color: var(--text-2);
+    max-width: 780px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .funko-page .tool-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (max-width: 992px) {
+    .funko-page .tool-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Cards and Sidebar panels */
+  .funko-page .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .funko-page .panel-card {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+
+  .funko-page .panel-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .funko-page .panel-card h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .funko-page .badge-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    background: rgba(228, 87, 46, 0.12);
+    color: var(--orange);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  /* Form Elements */
+  .funko-page .field {
+    margin-bottom: 1.25rem;
+  }
+  
+  .funko-page .field:last-child {
+    margin-bottom: 0;
+  }
+
+  .funko-page .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--text);
+  }
+
+  .funko-page .codes-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    padding: 8px 12px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .funko-page .codes-textarea:focus {
+    border-color: var(--orange);
+  }
+
+  .funko-page select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: border-color 0.15s;
+  }
+
+  .funko-page select:focus {
+    border-color: var(--orange);
+    outline: none;
+  }
+
+  .funko-page .help {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    line-height: 1.45;
+    margin-top: 0.25rem;
+  }
+
+  .funko-page .button-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .funko-page .button-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .funko-page .btn-full {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .funko-page .btn-half {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .funko-page .btn-primary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    transition: background 0.15s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .funko-page .btn-primary:hover:not(:disabled) {
+    background: var(--orange-btn);
+  }
+
+  .funko-page .btn-compact {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .funko-page .btn-compact:hover:not(:disabled) {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: var(--light);
+  }
+
+  .funko-page .btn-accent {
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--orange);
+  }
+
+  .funko-page .btn-accent:hover:not(:disabled) {
+    background: var(--orange-btn);
+    color: #fff;
+  }
+
+  .funko-page .btn-secondary-accent {
+    background: #087ce6;
+    color: #fff;
+    border-color: #087ce6;
+  }
+
+  .funko-page .btn-secondary-accent:hover:not(:disabled) {
+    background: #076ecc;
+    color: #fff;
+  }
+
+  .funko-page .btn-compact:disabled, .funko-page .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Workspace Layout */
+  .funko-page .workspace-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+
+  /* Metrics Card */
+  .funko-page .metrics-card {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .funko-page .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .funko-page .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .funko-page .status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--text-3);
+    display: inline-block;
+  }
+
+  .funko-page .status-dot.active {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    animation: pulseDot 1.5s infinite;
+  }
+
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .funko-page .progress-right-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .funko-page .progress-percent {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--orange);
+  }
+
+  .funko-page .progress-total-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+
+  .funko-page .progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+
+  .funko-page .progress-bar-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 4px;
+    transition: width 0.25s ease;
+  }
+
+  /* STATS GRID (4-CARD BALANCED DASHBOARD) */
+  .funko-page .stats-grid, .funko-page .stats-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.875rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .funko-page .stats-grid, .funko-page .stats-grid-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* VIEW MODE TABS */
+  .funko-page .view-mode-tabs-bar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.85rem;
+  }
+
+  .funko-page .view-tabs-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .funko-page .view-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .funko-page .view-tab-btn:hover {
+    border-color: var(--orange);
+    color: var(--text);
+  }
+
+  .funko-page .view-tab-btn.active {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .funko-page .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.875rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .funko-page .stat-label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .funko-page .stat-num {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .funko-page .text-primary { color: #087ce6 !important; }
+  .funko-page .text-success { color: #10b981 !important; }
+  .funko-page .text-warning { color: #f59e0b !important; }
+  .funko-page .text-teal { color: #059669 !important; }
+
+  /* Report Summary Card */
+  .funko-page .report-summary-card {
+    border-left: 4px solid var(--orange);
+  }
+
+  .funko-page .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .funko-page .report-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .funko-page .report-icon-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: rgba(228, 87, 46, 0.12);
+    color: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .funko-page .report-title-wrap h3 {
+    margin: 0 0 0.2rem 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .funko-page .report-title-wrap p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-2);
+  }
+
+  .funko-page .report-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .funko-page .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.875rem;
+  }
+
+  .funko-page .collection-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .funko-page .collection-card:hover {
+    border-color: var(--orange);
+    transform: translateY(-2px);
+  }
+
+  .funko-page .collection-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .funko-page .collection-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .funko-page .collection-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--orange);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 10px;
+  }
+
+  /* Toolbar */
+  .funko-page .results-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+
+  .funko-page .filter-group, .funko-page .actions-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .funko-page .search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 10px;
+    width: 220px;
+  }
+
+  .funko-page .search-input-wrap input {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+  }
+
+  .funko-page .select-compact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    padding: 6px 10px;
+    outline: none;
+  }
+
+  .funko-page .export-dropdown-wrap {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  /* Empty State */
+  .funko-page .empty-state {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+  }
+
+  .funko-page .empty-icon-wrap {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    background: rgba(228, 87, 46, 0.1);
+    color: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+  }
+
+  .funko-page .empty-state h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    color: var(--text);
+  }
+
+  .funko-page .empty-state p {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-2);
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* =======================================================
+     PREMIUM 2-STAGE PRODUCT CARDS LIST (EVO DESIGN SYSTEM)
+     ======================================================= */
+  .funko-page .product-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .funko-page .funko-product-card {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .funko-page .funko-product-card:hover {
+    border-color: rgba(228, 87, 46, 0.4);
+  }
+
+  .funko-page .funko-product-card.is-expanded {
+    border-color: var(--orange);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Main 2-Column Card Grid */
+  .funko-page .card-main-grid {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .funko-page .card-main-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Left Column: Gallery by Default */
+  .funko-page .card-gallery-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .funko-page .card-hero-img-box {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .funko-page .card-active-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: opacity 0.15s ease;
+  }
+
+  .funko-page .card-box-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--orange);
+    color: #ffffff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(228, 87, 46, 0.35);
+  }
+
+  .funko-page .card-thumbs-strip {
+    display: flex;
+    gap: 0.35rem;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+
+  .funko-page .card-thumb-item {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    aspect-ratio: 1/1;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.15s ease;
+  }
+
+  .funko-page .card-thumb-item:hover {
+    border-color: var(--orange);
+  }
+
+  .funko-page .card-thumb-item.active {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px rgba(228, 87, 46, 0.35);
+  }
+
+  .funko-page .card-thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .funko-page .card-gallery-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+  }
+
+  .funko-page .card-photo-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .funko-page .btn-single-zip {
+    padding: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  /* Right Column: Content & Expand Button */
+  .funko-page .card-content-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+  }
+
+  .funko-page .card-top-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .funko-page .card-pills-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .funko-page .badge-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+
+  .funko-page .badge-license {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .funko-page .badge-source {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .funko-page .source-local {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .funko-page .source-funko {
+    background: rgba(8, 124, 230, 0.12);
+    color: #087ce6;
+  }
+
+  .funko-page .source-upc {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+  }
+
+  .funko-page .source-none {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+  }
+
+  .funko-page .btn-refresh-card, .funko-page .btn-refresh-card-drawer {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .funko-page .btn-refresh-card:hover, .funko-page .btn-refresh-card-drawer:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: #ffffff;
+  }
+
+  .funko-page .btn-refresh-card.loading, .funko-page .btn-refresh-card-drawer.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .funko-page .card-codes-row {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .funko-page .mono-code-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--text-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .funko-page .mono-code-badge strong {
+    color: var(--text);
+  }
+
+  .funko-page .card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0.15rem 0;
+    line-height: 1.3;
+  }
+
+  .funko-page .card-desc-snippet {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--text-2);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Unified Action Toolbar per Card */
+  .funko-page .card-unified-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0.4rem 0;
+  }
+
+  .funko-page .card-unified-actions .btn-compact {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    font-weight: 600;
+  }
+
+  /* Clean Expand Action Button */
+  .funko-page .card-actions-wrapper {
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+
+  .funko-page .btn-expand-ficha-full {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.15s ease;
+  }
+
+  .funko-page .btn-expand-ficha-full:hover {
+    border-color: var(--orange);
+    background: #ffffff;
+  }
+
+  .funko-page .btn-expand-ficha-full.active {
+    border-color: var(--orange);
+    background: rgba(228, 87, 46, 0.08);
+  }
+
+  .funko-page .btn-expand-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--orange);
+  }
+
+  .funko-page .expanded-external-links-top {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  /* =======================================================
+     FULL-WIDTH EXPANDED FICHA DRAWER (COLLAPSED BY DEFAULT)
+     ======================================================= */
+  .funko-page .card-expanded-drawer {
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    padding: 1.25rem 1.5rem;
+    animation: fadeInDrawer 0.2s ease;
+  }
+
+  .funko-page .expanded-sheet-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .funko-page .expanded-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+  }
+
+  .funko-page .drawer-lang-selector {
+    display: flex;
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .funko-page .drawer-lang-btn {
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--text-3);
+    transition: all 0.15s ease;
+  }
+
+  .funko-page .drawer-lang-btn.active {
+    background: var(--orange);
+    color: #fff;
+  }
+
+  .funko-page .drawer-sheet-btns {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .funko-page .expanded-sheet-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .funko-page .expanded-sheet-desc {
+    font-family: 'Krub', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .funko-page .expanded-sheet-specs {
+    list-style: none;
+    padding: 0.75rem 0 0 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem 1.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-2);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .funko-page .expanded-sheet-specs {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .funko-page .expanded-sheet-specs li strong {
+    color: var(--text);
+  }
+
+  .funko-page .expanded-external-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+  }
+
+  /* Modal */
+  .funko-page .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .funko-page .modal-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 780px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+    padding: 1.75rem;
+  }
+
+  .funko-page .zip-modal-card {
+    max-width: 420px;
+    text-align: center;
+  }
+
+  /* Toast Notification */
+  .funko-page .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--dark);
+    color: #FFFFFF;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  .funko-page .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+</style>

@@ -108,10 +108,21 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
             Las figuras consultadas se guardan de forma permanente para responder en 0ms y no gastar cuotas de red.
           </p>
           <div class="button-stack">
-            <button class="btn-compact btn-full" id="btnExportLocalCatalog" type="button" title="Descargar copia de seguridad de la base local en formato JSON">
-              <i class="ph ph-download-simple" aria-hidden="true"></i>
-              <span data-es="Exportar Base Local (JSON)" data-en="Export Local Index (JSON)">Exportar Base Local (JSON)</span>
+            <button class="btn-compact btn-full btn-accent" id="btnLoadLocalCatalog" type="button" title="Cargar todas las figuras guardadas en la pantalla activa para ver fichas y re-exportar">
+              <i class="ph ph-database" aria-hidden="true"></i>
+              <span data-es="Cargar Catálogo en Pantalla" data-en="Load Catalog to Workspace">Cargar Catálogo en Pantalla</span>
             </button>
+            <div class="button-row">
+              <button class="btn-compact btn-half" id="btnExportLocalCatalog" type="button" title="Descargar copia de seguridad de la base local en formato JSON">
+                <i class="ph ph-download-simple" aria-hidden="true"></i>
+                <span data-es="Exportar (JSON)" data-en="Export (JSON)">Exportar (JSON)</span>
+              </button>
+              <button class="btn-compact btn-half" id="btnImportLocalCatalog" type="button" title="Importar copia de respaldo en formato JSON">
+                <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                <span data-es="Importar (JSON)" data-en="Import (JSON)">Importar (JSON)</span>
+              </button>
+              <input type="file" id="inputImportJson" accept=".json,application/json" style="display:none;" />
+            </div>
             <button class="btn-compact btn-full" id="btnClearLocalCatalog" type="button" title="Vaciar la memoria local para reiniciar búsquedas limpias">
               <i class="ph ph-trash" aria-hidden="true"></i>
               <span data-es="Limpiar Base Local" data-en="Clear Local Index">Limpiar Base Local</span>
@@ -352,7 +363,10 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
     const tabCollectionsLabel = document.getElementById('tabCollectionsLabel');
 
     const localCatalogBadge = document.getElementById('localCatalogBadge');
+    const btnLoadLocalCatalog = document.getElementById('btnLoadLocalCatalog');
     const btnExportLocalCatalog = document.getElementById('btnExportLocalCatalog');
+    const btnImportLocalCatalog = document.getElementById('btnImportLocalCatalog');
+    const inputImportJson = document.getElementById('inputImportJson');
     const btnClearLocalCatalog = document.getElementById('btnClearLocalCatalog');
 
     const reportSummaryCard = document.getElementById('reportSummaryCard');
@@ -394,6 +408,19 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
       }
     }
 
+    function getUniqueLocalFigures() {
+      const catalog = getLocalCatalog();
+      const map = new Map();
+      Object.values(catalog).forEach(item => {
+        if (!item || !item.title) return;
+        const key = item.sku || item.upc || item.query || item.title;
+        if (!map.has(key)) {
+          map.set(key, item);
+        }
+      });
+      return Array.from(map.values());
+    }
+
     function saveToLocalCatalog(item) {
       if (!item || item.status !== 'found') return;
       try {
@@ -416,24 +443,68 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
     }
 
     function updateLocalCatalogBadge() {
-      const catalog = getLocalCatalog();
-      // Count unique figures by SKU / Title
-      const uniqueSkus = new Set(Object.values(catalog).map((it) => (it && (it.sku || it.query || it.title))));
-      const count = uniqueSkus.size;
+      const uniqueFigures = getUniqueLocalFigures();
+      const count = uniqueFigures.length;
       if (localCatalogBadge) {
         localCatalogBadge.textContent = `${count} ${count === 1 ? 'figura' : 'figuras'}`;
       }
     }
 
+    function loadLocalCatalogToWorkspace() {
+      const uniqueItems = getUniqueLocalFigures();
+      if (uniqueItems.length === 0) {
+        alert('No hay figuras guardadas en la base local todavía. Realiza una búsqueda primero.');
+        return;
+      }
+
+      // Populate input textarea with the codes
+      const codes = uniqueItems.map(item => item.sku || item.upc || item.query).filter(Boolean);
+      codesInput.value = codes.join('\n');
+      updateCounter();
+
+      // Set active productsList
+      productsList = uniqueItems.map(item => ({
+        ...item,
+        source: 'local_index',
+        status: 'found'
+      }));
+
+      // Update metrics
+      progressBarFill.style.width = '100%';
+      progressPercent.textContent = '100%';
+      if (statTotalBadge) statTotalBadge.textContent = `(${productsList.length} códigos)`;
+      if (statLocal) statLocal.textContent = String(productsList.length);
+      statFunko.textContent = '0';
+      statUpc.textContent = '0';
+      statNotFound.textContent = '0';
+      statusDot.className = 'status-dot success';
+      statusText.textContent = `Base local cargada (${productsList.length} figuras)`;
+
+      // Enable export buttons
+      btnExportShopify.disabled = false;
+      btnExportShopifyEn.disabled = false;
+      btnCopyHtmlTable.disabled = false;
+      btnExportZip.disabled = false;
+      btnExportCsv.disabled = false;
+
+      // Render workspace cards & collections breakdown
+      renderResults();
+      showBatchSummary();
+      showToast(`¡Cargadas ${productsList.length} figuras desde la Base Local!`);
+    }
+
+    if (btnLoadLocalCatalog) {
+      btnLoadLocalCatalog.addEventListener('click', loadLocalCatalogToWorkspace);
+    }
+
     if (btnExportLocalCatalog) {
       btnExportLocalCatalog.addEventListener('click', () => {
-        const catalog = getLocalCatalog();
-        const count = Object.keys(catalog).length;
-        if (count === 0) {
+        const uniqueItems = getUniqueLocalFigures();
+        if (uniqueItems.length === 0) {
           alert('La base local está vacía. Consulta códigos para indexar figuras.');
           return;
         }
-        const blob = new Blob([JSON.stringify(catalog, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(uniqueItems, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
@@ -441,7 +512,50 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast('Base de datos local exportada en JSON');
+        showToast(`Base local (${uniqueItems.length} figuras) exportada en JSON`);
+      });
+    }
+
+    if (btnImportLocalCatalog && inputImportJson) {
+      btnImportLocalCatalog.addEventListener('click', () => {
+        inputImportJson.click();
+      });
+
+      inputImportJson.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (typeof data !== 'object' || data === null) throw new Error('Formato JSON no reconocido');
+
+            const currentCatalog = getLocalCatalog();
+            let importedCount = 0;
+
+            const items = Array.isArray(data) ? data : Object.values(data);
+            items.forEach(item => {
+              if (item && item.title) {
+                const cleanItem = { ...item, status: item.status || 'found', source: 'local_index' };
+                if (item.query) currentCatalog[item.query] = cleanItem;
+                if (item.sku) currentCatalog[item.sku] = cleanItem;
+                if (item.upc) currentCatalog[item.upc] = cleanItem;
+                importedCount++;
+              }
+            });
+
+            localStorage.setItem(LOCAL_CATALOG_KEY, JSON.stringify(currentCatalog));
+            updateLocalCatalogBadge();
+            loadLocalCatalogToWorkspace();
+            showToast(`¡Base importada con éxito!`);
+          } catch(err) {
+            alert('Error al importar archivo JSON: ' + err.message);
+          } finally {
+            inputImportJson.value = '';
+          }
+        };
+        reader.readAsText(file);
       });
     }
 

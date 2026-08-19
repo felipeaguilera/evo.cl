@@ -460,14 +460,21 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
       // Populate input textarea with the codes
       const codes = uniqueItems.map(item => item.sku || item.upc || item.query).filter(Boolean);
       codesInput.value = codes.join('\n');
-      updateCounter();
+      updateInputCount();
 
-      // Set active productsList
+      // Set active productsList directly with all locally indexed figures
       productsList = uniqueItems.map(item => ({
         ...item,
         source: 'local_index',
         status: 'found'
       }));
+
+      // Update button states: Search is not needed, it's ALREADY loaded!
+      btnStart.style.display = 'none';
+      btnPause.style.display = 'none';
+      btnReset.style.display = 'inline-flex';
+      btnReset.disabled = false;
+      codesInput.disabled = false;
 
       // Update metrics
       progressBarFill.style.width = '100%';
@@ -478,19 +485,32 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
       statUpc.textContent = '0';
       statNotFound.textContent = '0';
       statusDot.className = 'status-dot success';
-      statusText.textContent = `Base local cargada (${productsList.length} figuras)`;
+      statusText.textContent = `Base local desplegada (${productsList.length} figuras)`;
 
-      // Enable export buttons
+      // Enable all export buttons
       btnExportShopify.disabled = false;
       btnExportShopifyEn.disabled = false;
       btnCopyHtmlTable.disabled = false;
       btnExportZip.disabled = false;
       btnExportCsv.disabled = false;
 
+      // Ensure view mode tabs and list are active and visible
+      if (viewModeTabsBar) viewModeTabsBar.style.display = 'flex';
+      if (tabViewCards) tabViewCards.classList.add('active');
+      if (tabViewCollections) tabViewCollections.classList.remove('active');
+      reportSummaryCard.style.display = 'none';
+
+      const resultsToolbarElem = document.querySelector('.results-toolbar');
+      if (resultsToolbarElem) resultsToolbarElem.style.display = 'flex';
+
+      emptyState.style.display = 'none';
+      productCardsList.style.display = 'flex';
+
       // Render workspace cards & collections breakdown
       renderResults();
       showBatchSummary();
-      showToast(`¡Cargadas ${productsList.length} figuras desde la Base Local!`);
+
+      showToast(`¡Desplegadas ${productsList.length} figuras del Catálogo Local!`);
     }
 
     if (btnLoadLocalCatalog) {

@@ -57,8 +57,24 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       </script>
     </>
   )}
+
+  <!-- Early Theme & Lang Pre-paint Initializer (Avoids FOUC) -->
+  <script is:inline>
+    (function() {
+      try {
+        var t = localStorage.getItem('evo_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+        var l = localStorage.getItem('evo_lang');
+        if (l) {
+          document.documentElement.setAttribute('data-lang', l);
+          document.documentElement.setAttribute('lang', l);
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
   <slot />
+  <script is:inline src="/scripts/nav.js"></script>
 </body>
 </html>

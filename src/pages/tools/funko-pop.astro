@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 
-const title = 'Funko Pop! Scraper — EVO';
+const title = 'Funko Pop! Scraper. A tool by EVO.cl';
 const description = 'Consulta masiva de figuras Funko Pop! por código de barras (UPC) o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas de fotos y exporta directo a Shopify CSV, Tabla HTML y ZIP de fotos.';
 ---
 
@@ -936,10 +936,10 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
 
         let thumbsHtml = '';
         items.slice(0, 6).forEach(it => {
-          const src = it.image || '/assets/favicon.svg';
+          const src = it.image || '/assets/no-picture.svg';
           thumbsHtml += `
             <div style="width:34px; height:34px; min-width:34px; aspect-ratio:1/1; background:#fff; border:1px solid var(--border); border-radius:4px; padding:2px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-              <img src="${escapeAttr(src)}" alt="" style="width:100%; height:100%; object-fit:contain; display:block;" onerror="this.src='/assets/favicon.svg'">
+              <img src="${escapeAttr(src)}" alt="" style="width:100%; height:100%; object-fit:contain; display:block;" onerror="this.src='/assets/no-picture.svg'">
             </div>
           `;
         });
@@ -1233,7 +1233,7 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
       items.forEach((item, index) => {
         const cardId = `pcard-${item.query || index}-${index}`;
         const isExpanded = expandedProductIds.has(cardId);
-        const imgSrc = item.image || '/assets/favicon.svg';
+        const imgSrc = item.image || '/assets/no-picture.svg';
         const gallery = (item.gallery && item.gallery.length > 0) ? item.gallery : (item.image ? [item.image] : []);
         const photosCount = gallery.length;
 
@@ -1261,7 +1261,7 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
         gallery.forEach((url, gIdx) => {
           thumbsStripHtml += `
             <div class="card-thumb-item ${gIdx === 0 ? 'active' : ''}" data-url="${escapeAttr(url)}">
-              <img src="${escapeAttr(url)}" alt="Vista ${gIdx + 1}" onerror="this.src='/assets/favicon.svg'">
+              <img src="${escapeAttr(url)}" alt="Vista ${gIdx + 1}" onerror="this.src='/assets/no-picture.svg'">
             </div>
           `;
         });
@@ -1284,7 +1284,7 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
             <!-- LEFT COLUMN: DEFAULT GALLERY VIEWER (MAIN PHOTO + SUBPHOTOS) -->
             <div class="card-gallery-col">
               <div class="card-hero-img-box">
-                <img class="card-active-img" src="${escapeAttr(gallery[0] || imgSrc)}" alt="${escapeAttr(item.title || '')}" onerror="this.src='/assets/favicon.svg'">
+                <img class="card-active-img" src="${escapeAttr(gallery[0] || imgSrc)}" alt="${escapeAttr(item.title || '')}" onerror="this.src='/assets/no-picture.svg'">
                 ${item.boxNumber ? `<span class="card-box-badge">${escapeHtml(item.boxNumber)}</span>` : ''}
               </div>
 

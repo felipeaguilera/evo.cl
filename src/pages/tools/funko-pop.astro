@@ -1269,6 +1269,7 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
         }
 
         const funkoSearchUrl = `https://funko.com/search/?q=${encodeURIComponent(item.sku || item.query)}&vault=true`;
+        const amazonSearchUrl = `https://www.amazon.com/s?k=${encodeURIComponent(item.upc || item.sku || item.query)}`;
         const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent('Funko Pop ' + (item.sku || item.query) + ' ' + (item.title || ''))}`;
         const weplaySearchUrl = `https://www.weplay.cl/catalogsearch/result/?q=${encodeURIComponent(item.sku || item.query)}`;
 
@@ -1376,6 +1377,7 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
                 </div>
                 <div class="expanded-external-links-top">
                   ${item.link ? `<a href="${escapeAttr(item.link)}" target="_blank" rel="noopener" class="btn-compact btn-accent"><i class="ph ph-arrow-square-out"></i> Funko US Oficial</a>` : `<a href="${escapeAttr(funkoSearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-magnifying-glass"></i> Funko US</a>`}
+                  <a href="${escapeAttr(amazonSearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-amazon-logo"></i> Amazon</a>
                   <a href="${escapeAttr(weplaySearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-shopping-bag"></i> WePlay</a>
                   <a href="${escapeAttr(googleSearchUrl)}" target="_blank" rel="noopener" class="btn-compact"><i class="ph ph-google-logo"></i> Google</a>
                 </div>

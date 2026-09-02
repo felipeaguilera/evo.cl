@@ -1,0 +1,2000 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Banpresto Catalog Scraper. A tool by EVO.cl';
+const description = 'Consulta masiva de figuras Banpresto / Bandai Spirits por código JAN, título y precio PVP. Extrae fotos en alta resolución, galerías completas, franquicia, línea de producto y ficha técnica con traducción automática al español.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+
+  <!-- Load JSZip for client-side image ZIP generation -->
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <main class="banpresto-page">
+    <!-- TOOL HEADER -->
+    <header class="tool-header wrap">
+      <p class="label" data-es="Sistemas y Herramientas" data-en="Systems & Tools">Sistemas y Herramientas</p>
+      <h1 class="tool-title">Banpresto Catalog Scraper</h1>
+      <p class="tool-desc" data-es="Consulta masiva de figuras Banpresto / Bandai Spirits por código JAN, título y precio PVP. Extrae fotos en alta resolución, galerías multi-ángulo, franquicias, líneas de colección y fichas técnicas estandarizadas con traducción automática al español. Exporta a CSV General, Tabla copiable para Sheets, o ZIP de fotos nombradas." data-en="Bulk Banpresto / Bandai Spirits figure lookup by JAN code, title, and retail price. Extracts high-resolution photos, multi-angle galleries, franchises, product lines, and standardized technical sheets translated into Spanish. Exports to General CSV, copy-paste table for Sheets, or named photos ZIP.">
+        Consulta masiva de figuras Banpresto / Bandai Spirits por código JAN, título y precio PVP. Extrae fotos en alta resolución, galerías multi-ángulo, franquicias, líneas de colección y fichas técnicas estandarizadas con traducción automática al español. Exporta a CSV General, Tabla copiable para Sheets, o ZIP de fotos nombradas.
+      </p>
+    </header>
+
+    <div class="tool-grid wrap">
+      <!-- SIDEBAR CONTROLS -->
+      <div class="sidebar">
+        <!-- 1. INPUT ITEMS & PRIMARY ACTION -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 data-es="1. Lista de Figuras" data-en="1. Figure List">1. Lista de Figuras</h2>
+            <span class="badge-count" id="codeCounter">0 figuras</span>
+          </div>
+          
+          <div class="field">
+            <label for="codesInput">
+              <span data-es="Filas de Excel o 'JAN | Título | PVP'" data-en="Excel rows or 'JAN | Title | Price'">Filas de Excel o "JAN | Título | PVP"</span>
+            </label>
+            <textarea
+              id="codesInput"
+              class="codes-textarea"
+              placeholder="4573102713414 | JUJUTSU KAISEN MAXIMATIC YUJI ITADORI | $29.990&#10;4573102715531 | Shin Godzilla Monster Roah Attack XL | $79.990&#10;4573102711014 | Dragon Ball Z Match Makers Super Saiyan Gogeta | $29.990&#10;4573102713216 | NARUTO Shippuden Grandista Uzumaki Naruto | $29.990&#10;4573102714503 | ONE PIECE DXF EXTRA MONKEY.D.LUFFY GEAR5 | $29.990"
+              rows="7"
+              spellcheck="false"
+            ></textarea>
+            <div class="help" data-es="Pega filas directo de Excel o escribe 'JAN | Título | PVP' por línea. Si incluyes precio, ese valor se respeta siempre." data-en="Paste rows directly from Excel or write 'JAN | Title | Price' per line. If provided, input price is strictly preserved.">
+              Pega filas directo de Excel o escribe "JAN | Título | PVP" por línea. Si incluyes precio, ese valor se respeta siempre sobre cualquier dato externo.
+            </div>
+          </div>
+
+          <!-- PRIMARY ACTION BUTTONS -->
+          <div style="margin-bottom: 0.75rem;">
+            <button class="btn-primary btn-full" id="btnStart" type="button">
+              <i class="ph ph-play" aria-hidden="true"></i>
+              <span data-es="Iniciar Búsqueda" data-en="Start Search">Iniciar Búsqueda</span>
+            </button>
+            <div class="button-row" style="margin-top: 8px;">
+              <button class="btn-compact btn-half" id="btnPause" type="button" disabled>
+                <i class="ph ph-pause" aria-hidden="true"></i>
+                <span data-es="Pausar" data-en="Pause">Pausar</span>
+              </button>
+              <button class="btn-compact btn-half" id="btnReset" type="button" disabled>
+                <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                <span data-es="Reiniciar" data-en="Reset">Reiniciar</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SAMPLE BUTTONS -->
+          <div class="button-stack">
+            <button class="btn-compact btn-full" id="btnLoadSample" type="button">
+              <i class="ph ph-sparkle" aria-hidden="true"></i>
+              <span data-es="Cargar 15 figuras del Contenedor (con PVP)" data-en="Load 15 Container Figures (with Price)">Cargar 15 figuras del Contenedor (con PVP)</span>
+            </button>
+            <button class="btn-compact btn-full" id="btnClearInput" type="button">
+              <i class="ph ph-trash" aria-hidden="true"></i>
+              <span data-es="Limpiar lista" data-en="Clear list">Limpiar lista</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. SEARCH SETTINGS & PACING -->
+        <div class="panel-card">
+          <h2 data-es="2. Ritmo de Consulta" data-en="2. Query Pacing">2. Ritmo de Consulta</h2>
+          <div class="field">
+            <label for="batchPacing">
+              <span data-es="Velocidad de Lote" data-en="Batch Speed">Velocidad de Lote</span>
+            </label>
+            <select id="batchPacing">
+              <option value="fast" selected data-es="Rápida y Concurrente (3 req / 200ms — Recomendada)" data-en="Fast & Concurrent (3 req / 200ms — Recommended)">Rápida y Concurrente (3 req / 200ms — Recomendada)</option>
+              <option value="moderate" data-es="Moderada (2 req / 400ms)" data-en="Moderate (2 req / 400ms)">Moderada (2 req / 400ms)</option>
+              <option value="safe" data-es="Estable (1 req / 800ms)" data-en="Stable (1 req / 800ms)">Estable (1 req / 800ms)</option>
+            </select>
+            <div class="help" data-es="Evita bloqueos de cuota al consultar grandes lotes contra distribuidores." data-en="Prevents rate limiting when querying large distributor batches.">
+              Evita bloqueos de cuota al consultar grandes lotes contra distribuidores.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. LOCAL PERSISTENT INDEX -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 data-es="3. Índice Local EVO" data-en="3. EVO Local Index">3. Índice Local EVO</h2>
+            <span class="badge-count" id="localCatalogBadge">0 figuras</span>
+          </div>
+          <p class="help" style="margin-bottom: 0.85rem;" data-es="Las figuras consultadas se guardan de forma permanente para responder en 0ms y no consumir red." data-en="Queried figures are stored permanently for 0ms responses and zero network usage.">
+            Las figuras consultadas se guardan de forma permanente para responder en 0ms y no consumir red.
+          </p>
+          <div class="button-stack">
+            <button class="btn-compact btn-full btn-accent" id="btnLoadLocalCatalog" type="button" title="Cargar todas las figuras guardadas en la pantalla activa para ver fichas y re-exportar">
+              <i class="ph ph-database" aria-hidden="true"></i>
+              <span data-es="Cargar Catálogo en Pantalla" data-en="Load Catalog to Workspace">Cargar Catálogo en Pantalla</span>
+            </button>
+            <div class="button-row">
+              <button class="btn-compact btn-half" id="btnExportLocalCatalog" type="button" title="Descargar copia de seguridad de la base local en formato JSON">
+                <i class="ph ph-download-simple" aria-hidden="true"></i>
+                <span data-es="Exportar (JSON)" data-en="Export (JSON)">Exportar (JSON)</span>
+              </button>
+              <button class="btn-compact btn-half" id="btnImportLocalCatalog" type="button" title="Importar copia de respaldo en formato JSON">
+                <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                <span data-es="Importar (JSON)" data-en="Import (JSON)">Importar (JSON)</span>
+              </button>
+              <input type="file" id="inputImportJson" accept=".json,application/json" style="display:none;" />
+            </div>
+            <button class="btn-compact btn-full" id="btnClearLocalCatalog" type="button" title="Vaciar la memoria local para reiniciar búsquedas limpias">
+              <i class="ph ph-trash" aria-hidden="true"></i>
+              <span data-es="Limpiar Base Local" data-en="Clear Local Index">Limpiar Base Local</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE -->
+      <div class="workspace-area">
+        <!-- PROGRESS & METRICS -->
+        <div class="panel-card metrics-card">
+          <div class="progress-header">
+            <div class="status-indicator">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText" data-es="Listo para iniciar" data-en="Ready to start">Listo para iniciar</span>
+            </div>
+            <div class="progress-right-wrap">
+              <span class="progress-percent" id="progressPercent">0%</span>
+              <span class="progress-total-badge" id="statTotalBadge">(0 figuras)</span>
+            </div>
+          </div>
+
+          <!-- PROGRESS BAR -->
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+          </div>
+
+          <!-- STATS GRID (4-CARD DASHBOARD) -->
+          <div class="stats-grid stats-grid-4">
+            <div class="stat-card">
+              <span class="stat-label" data-es="Índice Local (0ms)" data-en="Local Index (0ms)">Índice Local (0ms)</span>
+              <span class="stat-num text-teal" id="statLocal">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="DistritoMax (Shopify)" data-en="DistritoMax (Shopify)">DistritoMax (Shopify)</span>
+              <span class="stat-num text-primary" id="statDistritoMax">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="Little Buddy / UPC" data-en="Little Buddy / UPC">Little Buddy / UPC</span>
+              <span class="stat-num text-success" id="statLittleBuddy">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label" data-es="No Encontrados" data-en="Not Found">No Encontrados</span>
+              <span class="stat-num text-warning" id="statNotFound">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW MODE TABS -->
+        <div class="view-mode-tabs-bar" id="viewModeTabsBar" style="display: none;">
+          <div class="view-tabs-group">
+            <button class="view-tab-btn active" id="tabViewCards" type="button">
+              <i class="ph ph-squares-four"></i> <span>Listado de Figuras</span>
+            </button>
+            <button class="view-tab-btn" id="tabViewCollections" type="button">
+              <i class="ph ph-folders"></i> <span id="tabCollectionsLabel">Franquicias (0)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- POST-BATCH REPORT SUMMARY (FRANCHISES BREAKDOWN) -->
+        <div class="panel-card report-summary-card" id="reportSummaryCard" style="display: none;">
+          <div class="report-header">
+            <div class="report-title-wrap">
+              <div class="report-icon-badge">
+                <i class="ph ph-squares-four"></i>
+              </div>
+              <div>
+                <h3 data-es="Franquicias y Líneas Identificadas" data-en="Identified Franchises & Lines">Franquicias y Líneas Identificadas</h3>
+                <p id="reportSummarySubtitle">Desglose agrupado por licencias del lote consultado. Haz clic en una para filtrar.</p>
+              </div>
+            </div>
+
+            <!-- ONE-CLICK EXPORT ACTIONS -->
+            <div class="report-actions">
+              <button class="btn-compact btn-accent" id="btnReportCopyHtml" type="button" title="Copiar tabla para pegar directo con Ctrl+V en Google Sheets, Excel o Notion">
+                <i class="ph ph-copy"></i>
+                <span data-es="Copiar Tabla (Sheets)" data-en="Copy Table (Sheets)">Copiar Tabla (Sheets)</span>
+              </button>
+              <button class="btn-compact btn-secondary-accent" id="btnReportExportCsv" type="button" title="Descargar archivo CSV general con todas las columnas y precios">
+                <i class="ph ph-file-csv"></i>
+                <span data-es="Descargar CSV General" data-en="Download General CSV">Descargar CSV</span>
+              </button>
+              <button class="btn-compact" id="btnReportExportZip" type="button" title="Descargar paquete ZIP con fotos nombradas por JAN">
+                <i class="ph ph-file-zip"></i>
+                <span data-es="ZIP Fotos (JAN)" data-en="Photos ZIP (JAN)">ZIP Fotos (JAN)</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- COLLECTIONS GRID -->
+          <div class="collections-grid" id="reportCollectionsGrid"></div>
+        </div>
+
+        <!-- TOOLBAR & FILTERS -->
+        <div class="results-toolbar">
+          <div class="filter-group">
+            <div class="search-input-wrap">
+              <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+              <input
+                type="text"
+                id="filterSearch"
+                placeholder="Filtrar por título, franquicia, JAN, precio..."
+                data-es-ph="Filtrar por título, franquicia, JAN, precio..."
+                data-en-ph="Filter by title, franchise, JAN, price..."
+              />
+            </div>
+
+            <select id="filterStatus" class="select-compact">
+              <option value="all" data-es="Todos los estados" data-en="All statuses">Todos los estados</option>
+              <option value="found" data-es="Solo encontrados" data-en="Only found">Solo encontrados</option>
+              <option value="not_found" data-es="Solo no encontrados" data-en="Only not found">Solo no encontrados</option>
+            </select>
+          </div>
+
+          <div class="actions-group">
+            <!-- EXPORT BUTTONS -->
+            <div class="export-dropdown-wrap">
+              <button class="btn-compact btn-accent" id="btnCopyHtmlTable" type="button" title="Copiar tabla formateada con fotos y precios para pegar con Ctrl+V en Google Sheets o Excel">
+                <i class="ph ph-copy" aria-hidden="true"></i>
+                <span data-es="Copiar Tabla" data-en="Copy Table">Copiar Tabla</span>
+              </button>
+              <button class="btn-compact" id="btnExportCsv" type="button" title="CSV general con todas las columnas, descripciones y precios reales">
+                <i class="ph ph-file-csv" aria-hidden="true"></i>
+                <span data-es="CSV General" data-en="General CSV">CSV General</span>
+              </button>
+              <button class="btn-compact" id="btnExportZip" type="button" title="Descargar paquete ZIP con todas las fotos de lote">
+                <i class="ph ph-file-zip" aria-hidden="true"></i>
+                <span data-es="ZIP Lote Fotos" data-en="ZIP Photos Batch">ZIP Lote Fotos</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTS CONTAINER -->
+        <div class="results-container">
+          <!-- EMPTY STATE -->
+          <div class="panel-card empty-state" id="emptyState">
+            <div class="empty-icon-wrap">
+              <i class="ph ph-barcode" aria-hidden="true"></i>
+            </div>
+            <h3 data-es="Sin figuras consultadas" data-en="No figures queried yet">Sin figuras consultadas</h3>
+            <p data-es="Ingresa una lista de figuras en el panel lateral o presiona 'Cargar 15 figuras del Contenedor (con PVP)'." data-en="Enter a list of figures on the sidebar or click 'Load 15 Container Figures (with Price)'.">
+              Ingresa una lista de figuras en el panel lateral o presiona 'Cargar 15 figuras del Contenedor (con PVP)'.
+            </p>
+          </div>
+
+          <!-- 2-STAGE PRODUCT CARDS LIST -->
+          <div class="product-cards-list" id="productCardsList" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZIP PROGRESS MODAL -->
+    <div class="modal-overlay" id="zipProgressModal" style="display:none;">
+      <div class="modal-card zip-modal-card">
+        <h3 style="margin-top:0; font-family:'Inter',sans-serif; font-size:1.15rem;" data-es="Generando Archivo ZIP..." data-en="Generating ZIP File...">Generando Archivo ZIP...</h3>
+        <p id="zipProgressText" style="font-size:0.875rem; color:var(--text-2); margin-bottom:1rem;">Descargando fotografías en alta resolución...</p>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="zipProgressFill" style="width:0%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toastNotification">
+      <i class="ph ph-check-circle" id="toastIcon"></i>
+      <span id="toastMsg">Acción completada</span>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script is:inline>
+    // SAMPLE CONTAINER ITEMS WITH REAL WEPLAY PVP FROM EXCEL (HOJA PRODUCTOS)
+    const SAMPLE_ITEMS = [
+      "4573102697622 | Hell Teacher: Jigoku Sensei Nube Meisuke Nueno FIGURE | $29.990",
+      "4573102697639 | Hell Teacher: Jigoku Sensei Nube Kyosuke Tamamo FIGURE | $29.990",
+      "4573102711526 | Hell Teacher: Jigoku Sensei Nube GLITTER&GLAMOURS Yukime | $29.990",
+      "4573102715531 | Shin Godzilla Monster Roah Attack eXtra Large Godzilla(2016)4th.Form | $79.990",
+      "4573102713414 | JUJUTSU KAISEN MAXIMATIC YUJI ITADORI-The culling game?- | $29.990",
+      "4573102713421 | JUJUTSU KAISEN MAXIMATIC MEGUMI FUSHIGURO-The culling game?- | $29.990",
+      "4573102711014 | Dragon Ball Z Match Makers Super Saiyan Gogeta | $29.990",
+      "4573102711021 | Dragon Ball Z Match Makers Janemba | $29.990",
+      "4573102713216 | NARUTO Shippuden Grandista Uzumaki Naruto#3 | $29.990",
+      "4573102713223 | NARUTO Shippuden Grandista Uchiha Sasuke#3 | $29.990",
+      "4573102714503 | ONE PIECE DXF THE GRANDLINE SERIES EXTRA MONKEY.D.LUFFY GEAR5 | $29.990",
+      "4573102714510 | ONE PIECE THE SHUKKO MONKEY.D.LUFFY | $29.990",
+      "4573102712882 | Spy x Family Break Time Collection Anya Forger & Bond Forger | $29.990",
+      "4573102712950 | Chainsaw Man Combination Battle Chainsaw Man | $29.990",
+      "4573102713001 | Bleach Solid And Souls Ichigo Kurosaki II | $29.990"
+    ];
+
+    // STATE
+    let productsList = [];
+    let isRunning = false;
+    let isPaused = false;
+    const expandedProductIds = new Set();
+
+    // DOM ELEMENTS
+    const codesInput = document.getElementById('codesInput');
+    const codeCounter = document.getElementById('codeCounter');
+    const btnLoadSample = document.getElementById('btnLoadSample');
+    const btnClearInput = document.getElementById('btnClearInput');
+    const btnStart = document.getElementById('btnStart');
+    const btnPause = document.getElementById('btnPause');
+    const btnReset = document.getElementById('btnReset');
+    const batchPacing = document.getElementById('batchPacing');
+
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const statTotalBadge = document.getElementById('statTotalBadge');
+    const statLocal = document.getElementById('statLocal');
+    const statDistritoMax = document.getElementById('statDistritoMax');
+    const statLittleBuddy = document.getElementById('statLittleBuddy');
+    const statNotFound = document.getElementById('statNotFound');
+
+    const viewModeTabsBar = document.getElementById('viewModeTabsBar');
+    const tabViewCards = document.getElementById('tabViewCards');
+    const tabViewCollections = document.getElementById('tabViewCollections');
+    const tabCollectionsLabel = document.getElementById('tabCollectionsLabel');
+
+    const localCatalogBadge = document.getElementById('localCatalogBadge');
+    const btnLoadLocalCatalog = document.getElementById('btnLoadLocalCatalog');
+    const btnExportLocalCatalog = document.getElementById('btnExportLocalCatalog');
+    const btnImportLocalCatalog = document.getElementById('btnImportLocalCatalog');
+    const inputImportJson = document.getElementById('inputImportJson');
+    const btnClearLocalCatalog = document.getElementById('btnClearLocalCatalog');
+
+    const reportSummaryCard = document.getElementById('reportSummaryCard');
+    const reportSummarySubtitle = document.getElementById('reportSummarySubtitle');
+    const reportCollectionsGrid = document.getElementById('reportCollectionsGrid');
+    const btnReportExportCsv = document.getElementById('btnReportExportCsv');
+    const btnReportCopyHtml = document.getElementById('btnReportCopyHtml');
+    const btnReportExportZip = document.getElementById('btnReportExportZip');
+
+    const filterSearch = document.getElementById('filterSearch');
+    const filterStatus = document.getElementById('filterStatus');
+    const btnCopyHtmlTable = document.getElementById('btnCopyHtmlTable');
+    const btnExportZip = document.getElementById('btnExportZip');
+    const btnExportCsv = document.getElementById('btnExportCsv');
+
+    const emptyState = document.getElementById('emptyState');
+    const productCardsList = document.getElementById('productCardsList');
+
+    const zipProgressModal = document.getElementById('zipProgressModal');
+    const zipProgressText = document.getElementById('zipProgressText');
+    const zipProgressFill = document.getElementById('zipProgressFill');
+
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // =======================================================
+    // LOCAL CATALOG STORAGE SYSTEM (PERSISTENT CLIENT-SIDE INDEX)
+    // =======================================================
+    const LOCAL_CATALOG_KEY = 'evo_banpresto_local_catalog_v1';
+
+    function getLocalCatalog() {
+      try {
+        const raw = localStorage.getItem(LOCAL_CATALOG_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function getUniqueLocalFigures() {
+      const catalog = getLocalCatalog();
+      const map = new Map();
+      Object.values(catalog).forEach(item => {
+        if (!item || !item.title) return;
+        const key = item.jan || item.itemNo || item.query || item.title;
+        if (!map.has(key)) {
+          map.set(key, item);
+        }
+      });
+      return Array.from(map.values());
+    }
+
+    function saveToLocalCatalog(item) {
+      if (!item || item.status !== 'found') return;
+      try {
+        const catalog = getLocalCatalog();
+        const cleanItem = { ...item, source: item.source || 'local_index' };
+        if (item.query) catalog[item.query] = cleanItem;
+        if (item.jan) catalog[item.jan] = cleanItem;
+        if (item.title) catalog[item.title] = cleanItem;
+        localStorage.setItem(LOCAL_CATALOG_KEY, JSON.stringify(catalog));
+        updateLocalCatalogBadge();
+      } catch (e) {
+        console.warn('Error saving to local catalog:', e);
+      }
+    }
+
+    function getFromLocalCatalog(query) {
+      if (!query) return null;
+      const catalog = getLocalCatalog();
+      return catalog[query] || null;
+    }
+
+    function updateLocalCatalogBadge() {
+      const uniqueFigures = getUniqueLocalFigures();
+      const count = uniqueFigures.length;
+      if (localCatalogBadge) {
+        localCatalogBadge.textContent = `${count} ${count === 1 ? 'figura' : 'figuras'}`;
+      }
+    }
+
+    // =======================================================
+    // HELPER FUNCTIONS & UI TOAST
+    // =======================================================
+    function showToast(msg, iconClass = 'ph ph-check-circle') {
+      if (!toastNotification || !toastMsg) return;
+      toastMsg.textContent = msg;
+      const icon = document.getElementById('toastIcon');
+      if (icon) icon.className = iconClass;
+      toastNotification.classList.add('visible');
+      setTimeout(() => {
+        toastNotification.classList.remove('visible');
+      }, 3200);
+    }
+
+    function updateCodeCounter() {
+      const lines = (codesInput.value || '')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean);
+      const count = lines.length;
+      codeCounter.textContent = `${count} ${count === 1 ? 'figura' : 'figuras'}`;
+    }
+
+    function updateStats() {
+      const total = productsList.length;
+      const localCount = productsList.filter(p => p.source === 'local_index').length;
+      const distritoMaxCount = productsList.filter(p => p.source === 'distritomax').length;
+      const littleBuddyCount = productsList.filter(p => p.source === 'littlebuddytoys' || p.source === 'upc_database').length;
+      const notFoundCount = productsList.filter(p => p.status === 'not_found' || p.status === 'error').length;
+
+      statLocal.textContent = localCount;
+      statDistritoMax.textContent = distritoMaxCount;
+      statLittleBuddy.textContent = littleBuddyCount;
+      statNotFound.textContent = notFoundCount;
+      statTotalBadge.textContent = `(${total} figuras)`;
+
+      // Update Franchises summary count
+      const franchises = new Set(productsList.filter(p => p.status === 'found').map(p => p.franchise || 'Banpresto'));
+      if (tabCollectionsLabel) {
+        tabCollectionsLabel.textContent = `Franquicias (${franchises.size})`;
+      }
+    }
+
+    function renderReportSummary() {
+      const foundItems = productsList.filter(p => p.status === 'found');
+      if (foundItems.length === 0) {
+        reportSummaryCard.style.display = 'none';
+        viewModeTabsBar.style.display = 'none';
+        return;
+      }
+
+      viewModeTabsBar.style.display = 'flex';
+      reportSummaryCard.style.display = 'block';
+
+      // Group by Franchise
+      const counts = {};
+      foundItems.forEach(p => {
+        const key = p.franchise || 'Banpresto';
+        counts[key] = (counts[key] || 0) + 1;
+      });
+
+      const sortedFranchises = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      reportSummarySubtitle.textContent = `Se identificaron ${foundItems.length} figuras en ${sortedFranchises.length} franquicias principales.`;
+
+      reportCollectionsGrid.innerHTML = sortedFranchises.map(([franchise, count]) => `
+        <div class="collection-card" onclick="filterByFranchise('${encodeURIComponent(franchise)}')">
+          <div class="collection-card-header">
+            <span class="collection-name">${franchise}</span>
+            <span class="collection-badge">${count}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.filterByFranchise = function(encodedFranchise) {
+      const franchise = decodeURIComponent(encodedFranchise);
+      filterSearch.value = franchise;
+      tabViewCards.click();
+      renderCardsList();
+    };
+
+    // =======================================================
+    // 2-STAGE PRODUCT CARDS RENDERER
+    // =======================================================
+    function renderCardsList() {
+      const searchTerm = (filterSearch.value || '').toLowerCase().trim();
+      const statusFilter = filterStatus.value || 'all';
+
+      const filtered = productsList.filter(p => {
+        if (statusFilter === 'found' && p.status !== 'found') return false;
+        if (statusFilter === 'not_found' && p.status === 'found') return false;
+        if (!searchTerm) return true;
+
+        const matchTitle = (p.title || '').toLowerCase().includes(searchTerm);
+        const matchFranchise = (p.franchise || '').toLowerCase().includes(searchTerm);
+        const matchLine = (p.line || '').toLowerCase().includes(searchTerm);
+        const matchChar = (p.character || '').toLowerCase().includes(searchTerm);
+        const matchJan = (p.jan || '').toLowerCase().includes(searchTerm);
+        const matchPrice = (p.price || '').toLowerCase().includes(searchTerm);
+        const matchQuery = (p.query || '').toLowerCase().includes(searchTerm);
+
+        return matchTitle || matchFranchise || matchLine || matchChar || matchJan || matchPrice || matchQuery;
+      });
+
+      if (filtered.length === 0) {
+        productCardsList.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      productCardsList.style.display = 'flex';
+
+      productCardsList.innerHTML = filtered.map((item, idx) => {
+        const isFound = item.status === 'found';
+        const isExpanded = expandedProductIds.has(item.jan || item.title || String(idx));
+        const cardId = `card_${item.jan || idx}`;
+
+        let sourceBadge = '';
+        if (item.source === 'distritomax') {
+          sourceBadge = `<span class="source-badge tag-primary"><i class="ph ph-shopping-bag"></i> DistritoMax (Shopify)</span>`;
+        } else if (item.source === 'littlebuddytoys') {
+          sourceBadge = `<span class="source-badge tag-success"><i class="ph ph-storefront"></i> Little Buddy Toys</span>`;
+        } else if (item.source === 'upc_database') {
+          sourceBadge = `<span class="source-badge tag-success"><i class="ph ph-barcode"></i> UPC Database</span>`;
+        } else if (item.source === 'local_index') {
+          sourceBadge = `<span class="source-badge tag-teal"><i class="ph ph-lightning"></i> Índice Local (0ms)</span>`;
+        } else {
+          sourceBadge = `<span class="source-badge tag-warning"><i class="ph ph-warning-circle"></i> No Encontrado</span>`;
+        }
+
+        const gallery = item.gallery && item.gallery.length > 0 ? item.gallery : item.image ? [item.image] : [];
+        const mainImg = gallery[0] || 'https://via.placeholder.com/400x400?text=Sin+Imagen';
+
+        return `
+          <div class="funko-product-card ${isExpanded ? 'is-expanded' : ''}" id="${cardId}">
+            <div class="card-main-grid">
+              <!-- COLUMN 1: INTERACTIVE IMAGE GALLERY -->
+              <div class="card-gallery-col">
+                <div class="gallery-main-frame">
+                  <img src="${mainImg}" alt="${item.title}" id="mainImg_${cardId}" loading="lazy" />
+                  <span class="gallery-count-badge">${gallery.length} ${gallery.length === 1 ? 'foto' : 'fotos'}</span>
+                </div>
+                ${gallery.length > 1 ? `
+                  <div class="gallery-thumbs-row">
+                    ${gallery.map((imgUrl, thumbIdx) => `
+                      <img
+                        src="${imgUrl}"
+                        class="gallery-thumb ${thumbIdx === 0 ? 'active' : ''}"
+                        onclick="switchCardImage('${cardId}', '${imgUrl}', this)"
+                        alt="Miniatura ${thumbIdx + 1}"
+                      />
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- COLUMN 2: SPECS & ACTIONS -->
+              <div class="card-details-col">
+                <div class="card-badges-row">
+                  ${sourceBadge}
+                  ${item.franchise ? `<span class="tag-badge franchise-badge"><i class="ph ph-film-strip"></i> ${item.franchise}</span>` : ''}
+                  ${item.line ? `<span class="tag-badge line-badge"><i class="ph ph-tag"></i> ${item.line}</span>` : ''}
+                  ${item.price ? `<span class="tag-badge price-badge"><i class="ph ph-currency-dollar"></i> ${item.price}</span>` : ''}
+                </div>
+
+                <h3 class="card-title">${item.title}</h3>
+                ${item.originalTitle && item.originalTitle !== item.title ? `<p class="card-original-title">Input: ${item.originalTitle}</p>` : ''}
+
+                <div class="card-specs-grid">
+                  <div class="spec-item">
+                    <span class="spec-label">Código JAN / EAN</span>
+                    <span class="spec-value mono">${item.jan || '—'}</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Número de Ítem</span>
+                    <span class="spec-value mono">${item.itemNo || '—'}</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Personaje</span>
+                    <span class="spec-value">${item.character || '—'}</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Precio PVP</span>
+                    <span class="spec-value mono text-orange">${item.price || 'Sin precio'}</span>
+                  </div>
+                </div>
+
+                <!-- CARD ACTION BUTTONS -->
+                <div class="card-actions-bar">
+                  <button class="btn-compact btn-accent" type="button" onclick="toggleExpandCard('${item.jan || item.title || String(idx)}')">
+                    <i class="ph ${isExpanded ? 'ph-caret-up' : 'ph-file-text'}"></i>
+                    <span>${isExpanded ? 'Ocultar Ficha' : 'Ver Ficha Completa'}</span>
+                  </button>
+                  ${isFound ? `
+                    <button class="btn-compact" type="button" onclick="copyCardFichaHtml(${idx})">
+                      <i class="ph ph-code"></i> <span>Copiar Ficha HTML</span>
+                    </button>
+                    <button class="btn-compact" type="button" onclick="copyCardText(${idx})">
+                      <i class="ph ph-copy"></i> <span>Copiar Texto</span>
+                    </button>
+                  ` : ''}
+                  ${item.link ? `
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn-compact btn-icon-only" title="Abrir ficha original en distribuidor">
+                      <i class="ph ph-arrow-square-out"></i>
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+
+            <!-- EXPANDABLE TECHNICAL SHEET (FICHA TÉCNICA) -->
+            ${isExpanded ? `
+              <div class="card-expanded-drawer">
+                <div class="drawer-header">
+                  <h4><i class="ph ph-article"></i> Ficha Técnica Estandarizada (Traducción Español)</h4>
+                </div>
+                <div class="drawer-content">
+                  ${item.descriptionHtml || `<p class="help">No se generó ficha HTML para este ítem.</p>`}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.switchCardImage = function(cardId, imgUrl, thumbEl) {
+      const mainImg = document.getElementById(`mainImg_${cardId}`);
+      if (mainImg) mainImg.src = imgUrl;
+      const parent = thumbEl.parentElement;
+      if (parent) {
+        parent.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+        thumbEl.classList.add('active');
+      }
+    };
+
+    window.toggleExpandCard = function(idKey) {
+      if (expandedProductIds.has(idKey)) {
+        expandedProductIds.delete(idKey);
+      } else {
+        expandedProductIds.add(idKey);
+      }
+      renderCardsList();
+    };
+
+    window.copyCardFichaHtml = function(idx) {
+      const item = productsList[idx];
+      if (!item || !item.descriptionHtml) return;
+      navigator.clipboard.writeText(item.descriptionHtml).then(() => {
+        showToast('Ficha HTML copiada al portapapeles');
+      });
+    };
+
+    window.copyCardText = function(idx) {
+      const item = productsList[idx];
+      if (!item) return;
+      const text = `FIGURA: ${item.title}\nFRANQUICIA: ${item.franchise}\nLÍNEA: ${item.line}\nJAN: ${item.jan}\nPRECIO PVP: ${item.price || 'Sin precio'}\nFOTOS: ${item.gallery.join(', ')}`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Datos copiados al portapapeles');
+      });
+    };
+
+    // =======================================================
+    // BATCH RUNNER & API CONSUMPTION
+    // =======================================================
+    async function runBatchLookup() {
+      const rawLines = (codesInput.value || '')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean);
+
+      if (rawLines.length === 0) {
+        alert('Por favor ingresa al menos un código o título de Banpresto.');
+        return;
+      }
+
+      isRunning = true;
+      isPaused = false;
+      btnStart.disabled = true;
+      btnPause.disabled = false;
+      btnReset.disabled = false;
+      statusDot.className = 'status-dot active';
+      statusText.textContent = 'Consultando distribuidores...';
+
+      productsList = [];
+      expandedProductIds.clear();
+
+      const total = rawLines.length;
+      let completed = 0;
+
+      // Determine pacing
+      const pace = batchPacing.value;
+      const concurrency = pace === 'fast' ? 3 : pace === 'moderate' ? 2 : 1;
+      const delayMs = pace === 'fast' ? 200 : pace === 'moderate' ? 400 : 800;
+
+      // Check local cache first for all items
+      const itemsToFetch = [];
+      for (const line of rawLines) {
+        const cached = getFromLocalCatalog(line);
+        if (cached) {
+          // If input line has a price, overwrite cached price with input price
+          let inputPrice = '';
+          if (line.includes('|')) {
+            const parts = line.split('|').map(p => p.trim());
+            if (parts.length >= 3) inputPrice = parts[2];
+          } else if (line.includes('\t')) {
+            const parts = line.split('\t').map(p => p.trim());
+            if (parts.length >= 3) inputPrice = parts[2];
+          }
+          const finalPrice = inputPrice ? (inputPrice.startsWith('$') ? inputPrice : `$${parseInt(inputPrice.replace(/\\D/g, ''), 10).toLocaleString('es-CL')}`) : (cached.price || '');
+          productsList.push({ ...cached, price: finalPrice, source: 'local_index' });
+          completed++;
+        } else {
+          itemsToFetch.push(line);
+        }
+      }
+
+      updateStats();
+      renderReportSummary();
+      renderCardsList();
+
+      progressPercent.textContent = `${Math.round((completed / total) * 100)}%`;
+      progressBarFill.style.width = `${Math.round((completed / total) * 100)}%`;
+
+      // Fetch network batches
+      for (let i = 0; i < itemsToFetch.length; i += concurrency) {
+        if (!isRunning) break;
+        while (isPaused) {
+          await new Promise(r => setTimeout(r, 300));
+          if (!isRunning) break;
+        }
+
+        const chunk = itemsToFetch.slice(i, i + concurrency);
+        try {
+          const res = await fetch('/.netlify/functions/banpresto-lookup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ queries: chunk })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.items && Array.isArray(data.items)) {
+              data.items.forEach(item => {
+                productsList.push(item);
+                if (item.status === 'found') {
+                  saveToLocalCatalog(item);
+                }
+              });
+            }
+          } else {
+            // Push placeholders for failed items
+            chunk.forEach(q => {
+              const parts = q.includes('|') ? q.split('|').map(s => s.trim()) : q.split('\t').map(s => s.trim());
+              productsList.push({
+                query: q,
+                jan: parts[0] || '',
+                title: parts[1] || q,
+                price: parts[2] || '',
+                franchise: 'Banpresto',
+                line: 'Banpresto',
+                image: '',
+                gallery: [],
+                status: 'error',
+                source: 'not_found',
+                diagnosis: 'Error HTTP en Netlify Function'
+              });
+            });
+          }
+        } catch (err) {
+          console.error('Batch lookup error:', err);
+        }
+
+        completed += chunk.length;
+        const pct = Math.round((completed / total) * 100);
+        progressPercent.textContent = `${pct}%`;
+        progressBarFill.style.width = `${pct}%`;
+
+        updateStats();
+        renderReportSummary();
+        renderCardsList();
+
+        if (delayMs > 0 && i + concurrency < itemsToFetch.length) {
+          await new Promise(r => setTimeout(r, delayMs));
+        }
+      }
+
+      isRunning = false;
+      btnStart.disabled = false;
+      btnPause.disabled = true;
+      statusDot.className = 'status-dot';
+      statusText.textContent = 'Búsqueda finalizada';
+      showToast(`Búsqueda completada: ${productsList.filter(p => p.status === 'found').length} encontradas.`);
+    }
+
+    // =======================================================
+    // EXPORT FUNCTIONS: CSV, SHEETS TABLE & ZIP PHOTOS
+    // =======================================================
+    function exportGeneralCsv() {
+      if (productsList.length === 0) return alert('No hay productos para exportar.');
+
+      const headers = ['JAN', 'Item No', 'Titulo', 'Franquicia', 'Linea', 'Personaje', 'Precio PVP', 'Fuente', 'Estado', 'Imagen Principal', 'Galeria', 'Descripcion ES', 'Ficha HTML'];
+      const rows = productsList.map(p => [
+        `"${p.jan || ''}"`,
+        `"${p.itemNo || ''}"`,
+        `"${(p.title || '').replace(/"/g, '""')}"`,
+        `"${(p.franchise || '').replace(/"/g, '""')}"`,
+        `"${(p.line || '').replace(/"/g, '""')}"`,
+        `"${(p.character || '').replace(/"/g, '""')}"`,
+        `"${p.price || ''}"`,
+        `"${p.source || ''}"`,
+        `"${p.status || ''}"`,
+        `"${p.image || ''}"`,
+        `"${(p.gallery || []).join(' | ')}"`,
+        `"${(p.description_es || '').replace(/"/g, '""')}"`,
+        `"${(p.descriptionHtml || '').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Banpresto_Catalogo_EVO_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      showToast('CSV General descargado');
+    }
+
+    function copyFormattedHtmlTable() {
+      if (productsList.length === 0) return alert('No hay productos para copiar.');
+
+      let html = `<table border="1" style="border-collapse:collapse; font-family:Arial,sans-serif;">
+        <thead>
+          <tr style="background:#f4f4f5;">
+            <th>Foto</th>
+            <th>JAN</th>
+            <th>Item No</th>
+            <th>Título Oficial</th>
+            <th>Franquicia</th>
+            <th>Línea</th>
+            <th>Personaje</th>
+            <th>Precio PVP</th>
+            <th>Fuente</th>
+            <th>Ficha Técnica (HTML)</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      productsList.forEach(p => {
+        html += `<tr>
+          <td>${p.image ? `<img src="${p.image}" width="70" height="70" style="object-fit:cover;" />` : 'Sin Foto'}</td>
+          <td>${p.jan || ''}</td>
+          <td>${p.itemNo || ''}</td>
+          <td><strong>${p.title || ''}</strong></td>
+          <td>${p.franchise || ''}</td>
+          <td>${p.line || ''}</td>
+          <td>${p.character || ''}</td>
+          <td><strong>${p.price || '—'}</strong></td>
+          <td>${p.source || ''}</td>
+          <td>${(p.descriptionHtml || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+        </tr>`;
+      });
+
+      html += `</tbody></table>`;
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const plainBlob = new Blob([productsList.map(p => `${p.jan}\t${p.title}\t${p.franchise}\t${p.price || ''}\t${p.image}`).join('\n')], { type: 'text/plain' });
+
+      navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': blob,
+          'text/plain': plainBlob
+        })
+      ]).then(() => {
+        showToast('Tabla copiada. Lista para pegar con Ctrl+V en Google Sheets o Excel');
+      }).catch(err => {
+        console.warn('Clipboard error:', err);
+        navigator.clipboard.writeText(html);
+        showToast('HTML copiado');
+      });
+    }
+
+    async function exportZipPhotos() {
+      const foundItems = productsList.filter(p => p.status === 'found' && (p.image || (p.gallery && p.gallery.length > 0)));
+      if (foundItems.length === 0) return alert('No hay fotos encontradas para empaquetar.');
+
+      if (typeof JSZip === 'undefined') {
+        alert('Error: La librería JSZip no está disponible.');
+        return;
+      }
+
+      zipProgressModal.style.display = 'flex';
+      zipProgressText.textContent = 'Iniciando descarga de fotografías...';
+      zipProgressFill.style.width = '0%';
+
+      const zip = new JSZip();
+      let downloaded = 0;
+      let totalImages = 0;
+
+      // Calculate total images
+      foundItems.forEach(item => {
+        const gallery = item.gallery && item.gallery.length > 0 ? item.gallery : [item.image];
+        totalImages += gallery.length;
+      });
+
+      for (const item of foundItems) {
+        const cleanJan = (item.jan || item.itemNo || item.title).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const gallery = item.gallery && item.gallery.length > 0 ? item.gallery : [item.image];
+
+        for (let i = 0; i < gallery.length; i++) {
+          const imgUrl = gallery[i];
+          if (!imgUrl) continue;
+
+          const fileName = `${cleanJan}_${String(i + 1).padStart(2, '0')}.jpg`;
+          try {
+            // Use Netlify image proxy to bypass CORS
+            const proxyUrl = `/.netlify/functions/banpresto-lookup?img=${encodeURIComponent(imgUrl)}`;
+            const res = await fetch(proxyUrl);
+            if (res.ok) {
+              const arrayBuf = await res.arrayBuffer();
+              zip.file(fileName, arrayBuf);
+            }
+          } catch (e) {
+            console.warn('Error downloading image for zip:', imgUrl, e);
+          }
+
+          downloaded++;
+          const pct = Math.round((downloaded / totalImages) * 100);
+          zipProgressFill.style.width = `${pct}%`;
+          zipProgressText.textContent = `Descargando imagen ${downloaded} de ${totalImages}...`;
+        }
+      }
+
+      zipProgressText.textContent = 'Comprimiendo archivo ZIP...';
+      const content = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = `Banpresto_Fotos_HD_${new Date().toISOString().slice(0, 10)}.zip`;
+      link.click();
+
+      zipProgressModal.style.display = 'none';
+      showToast('Paquete ZIP descargado exitosamente');
+    }
+
+    // =======================================================
+    // EVENT LISTENERS & INITIALIZATION
+    // =======================================================
+    codesInput.addEventListener('input', updateCodeCounter);
+
+    btnLoadSample.addEventListener('click', () => {
+      codesInput.value = SAMPLE_ITEMS.join('\n');
+      updateCodeCounter();
+      showToast('15 figuras de ejemplo cargadas con PVP');
+    });
+
+    btnClearInput.addEventListener('click', () => {
+      codesInput.value = '';
+      updateCodeCounter();
+    });
+
+    btnStart.addEventListener('click', runBatchLookup);
+
+    btnPause.addEventListener('click', () => {
+      isPaused = !isPaused;
+      btnPause.innerHTML = isPaused ? '<i class="ph ph-play"></i> Reanudar' : '<i class="ph ph-pause"></i> Pausar';
+      statusText.textContent = isPaused ? 'Búsqueda en pausa' : 'Consultando distribuidores...';
+    });
+
+    btnReset.addEventListener('click', () => {
+      isRunning = false;
+      isPaused = false;
+      btnStart.disabled = false;
+      btnPause.disabled = true;
+      btnReset.disabled = true;
+      statusDot.className = 'status-dot';
+      statusText.textContent = 'Listo para iniciar';
+      progressPercent.textContent = '0%';
+      progressBarFill.style.width = '0%';
+      productsList = [];
+      updateStats();
+      renderReportSummary();
+      renderCardsList();
+    });
+
+    // View Tabs
+    tabViewCards.addEventListener('click', () => {
+      tabViewCards.classList.add('active');
+      tabViewCollections.classList.remove('active');
+      productCardsList.style.display = 'flex';
+      reportCollectionsGrid.style.display = 'none';
+    });
+
+    tabViewCollections.addEventListener('click', () => {
+      tabViewCollections.classList.add('active');
+      tabViewCards.classList.remove('active');
+      reportCollectionsGrid.style.display = 'grid';
+    });
+
+    // Filters
+    filterSearch.addEventListener('input', renderCardsList);
+    filterStatus.addEventListener('change', renderCardsList);
+
+    // Export Buttons
+    btnCopyHtmlTable.addEventListener('click', copyFormattedHtmlTable);
+    btnExportCsv.addEventListener('click', exportGeneralCsv);
+    btnExportZip.addEventListener('click', exportZipPhotos);
+
+    btnReportCopyHtml.addEventListener('click', copyFormattedHtmlTable);
+    btnReportExportCsv.addEventListener('click', exportGeneralCsv);
+    btnReportExportZip.addEventListener('click', exportZipPhotos);
+
+    // Local Catalog Management
+    btnLoadLocalCatalog.addEventListener('click', () => {
+      const items = getUniqueLocalFigures();
+      if (items.length === 0) return alert('El índice local está vacío.');
+      productsList = items;
+      updateStats();
+      renderReportSummary();
+      renderCardsList();
+      showToast(`${items.length} figuras cargadas desde el índice local`);
+    });
+
+    btnExportLocalCatalog.addEventListener('click', () => {
+      const catalog = getLocalCatalog();
+      const count = Object.keys(catalog).length;
+      if (count === 0) return alert('El índice local está vacío.');
+      const blob = new Blob([JSON.stringify(catalog, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `EVO_Banpresto_Local_Index_${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      showToast('Copia de respaldo JSON descargada');
+    });
+
+    btnImportLocalCatalog.addEventListener('click', () => {
+      inputImportJson.click();
+    });
+
+    inputImportJson.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target?.result);
+          if (typeof data === 'object' && data !== null) {
+            const current = getLocalCatalog();
+            const merged = { ...current, ...data };
+            localStorage.setItem(LOCAL_CATALOG_KEY, JSON.stringify(merged));
+            updateLocalCatalogBadge();
+            showToast('Índice local actualizado exitosamente');
+          }
+        } catch (err) {
+          alert('Error al leer el archivo JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    btnClearLocalCatalog.addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que deseas vaciar el índice local de Banpresto?')) {
+        localStorage.removeItem(LOCAL_CATALOG_KEY);
+        updateLocalCatalogBadge();
+        showToast('Índice local vaciado');
+      }
+    });
+
+    // Initialize
+    updateCodeCounter();
+    updateLocalCatalogBadge();
+  </script>
+
+  <style>
+    .banpresto-page {
+      padding-top: calc(var(--nav-h) + 2rem);
+      padding-bottom: 5rem;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    .banpresto-page .tool-header {
+      margin-bottom: 2rem;
+    }
+
+    .banpresto-page .tool-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0.25rem 0 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .banpresto-page .tool-desc {
+      font-size: 1rem;
+      color: var(--text-2);
+      max-width: 820px;
+      line-height: 1.6;
+    }
+
+    .banpresto-page .tool-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 980px) {
+      .banpresto-page .tool-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar Panels */
+    .banpresto-page .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .banpresto-page .panel-card {
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .banpresto-page .panel-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .banpresto-page .panel-card h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .banpresto-page .badge-count {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(228, 87, 46, 0.1);
+      color: var(--orange);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .banpresto-page .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .banpresto-page .field label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .banpresto-page .codes-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text);
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .banpresto-page .codes-textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+
+    .banpresto-page .help {
+      font-family: 'Krub', sans-serif;
+      font-size: 0.75rem;
+      color: var(--text-3);
+      line-height: 1.4;
+    }
+
+    .banpresto-page select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.6rem;
+      font-family: inherit;
+      font-size: 0.82rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .banpresto-page .button-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .banpresto-page .button-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .banpresto-page .btn-primary {
+      background: var(--orange);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background 0.15s ease;
+    }
+
+    .banpresto-page .btn-primary:hover {
+      background: #cf431a;
+    }
+
+    .banpresto-page .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .banpresto-page .btn-compact {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+
+    .banpresto-page .btn-compact:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .banpresto-page .btn-compact:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .banpresto-page .btn-full { width: 100%; }
+    .banpresto-page .btn-half { flex: 1; }
+    .banpresto-page .btn-accent {
+      background: rgba(228, 87, 46, 0.1);
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+    .banpresto-page .btn-accent:hover {
+      background: var(--orange);
+      color: #fff;
+    }
+    .banpresto-page .btn-secondary-accent {
+      background: rgba(8, 124, 230, 0.08);
+      border-color: #087ce6;
+      color: #087ce6;
+    }
+
+    /* Workspace */
+    .banpresto-page .workspace-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-width: 0;
+    }
+
+    .banpresto-page .metrics-card {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .banpresto-page .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .banpresto-page .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .banpresto-page .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--text-3);
+      display: inline-block;
+    }
+
+    .banpresto-page .status-dot.active {
+      background: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .banpresto-page .progress-right-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .banpresto-page .progress-percent {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--orange);
+    }
+
+    .banpresto-page .progress-total-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-3);
+      font-weight: 600;
+    }
+
+    .banpresto-page .progress-bar-track {
+      width: 100%;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .banpresto-page .progress-bar-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 4px;
+      transition: width 0.25s ease;
+    }
+
+    .banpresto-page .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.875rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .banpresto-page .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .banpresto-page .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.875rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .banpresto-page .stat-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .banpresto-page .stat-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .banpresto-page .text-primary { color: #087ce6 !important; }
+    .banpresto-page .text-success { color: #10b981 !important; }
+    .banpresto-page .text-warning { color: #f59e0b !important; }
+    .banpresto-page .text-teal { color: #059669 !important; }
+    .banpresto-page .text-orange { color: var(--orange) !important; }
+
+    /* View Mode Tabs */
+    .banpresto-page .view-mode-tabs-bar {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .banpresto-page .view-tabs-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .banpresto-page .view-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .banpresto-page .view-tab-btn:hover {
+      border-color: var(--orange);
+      color: var(--text);
+    }
+
+    .banpresto-page .view-tab-btn.active {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Report Summary Card */
+    .banpresto-page .report-summary-card {
+      border-left: 4px solid var(--orange);
+    }
+
+    .banpresto-page .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .banpresto-page .report-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .banpresto-page .report-icon-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(228, 87, 46, 0.12);
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .banpresto-page .report-title-wrap h3 {
+      margin: 0 0 0.2rem 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .banpresto-page .report-title-wrap p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-2);
+    }
+
+    .banpresto-page .report-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .banpresto-page .collections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.875rem;
+    }
+
+    .banpresto-page .collection-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.875rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .banpresto-page .collection-card:hover {
+      border-color: var(--orange);
+      transform: translateY(-2px);
+    }
+
+    .banpresto-page .collection-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .banpresto-page .collection-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .banpresto-page .collection-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--orange);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    /* Toolbar */
+    .banpresto-page .results-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+
+    .banpresto-page .filter-group, .banpresto-page .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .banpresto-page .search-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 10px;
+      width: 260px;
+    }
+
+    .banpresto-page .search-input-wrap input {
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.8rem;
+      color: var(--text);
+      outline: none;
+      width: 100%;
+    }
+
+    .banpresto-page .select-compact {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      padding: 6px 10px;
+      outline: none;
+    }
+
+    .banpresto-page .export-dropdown-wrap {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    /* Empty State */
+    .banpresto-page .empty-state {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+    }
+
+    .banpresto-page .empty-icon-wrap {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      background: rgba(228, 87, 46, 0.1);
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 1.5rem;
+    }
+
+    .banpresto-page .empty-state h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    .banpresto-page .empty-state p {
+      font-family: 'Krub', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-2);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* Product Cards List */
+    .banpresto-page .product-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .banpresto-page .funko-product-card {
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .banpresto-page .funko-product-card:hover {
+      border-color: rgba(228, 87, 46, 0.4);
+    }
+
+    .banpresto-page .funko-product-card.is-expanded {
+      border-color: var(--orange);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .banpresto-page .card-main-grid {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem;
+    }
+
+    @media (max-width: 680px) {
+      .banpresto-page .card-main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Gallery Column */
+    .banpresto-page .card-gallery-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .banpresto-page .gallery-main-frame {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .banpresto-page .gallery-main-frame img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .banpresto-page .gallery-count-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      font-size: 0.68rem;
+      font-family: 'IBM Plex Mono', monospace;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .banpresto-page .gallery-thumbs-row {
+      display: flex;
+      gap: 0.35rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .banpresto-page .gallery-thumb {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      object-fit: cover;
+      cursor: pointer;
+      opacity: 0.65;
+      transition: opacity 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .banpresto-page .gallery-thumb:hover,
+    .banpresto-page .gallery-thumb.active {
+      opacity: 1;
+      border-color: var(--orange);
+    }
+
+    /* Details Column */
+    .banpresto-page .card-details-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .banpresto-page .card-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .banpresto-page .source-badge {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .banpresto-page .tag-badge {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .banpresto-page .tag-primary {
+      background: rgba(8, 124, 230, 0.1);
+      color: #087ce6;
+      border: 1px solid rgba(8, 124, 230, 0.3);
+    }
+    .banpresto-page .tag-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .banpresto-page .tag-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .banpresto-page .tag-teal {
+      background: rgba(5, 150, 105, 0.1);
+      color: #059669;
+      border: 1px solid rgba(5, 150, 105, 0.3);
+    }
+
+    .banpresto-page .franchise-badge {
+      border-color: rgba(228, 87, 46, 0.3);
+      color: var(--orange);
+    }
+
+    .banpresto-page .price-badge {
+      background: rgba(228, 87, 46, 0.12);
+      border-color: var(--orange);
+      color: var(--orange);
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .banpresto-page .card-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    .banpresto-page .card-original-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-3);
+      margin: 0;
+    }
+
+    .banpresto-page .card-specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.5rem 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      margin: 0.25rem 0;
+    }
+
+    .banpresto-page .spec-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .banpresto-page .spec-label {
+      font-size: 0.68rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .banpresto-page .spec-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .banpresto-page .spec-value.mono {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .banpresto-page .card-actions-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .banpresto-page .btn-icon-only {
+      padding: 0.5rem;
+    }
+
+    /* Drawer */
+    .banpresto-page .card-expanded-drawer {
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      padding: 1.25rem;
+    }
+
+    .banpresto-page .drawer-header h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0 0 0.85rem 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .banpresto-page .drawer-content {
+      font-family: 'Krub', sans-serif;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-2);
+    }
+
+    /* Modals & Toast */
+    .banpresto-page .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .banpresto-page .modal-card {
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .banpresto-page .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #18181b;
+      color: #f4f4f5;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2000;
+    }
+
+    .banpresto-page .toast.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</Base>

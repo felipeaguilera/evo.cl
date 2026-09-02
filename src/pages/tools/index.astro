@@ -1,0 +1,186 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Herramientas y Sistemas. EVO.cl';
+const description = 'Catálogo de herramientas internas y utilidades desarrolladas por EVO Communication Lab: scrapers de catálogo para retail, vectorizadores y automatizaciones.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+
+  <main class="tools-index-page">
+    <header class="tool-header wrap">
+      <p class="label" data-es="Sistemas y Herramientas" data-en="Systems & Tools">Sistemas y Herramientas</p>
+      <h1 class="tool-title" data-es="Herramientas EVO" data-en="EVO Tools">Herramientas EVO</h1>
+      <p class="tool-desc" data-es="Suite de utilidades, extractores y automatizaciones para clientes y proyectos internos de EVO Creative Lab." data-en="Suite of utilities, extractors, and automations for EVO Creative Lab clients and internal projects.">
+        Suite de utilidades, extractores y automatizaciones para clientes y proyectos internos de EVO Creative Lab.
+      </p>
+    </header>
+
+    <div class="wrap">
+      <div class="tools-grid">
+        <!-- TOOL 1: BANPRESTO SCRAPER -->
+        <a href="/tools/banpresto" class="tool-card">
+          <div class="tool-card-icon">
+            <i class="ph ph-robot"></i>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-card-badge">E-Commerce / Retail</div>
+            <h3>Banpresto Catalog Scraper</h3>
+            <p>Consulta masiva de figuras Banpresto / Bandai Spirits por JAN, título y PVP. Extrae fotos HD multi-ángulo, franquicias, líneas y ficha en español. Exporta a CSV, Sheets y ZIP.</p>
+          </div>
+          <div class="tool-card-footer">
+            <span>Abrir herramienta</span>
+            <i class="ph ph-arrow-right"></i>
+          </div>
+        </a>
+
+        <!-- TOOL 2: FUNKO POP SCRAPER -->
+        <a href="/tools/funko-pop" class="tool-card">
+          <div class="tool-card-icon">
+            <i class="ph ph-package"></i>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-card-badge">E-Commerce / Retail</div>
+            <h3>Funko Pop! Catalog Scraper</h3>
+            <p>Consulta masiva de figuras Funko Pop! por UPC o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas y exporta a Shopify CSV, Sheets y ZIP.</p>
+          </div>
+          <div class="tool-card-footer">
+            <span>Abrir herramienta</span>
+            <i class="ph ph-arrow-right"></i>
+          </div>
+        </a>
+
+        <!-- TOOL 3: VECTORIZER -->
+        <a href="/tools/vectorizer" class="tool-card">
+          <div class="tool-card-icon">
+            <i class="ph ph-vector-three"></i>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-card-badge">Diseño / Vector</div>
+            <h3>Vectorizer</h3>
+            <p>Convierte logos o íconos planos en archivos SVG limpios y optimizados sin depender de servicios externos. Corre 100% en tu navegador de forma local.</p>
+          </div>
+          <div class="tool-card-footer">
+            <span>Abrir herramienta</span>
+            <i class="ph ph-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+
+  <style>
+    .tools-index-page {
+      padding-top: calc(var(--nav-h) + 2rem);
+      padding-bottom: 5rem;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    .tools-index-page .tool-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .tools-index-page .tool-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0.25rem 0 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .tools-index-page .tool-desc {
+      font-size: 1.05rem;
+      color: var(--text-2);
+      max-width: 720px;
+      line-height: 1.6;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tool-card {
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tool-card:hover {
+      border-color: var(--orange);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .tool-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(228, 87, 46, 0.1);
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .tool-card-badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .tool-card-body h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 0.6rem 0;
+    }
+
+    .tool-card-body p {
+      font-family: 'Krub', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text-2);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .tool-card-footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    .tool-card:hover .tool-card-footer i {
+      transform: translateX(4px);
+      transition: transform 0.15s ease;
+    }
+  </style>
+</Base>

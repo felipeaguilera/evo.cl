@@ -465,7 +465,8 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
       // Set active productsList directly with all locally indexed figures
       productsList = uniqueItems.map(item => ({
         ...item,
-        source: 'local_index',
+        source: item.source || 'local_index',
+        fromCache: true,
         status: 'found'
       }));
 
@@ -481,9 +482,15 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
       progressPercent.textContent = '100%';
       if (statTotalBadge) statTotalBadge.textContent = `(${productsList.length} códigos)`;
       if (statLocal) statLocal.textContent = String(productsList.length);
-      statFunko.textContent = '0';
-      statUpc.textContent = '0';
-      statNotFound.textContent = '0';
+
+      const bySource = { funko_storefront: 0, upc_database: 0, not_found: 0, other: 0 };
+      uniqueItems.forEach(item => {
+        const key = bySource.hasOwnProperty(item.source) ? item.source : 'other';
+        bySource[key]++;
+      });
+      statFunko.textContent = String(bySource.funko_storefront);
+      statUpc.textContent = String(bySource.upc_database);
+      statNotFound.textContent = String(bySource.not_found);
       statusDot.className = 'status-dot success';
       statusText.textContent = `Base local desplegada (${productsList.length} figuras)`;
 
@@ -657,7 +664,7 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
       if (!forceRefresh) {
         const cached = getFromLocalCatalog(query);
         if (cached && cached.status === 'found') {
-          return { ...cached, query, source: 'local_index' };
+          return { ...cached, query, source: cached.source || 'local_index', fromCache: true };
         }
       }
 
@@ -824,7 +831,7 @@ const description = 'Consulta masiva de figuras Funko Pop! por código de barras
         progressPercent.textContent = `${pct}%`;
         progressBarFill.style.width = `${pct}%`;
 
-        const localCount = productsList.filter(p => p.source === 'local_index').length;
+        const localCount = productsList.filter(p => p.fromCache || p.source === 'local_index').length;
         const funkoCount = productsList.filter(p => p.source === 'funko_storefront').length;
         const upcCount = productsList.filter(p => p.source === 'upc_database').length;
         const notFoundCount = productsList.filter(p => p.status !== 'found').length;
@@ -1258,14 +1265,18 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
         const photosCount = gallery.length;
 
         let sourceBadge = '';
-        if (item.source === 'local_index') {
-          sourceBadge = `<span class="badge-source source-local" title="Recuperado desde el índice persistente local (0ms)"><i class="ph ph-hard-drive"></i> Índice Local</span>`;
-        } else if (item.source === 'funko_storefront') {
+        if (item.source === 'funko_storefront') {
           sourceBadge = `<span class="badge-source source-funko"><i class="ph ph-check-circle"></i> Funko US (Oficial)</span>`;
         } else if (item.source === 'upc_database') {
           sourceBadge = `<span class="badge-source source-upc"><i class="ph ph-barcode"></i> UPC Index</span>`;
+        } else if (item.source === 'local_index') {
+          sourceBadge = `<span class="badge-source source-local" title="Guardado antes de que se registrara el origen real"><i class="ph ph-hard-drive"></i> Base Local</span>`;
         } else {
           sourceBadge = `<span class="badge-source source-none"><i class="ph ph-warning-circle"></i> No Encontrado</span>`;
+        }
+
+        if (item.fromCache) {
+          sourceBadge += `<span class="badge-cache" title="Recuperado del índice local (0ms), sin llamar a la red"><i class="ph ph-hard-drive"></i></span>`;
         }
 
         const funkoSearchUrl = `https://funko.com/search/?q=${encodeURIComponent(item.sku || item.query)}&vault=true`;
@@ -2584,6 +2595,18 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
   .funko-page .source-none {
     background: rgba(245, 158, 11, 0.12);
     color: #d97706;
+  }
+
+  .funko-page .badge-cache {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    background: rgba(100, 116, 139, 0.12);
+    color: #64748b;
+    border: 1px solid rgba(100, 116, 139, 0.25);
+    margin-left: 4px;
   }
 
   .funko-page .btn-refresh-card, .funko-page .btn-refresh-card-drawer {

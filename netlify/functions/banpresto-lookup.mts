@@ -120,6 +120,42 @@ async function translateToSpanish(text: string): Promise<string> {
   return text;
 }
 
+function stripNavigationBoilerplate(text: string): string {
+  if (!text) return "";
+
+  let cleaned = text;
+
+  // 1. Remove HTML link tags pointing to collections / categories
+  cleaned = cleaned.replace(/<p[^>]*>\s*<a[^>]+href="[^"]*(?:collections|category|categories)[^"]*"[^>]*>[\s\S]*?<\/a>\s*<\/p>/gi, "");
+  cleaned = cleaned.replace(/<a[^>]+href="[^"]*(?:collections|category|categories)[^"]*"[^>]*>[\s\S]*?<\/a>/gi, "");
+
+  // 2. Remove "Ver Todos / Ver Todas / View All / Shop All" repeated blocks
+  const navBlockPattern = /(?:(?:Ver\s+(?:Todos|Todas|Todo|Toda)|View\s+All|Shop\s+All)\b[^.!?\n<]*?){2,}$/gim;
+  cleaned = cleaned.replace(navBlockPattern, "");
+
+  // Specific single phrases commonly injected by themes
+  const knownJunkPhrases = [
+    /\bVer\s+(?:Todos|Todas|Todo|Toda)\s+(?:Los|Las)?\s+[^.!?\n<]+/gi,
+    /\bView\s+All\s+[^.!?\n<]+/gi,
+    /\bShop\s+All\s+[^.!?\n<]+/gi,
+    /\bCompartir\s+en\s+(?:Facebook|Twitter|Pinterest|WhatsApp|Instagram)\b/gi,
+    /\bShare\s+on\s+(?:Facebook|Twitter|Pinterest|WhatsApp|Instagram)\b/gi,
+    /\bAñadir\s+a\s+(?:Favoritos|Wishlist|Lista de Deseos)\b/gi,
+    /\bAdd\s+to\s+(?:Wishlist|Favorites)\b/gi,
+    /\bComparar\b\s*$/gim,
+    /\bCompare\b\s*$/gim,
+  ];
+
+  for (const pattern of knownJunkPhrases) {
+    cleaned = cleaned.replace(pattern, "");
+  }
+
+  // 3. Remove leftover empty paragraph tags
+  cleaned = cleaned.replace(/<p\b[^>]*>\s*(?:&nbsp;|\s)*<\/p>/gi, "");
+
+  return cleaned.replace(/\s{2,}/g, " ").trim();
+}
+
 function extractMetadata(rawTitle: string) {
   const clean = (rawTitle || "")
     .replace(/[『』~～♡?¿!¡#]/g, " ")
@@ -244,11 +280,13 @@ function buildStandardDescriptionHtml(p: {
   lang?: "es" | "en";
 }): string {
   const isEs = p.lang !== "en";
-  const cleanDesc = (p.description || "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<\/?[^>]+(>|$)/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const cleanDesc = stripNavigationBoilerplate(
+    (p.description || "")
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<\/?[^>]+(>|$)/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 
   if (isEs) {
     return `
@@ -331,7 +369,7 @@ async function queryDistritoMax(rawTitle: string): Promise<Partial<BanprestoProd
             image: gallery[0] || p.image || "",
             gallery,
             link,
-            description_es: p.body || "",
+            description_es: stripNavigationBoilerplate(p.body || ""),
             status: "found",
           };
         }
@@ -383,7 +421,8 @@ async function queryLittleBuddy(rawTitle: string): Promise<Partial<BanprestoProd
               pPage.data.match(/<div[^>]*class="[^"]*woocommerce-product-details__short-description[^"]*"[\s\S]*?<\/div>/i) ||
               pPage.data.match(/<div[^>]*id="tab-description"[^>]*>([\s\S]*?)<\/div>/i);
             if (descMatch) {
-              desc_en = descMatch[0].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+              const rawDesc = descMatch[0].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+              desc_en = stripNavigationBoilerplate(rawDesc);
             }
           }
 
@@ -423,7 +462,7 @@ async function queryUpcDatabase(jan: string): Promise<Partial<BanprestoProductRe
         const item = json.items[0];
         const title = item.title || "";
         const images: string[] = Array.isArray(item.images) ? item.images : [];
-        const desc_en = item.description || "";
+        const desc_en = stripNavigationBoilerplate(item.description || "");
         const desc_es = await translateToSpanish(desc_en);
 
         const meta = extractMetadata(title);
@@ -545,7 +584,10 @@ async function lookupSingleBanpresto(rawInput: any, forceRefresh = false): Promi
   const meta = extractMetadata(title || result?.title || "");
   const finalJan = jan || result?.jan || "";
   const finalItemNo = itemNo || (finalJan.length === 13 ? finalJan.substring(7, 12) : undefined);
-  const finalTitle = result?.title || title || (finalJan ? `Banpresto Item #${finalJan}` : "Figura Banpresto");
+  const hasRealInputTitle = Boolean(title && !/^Banpresto JAN \d+$/i.test(title));
+  const finalTitle = hasRealInputTitle
+    ? title
+    : (result?.title || title || (finalJan ? `Banpresto Item #${finalJan}` : "Figura Banpresto"));
   const finalFranchise = result?.franchise || meta.franchise || "Banpresto";
   const finalLine = result?.line || meta.line || "Banpresto";
   const finalChar = result?.character || meta.character;

@@ -1275,9 +1275,12 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
           sourceBadge = `<span class="badge-source source-none"><i class="ph ph-warning-circle"></i> No Encontrado</span>`;
         }
 
+        let cacheBadge = '';
         if (item.fromCache) {
-          sourceBadge += `<span class="badge-cache" title="Recuperado del índice local (0ms), sin llamar a la red"><i class="ph ph-hard-drive"></i></span>`;
+          cacheBadge = `<span class="badge-cache" title="Recuperado del índice local (0ms), sin llamar a la red"><i class="ph ph-hard-drive"></i></span>`;
         }
+
+        const sourceBadgeGroup = `<span class="source-badge-group">${sourceBadge}${cacheBadge}</span>`;
 
         const funkoSearchUrl = `https://funko.com/search/?q=${encodeURIComponent(item.sku || item.query)}&vault=true`;
         const amazonSearchUrl = `https://www.amazon.com/s?k=${encodeURIComponent(item.upc || item.sku || item.query)}`;
@@ -1334,7 +1337,7 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
                 <div class="card-pills-row">
                   ${item.license ? `<span class="badge-tag badge-license">${escapeHtml(item.license)}</span>` : ''}
                   ${item.fandom ? `<span class="badge-tag">${escapeHtml(item.fandom)}</span>` : ''}
-                  ${sourceBadge}
+                  ${sourceBadgeGroup}
                 </div>
                 <div class="card-codes-row">
                   <span class="mono-code-badge"><i class="ph ph-barcode"></i> UPC: <strong>${escapeHtml(item.upc || item.query)}</strong></span>
@@ -2607,6 +2610,12 @@ ${item.fandom ? `- Fandom / Universe: ${item.fandom}\n` : ''}${item.boxNumber ? 
     color: #64748b;
     border: 1px solid rgba(100, 116, 139, 0.25);
     margin-left: 4px;
+  }
+
+  .funko-page .source-badge-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .funko-page .btn-refresh-card, .funko-page .btn-refresh-card-drawer {

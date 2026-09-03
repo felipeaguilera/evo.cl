@@ -1255,9 +1255,12 @@ ${item.price ? `- Retail Price (MSRP): ${item.price}\n` : ''}- Material: High qu
           sourceBadge = `<span class="badge-source source-none"><i class="ph ph-warning-circle"></i> No Encontrado</span>`;
         }
 
+        let cacheBadge = '';
         if (item.fromCache) {
-          sourceBadge += `<span class="badge-cache" title="Recuperado del índice local (0ms), sin llamar a la red"><i class="ph ph-hard-drive"></i></span>`;
+          cacheBadge = `<span class="badge-cache" title="Recuperado del índice local (0ms), sin llamar a la red"><i class="ph ph-hard-drive"></i></span>`;
         }
+
+        const sourceBadgeGroup = `<span class="source-badge-group">${sourceBadge}${cacheBadge}</span>`;
 
         const distritoSearchUrl = `https://distritomax.com/search?q=${encodeURIComponent(item.character || item.title || item.jan)}`;
         const buddySearchUrl = `https://littlebuddytoys.com/?s=${encodeURIComponent(item.character || item.title || item.jan)}&post_type=product`;
@@ -1314,7 +1317,7 @@ ${item.price ? `- Retail Price (MSRP): ${item.price}\n` : ''}- Material: High qu
                 <div class="card-pills-row">
                   ${item.franchise ? `<span class="badge-tag badge-license">${escapeHtml(item.franchise)}</span>` : ''}
                   ${item.line ? `<span class="badge-tag">${escapeHtml(item.line)}</span>` : ''}
-                  ${sourceBadge}
+                  ${sourceBadgeGroup}
                 </div>
                 <div class="card-codes-row">
                   <span class="mono-code-badge"><i class="ph ph-barcode"></i> JAN: <strong>${escapeHtml(item.jan || item.query)}</strong></span>
@@ -2502,6 +2505,12 @@ ${item.price ? `- Retail Price (MSRP): ${item.price}\n` : ''}- Material: High qu
     color: #64748b;
     border: 1px solid rgba(100, 116, 139, 0.25);
     margin-left: 4px;
+  }
+
+  .banpresto-page .source-badge-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .banpresto-page .btn-refresh-card, .banpresto-page .btn-refresh-card-drawer {

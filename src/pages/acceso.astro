@@ -104,13 +104,25 @@ const description = 'Acceso a las herramientas privadas de EVO Communication Lab
       btnIn.addEventListener('click', function () { id.open('login'); });
       btnOut.addEventListener('click', function () { id.logout(); });
 
+      // El widget se inicia solo en DOMContentLoaded. Iniciarlo dos veces crea dos
+      // iframes y el segundo tapa la ventana de invitación. Se inicia una sola vez,
+      // en español, y la llamada automática queda sin efecto.
+      var initReal = id.init;
+      var iniciado = false;
+      id.init = function (opts) {
+        if (iniciado) return;
+        iniciado = true;
+        return initReal.call(id, opts);
+      };
       id.init({ locale: 'es' });
     })();
   </script>
 </Base>
 
 <style>
-  .acceso { padding-top: 8rem; padding-bottom: 6rem; max-width: 560px; }
+  /* Alto mínimo: la página llena la pantalla y el footer queda abajo. 59px de nav y 69px de footer. */
+  .acceso { min-height: calc(100svh - 128px); display: flex; flex-direction: column; justify-content: center; padding-top: 4rem; padding-bottom: 4rem; max-width: 560px; }
+  .acceso [hidden] { display: none !important; }
   .acceso-title { font-size: clamp(2rem, 5vw, 3rem); margin: 0.5rem 0 1rem; }
   .acceso-copy { color: var(--text-2); margin-bottom: 1.75rem; }
   .acceso-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }

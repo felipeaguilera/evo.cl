@@ -23,6 +23,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <html lang={lang} data-lang={lang} data-theme="light">
 <head>
   <meta charset="UTF-8" />
+  <!-- Netlify Identity devuelve invitaciones y login con Google a la raíz del sitio. Reenviar a /acceso/. -->
+  <script is:inline>
+    if (/(invite_token|recovery_token|confirmation_token|email_change_token|access_token)=/.test(location.hash) && location.pathname.indexOf('/acceso') !== 0) {
+      location.replace('/acceso/' + location.hash);
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />

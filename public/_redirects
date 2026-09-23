@@ -1,1 +1,12 @@
 /1to1  /1a1  301
+
+# Herramientas privadas: solo sesiones de Netlify Identity con rol weplay o evo.
+# Sin rol, Netlify sirve la página de acceso con estado 401 en la misma URL.
+/tools/banpresto     /tools/banpresto/index.html  200!  Role=weplay,evo
+/tools/banpresto/*   /tools/banpresto/:splat      200!  Role=weplay,evo
+/tools/funko-pop     /tools/funko-pop/index.html  200!  Role=weplay,evo
+/tools/funko-pop/*   /tools/funko-pop/:splat      200!  Role=weplay,evo
+/tools/banpresto     /acceso/index.html  401!
+/tools/banpresto/*   /acceso/index.html  401!
+/tools/funko-pop     /acceso/index.html  401!
+/tools/funko-pop/*   /acceso/index.html  401!

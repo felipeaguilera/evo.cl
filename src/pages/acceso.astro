@@ -1,0 +1,119 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+// Página de acceso a las herramientas privadas.
+// Netlify la sirve con estado 401 en la misma URL de la herramienta cuando la
+// visita no trae una sesión con el rol correcto (ver public/_redirects).
+// El login lo maneja Netlify Identity: invitación por correo o Google.
+const title = 'Acceso. EVO Communication Lab';
+const description = 'Acceso a las herramientas privadas de EVO Communication Lab.';
+---
+<Base title={title} description={description}>
+  <Nav />
+
+  <main class="acceso wrap">
+    <p class="label">Herramientas privadas</p>
+    <h1 class="acceso-title">Acceso</h1>
+    <p class="acceso-copy" id="acceso-msg">Esta herramienta es privada. Entra con la cuenta que recibió la invitación.</p>
+    <div class="acceso-actions">
+      <button type="button" class="btn btn-primary" id="acceso-login">
+        <i class="ph ph-sign-in" aria-hidden="true"></i>
+        <span>Entrar</span>
+      </button>
+      <button type="button" class="btn btn-outline" id="acceso-logout" hidden>
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
+    <ul class="acceso-links" id="acceso-links" hidden>
+      <li><a href="/tools/banpresto">Banpresto Catalog Scraper</a></li>
+      <li><a href="/tools/funko-pop">Funko Pop Catalog Scraper</a></li>
+    </ul>
+  </main>
+
+  <Footer />
+
+  <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script is:inline>
+    (function () {
+      var ROLES = ['weplay', 'evo'];
+      var NEXT_KEY = 'evo_acceso_next';
+      var LOOP_KEY = 'evo_acceso_reload';
+      var enAcceso = location.pathname.indexOf('/acceso') === 0;
+      var msg = document.getElementById('acceso-msg');
+      var btnIn = document.getElementById('acceso-login');
+      var btnOut = document.getElementById('acceso-logout');
+      var links = document.getElementById('acceso-links');
+      var id = window.netlifyIdentity;
+
+      function store(fn) { try { return fn(); } catch (e) { return null; } }
+
+      // Si llegamos servidos en la URL de una herramienta, recordar a dónde volver
+      // (el login con Google pasa por la raíz del sitio y vuelve a /acceso/).
+      if (!enAcceso) store(function () { sessionStorage.setItem(NEXT_KEY, location.pathname); });
+
+      function tieneRol(user) {
+        var roles = (user && user.app_metadata && user.app_metadata.roles) || [];
+        return roles.some(function (r) { return ROLES.indexOf(r) !== -1; });
+      }
+
+      function continuar(user) {
+        if (!tieneRol(user)) {
+          msg.textContent = 'Tu cuenta (' + user.email + ') no tiene acceso a estas herramientas todavía. Escríbenos a info@evo.cl.';
+          btnIn.hidden = true;
+          btnOut.hidden = false;
+          return;
+        }
+        // Renovar el token para que la cookie nf_jwt esté vigente antes de recargar.
+        user.jwt(true).then(function () {
+          if (!enAcceso) {
+            // Evitar un bucle si Netlify vuelve a rechazar la sesión.
+            var n = Number(store(function () { return sessionStorage.getItem(LOOP_KEY); }) || 0);
+            if (n >= 2) {
+              msg.textContent = 'La sesión está abierta pero el sitio no la reconoce. Cierra sesión y vuelve a entrar.';
+              btnIn.hidden = true; btnOut.hidden = false;
+              return;
+            }
+            store(function () { sessionStorage.setItem(LOOP_KEY, String(n + 1)); });
+            location.reload();
+            return;
+          }
+          var next = store(function () { return sessionStorage.getItem(NEXT_KEY); });
+          store(function () { sessionStorage.removeItem(NEXT_KEY); sessionStorage.removeItem(LOOP_KEY); });
+          if (next && next.indexOf('/tools/') === 0) { location.replace(next); return; }
+          msg.textContent = 'Sesión abierta como ' + user.email + '.';
+          btnIn.hidden = true;
+          btnOut.hidden = false;
+          links.hidden = false;
+        });
+      }
+
+      if (!id) {
+        msg.textContent = 'No se pudo cargar el acceso. Recarga la página.';
+        return;
+      }
+
+      id.on('init', function (user) { if (user) continuar(user); });
+      id.on('login', function (user) { id.close(); continuar(user); });
+      id.on('logout', function () {
+        store(function () { sessionStorage.removeItem(LOOP_KEY); });
+        location.href = '/acceso/';
+      });
+
+      btnIn.addEventListener('click', function () { id.open('login'); });
+      btnOut.addEventListener('click', function () { id.logout(); });
+
+      id.init({ locale: 'es' });
+    })();
+  </script>
+</Base>
+
+<style>
+  .acceso { padding-top: 8rem; padding-bottom: 6rem; max-width: 560px; }
+  .acceso-title { font-size: clamp(2rem, 5vw, 3rem); margin: 0.5rem 0 1rem; }
+  .acceso-copy { color: var(--text-2); margin-bottom: 1.75rem; }
+  .acceso-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .acceso-links { margin-top: 1.75rem; padding-left: 1.1rem; line-height: 2; }
+  .acceso-links a { color: var(--text); }
+</style>

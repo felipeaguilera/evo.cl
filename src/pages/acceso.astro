@@ -9,27 +9,76 @@ import Footer from '../components/Footer.astro';
 // El login lo maneja Netlify Identity: invitación por correo o Google.
 const title = 'Acceso. EVO Communication Lab';
 const description = 'Acceso a las herramientas privadas de EVO Communication Lab.';
+
+// Módulos visibles con sesión abierta. Textos tomados de /tools/.
+// cover: ruta a una imagen (ej. '/assets/tools/banpresto.jpg') cuando exista la portadilla.
+// Mientras sea null se muestra la portada genérica de EVO.
+const modulos = [
+  {
+    href: '/tools/banpresto',
+    icon: 'ph-robot',
+    badge: 'E-Commerce / Retail',
+    nombre: 'Banpresto Catalog Scraper',
+    desc: 'Consulta masiva de figuras Banpresto / Bandai Spirits por JAN, título y PVP. Extrae fotos HD multi-ángulo, franquicias, líneas y ficha en español. Exporta a CSV, Sheets y ZIP.',
+    cover: null,
+  },
+  {
+    href: '/tools/funko-pop',
+    icon: 'ph-package',
+    badge: 'E-Commerce / Retail',
+    nombre: 'Funko Pop! Catalog Scraper',
+    desc: 'Consulta masiva de figuras Funko Pop! por UPC o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas y exporta a Shopify CSV, Sheets y ZIP.',
+    cover: null,
+  },
+];
 ---
 <Base title={title} description={description}>
   <Nav />
 
   <main class="acceso wrap">
-    <p class="label">Herramientas privadas</p>
-    <h1 class="acceso-title">Acceso</h1>
-    <p class="acceso-copy" id="acceso-msg">Esta herramienta es privada. Entra con la cuenta que recibió la invitación.</p>
-    <div class="acceso-actions">
-      <button type="button" class="btn btn-primary" id="acceso-login">
-        <i class="ph ph-sign-in" aria-hidden="true"></i>
-        <span>Entrar</span>
-      </button>
-      <button type="button" class="btn btn-outline" id="acceso-logout" hidden>
-        <span>Cerrar sesión</span>
-      </button>
+    <div class="acceso-head">
+      <p class="label">Herramientas privadas</p>
+      <h1 class="section-title" id="acceso-title">Acceso</h1>
+      <p class="acceso-copy" id="acceso-msg">Esta herramienta es privada. Entra con la cuenta que recibió la invitación.</p>
+      <div class="acceso-actions">
+        <button type="button" class="btn btn-primary" id="acceso-login">
+          <i class="ph ph-sign-in" aria-hidden="true"></i>
+          <span>Entrar</span>
+        </button>
+        <button type="button" class="btn btn-outline" id="acceso-logout" hidden>
+          <i class="ph ph-sign-out" aria-hidden="true"></i>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
     </div>
-    <ul class="acceso-links" id="acceso-links" hidden>
-      <li><a href="/tools/banpresto">Banpresto Catalog Scraper</a></li>
-      <li><a href="/tools/funko-pop">Funko Pop Catalog Scraper</a></li>
-    </ul>
+
+    <div class="modulos" id="acceso-links" hidden>
+      {modulos.map((m) => (
+        <a href={m.href} class="modulo">
+          <div class="modulo-cover">
+            {m.cover ? (
+              <img src={m.cover} alt="" loading="lazy" />
+            ) : (
+              <div class="modulo-cover-gen" aria-hidden="true">
+                <i class={`ph ${m.icon}`}></i>
+                <span>EVO / Tools</span>
+              </div>
+            )}
+          </div>
+          <div class="modulo-body">
+            <div class="modulo-badge">{m.badge}</div>
+            <h3>{m.nombre}</h3>
+            <p>{m.desc}</p>
+          </div>
+          <div class="modulo-foot">
+            <span class="btn btn-primary">
+              <span>Abrir herramienta</span>
+              <i class="ph ph-arrow-right" aria-hidden="true"></i>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
   </main>
 
   <Footer />
@@ -82,6 +131,7 @@ const description = 'Acceso a las herramientas privadas de EVO Communication Lab
           var next = store(function () { return sessionStorage.getItem(NEXT_KEY); });
           store(function () { sessionStorage.removeItem(NEXT_KEY); sessionStorage.removeItem(LOOP_KEY); });
           if (next && next.indexOf('/tools/') === 0) { location.replace(next); return; }
+          document.getElementById('acceso-title').textContent = 'Tus herramientas';
           msg.textContent = 'Sesión abierta como ' + user.email + '.';
           btnIn.hidden = true;
           btnOut.hidden = false;
@@ -121,11 +171,24 @@ const description = 'Acceso a las herramientas privadas de EVO Communication Lab
 
 <style>
   /* Alto mínimo: la página llena la pantalla y el footer queda abajo. 59px de nav y 69px de footer. */
-  .acceso { min-height: calc(100svh - 128px); display: flex; flex-direction: column; justify-content: center; padding-top: 4rem; padding-bottom: 4rem; max-width: 560px; }
+  .acceso { min-height: calc(100svh - 128px); display: flex; flex-direction: column; justify-content: center; padding-top: 4rem; padding-bottom: 4rem; }
   .acceso [hidden] { display: none !important; }
-  .acceso-title { font-size: clamp(2rem, 5vw, 3rem); margin: 0.5rem 0 1rem; }
-  .acceso-copy { color: var(--text-2); margin-bottom: 1.75rem; }
+  .acceso-head { max-width: 640px; }
+  .acceso-copy { font-family: 'Krub', sans-serif; font-size: 1.05rem; color: var(--text-2); line-height: 1.6; margin: 1rem 0 1.75rem; }
   .acceso-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-  .acceso-links { margin-top: 1.75rem; padding-left: 1.1rem; line-height: 2; }
-  .acceso-links a { color: var(--text); }
+
+  .modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .modulo { display: flex; flex-direction: column; background: var(--light); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+  .modulo:hover { border-color: var(--orange); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06); }
+  .modulo-cover { aspect-ratio: 16 / 9; background: var(--dark); overflow: hidden; }
+  .modulo-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .modulo-cover-gen { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 80% 20%, rgba(228, 87, 46, 0.35), transparent 55%), var(--dark); }
+  .modulo-cover-gen i { font-size: 3.5rem; color: var(--orange); }
+  .modulo-cover-gen span { position: absolute; left: 1rem; bottom: 0.9rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); }
+  .modulo-body { padding: 1.5rem 1.5rem 0; flex: 1; }
+  .modulo-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .modulo-body h3 { font-family: 'Inter', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--text); margin: 0 0 0.6rem; }
+  .modulo-body p { font-family: 'Krub', sans-serif; font-size: 0.88rem; color: var(--text-2); line-height: 1.55; margin: 0; }
+  .modulo-foot { padding: 1.25rem 1.5rem 1.5rem; }
+  .modulo:hover .modulo-foot i { transform: translateX(4px); transition: transform 0.15s ease; }
 </style>

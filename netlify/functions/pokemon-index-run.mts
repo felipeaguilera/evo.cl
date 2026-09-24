@@ -1,5 +1,5 @@
 import type { Context } from '@netlify/functions';
-import { buildPokemonIndex } from './pokemon-index.js';
+import { buildPokemonIndex } from './pokemon-index.mts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

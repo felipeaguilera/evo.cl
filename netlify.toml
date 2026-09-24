@@ -17,3 +17,9 @@
   status = 200
   force = true
 
+[[redirects]]
+  from = "/api/catalog-lookup"
+  to = "/.netlify/functions/catalog-lookup"
+  status = 200
+  force = true
+

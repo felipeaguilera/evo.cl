@@ -1,0 +1,905 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Pokémon TCG Scraper. A tool by EVO.cl';
+const description = 'Consulta masiva de productos sellados Pokémon TCG por UPC o título. Resuelve variantes, extrae fotos HD oficiales de TCGplayer, descripciones en español y exporta directo a Shopify CSV, Tabla HTML y ZIP de fotos.';
+---
+
+<Base title={title} description={description}>
+  <Nav />
+
+  <!-- JSZip for client-side ZIP generation -->
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <main class="catalog-tool-page pokemon-page">
+    <!-- TOOL HEADER -->
+    <header class="tool-header wrap">
+      <p class="label" data-es="Sistemas y Herramientas" data-en="Systems & Tools">Sistemas y Herramientas</p>
+      <h1 class="tool-title">Pokémon TCG Catalog Scraper</h1>
+      <p class="tool-desc">
+        Consulta masiva de productos sellados Pokémon TCG por código UPC o título. Resuelve variantes ambiguas, extrae fotos oficiales en alta resolución, genera descripciones en español y exporta directo a Shopify CSV, Sheets o ZIP de fotos.
+      </p>
+      <div class="tool-index-badge-wrap">
+        <span class="tool-index-badge" title="Fecha del snapshot generado desde el catálogo TCGplayer">
+          <i class="ph ph-database"></i> Índice TCGplayer: <strong id="indexGeneratedAtBadge">Cargando...</strong> <span id="indexTotalProductsBadge"></span>
+        </span>
+      </div>
+    </header>
+
+    <div class="tool-grid wrap">
+      <!-- SIDEBAR CONTROLS -->
+      <div class="sidebar">
+        <!-- 1. INPUT CODES & PRIMARY ACTION -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2>1. Lista de Códigos / Títulos</h2>
+            <span class="badge-count" id="codeCounter">0 códigos</span>
+          </div>
+
+          <div class="field">
+            <label for="codesInput">
+              <span>Códigos UPC o Formato "UPC | Título"</span>
+            </label>
+            <textarea
+              id="codesInput"
+              class="codes-textarea"
+              placeholder="196214158801 Pokemon TCG 30th Celebration - Elite Trainer Box English&#10;196214144873 Pokemon TCG 30th Celebration - Elite Trainer Box Español&#10;196214146242 Pokemon TCG 30th Celebration - ex Box Español"
+              rows="6"
+              spellcheck="false"
+            ></textarea>
+            <div class="help">
+              Ingresa UPCs (12 dígitos) o líneas con formato "UPC Título", separados por saltos de línea.
+            </div>
+          </div>
+
+
+          <!-- PRIMARY ACTION BUTTONS -->
+          <div style="margin-bottom: 0.75rem;">
+            <button class="btn-primary btn-full" id="btnStart" type="button">
+              <i class="ph ph-play" aria-hidden="true"></i>
+              <span>Iniciar Búsqueda</span>
+            </button>
+            <div class="button-row" style="margin-top: 8px;">
+              <button class="btn-compact btn-half" id="btnPause" type="button" disabled>
+                <i class="ph ph-pause" aria-hidden="true"></i>
+                <span>Pausar</span>
+              </button>
+              <button class="btn-compact btn-half" id="btnReset" type="button" disabled>
+                <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                <span>Reiniciar</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SAMPLE BUTTONS -->
+          <div class="button-stack">
+            <button class="btn-compact btn-full" id="btnLoadSample" type="button">
+              <i class="ph ph-sparkle" aria-hidden="true"></i>
+              <span>Cargar 8 SKU de muestra</span>
+            </button>
+            <button class="btn-compact btn-full" id="btnClearInput" type="button">
+              <i class="ph ph-trash" aria-hidden="true"></i>
+              <span>Limpiar lista</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. SEARCH SETTINGS & PACING -->
+        <div class="panel-card">
+          <h2>2. Ritmo de Consulta</h2>
+          <div class="field">
+            <label for="batchPacing">
+              <span>Velocidad de Lote</span>
+            </label>
+            <select id="batchPacing">
+              <option value="fast" selected>Rápida y Concurrente (3 req / 200ms)</option>
+              <option value="moderate">Moderada (2 req / 400ms)</option>
+              <option value="safe">Estable (1 req / 800ms)</option>
+            </select>
+            <div class="help">
+              Ajusta la velocidad de consulta a la red para enriquecimiento y descarga de imágenes.
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. LOCAL PERSISTENT INDEX -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2>3. Catálogo Local EVO</h2>
+            <span class="badge-count" id="localCatalogBadge">0 productos</span>
+          </div>
+          <p class="help" style="margin-bottom: 0.85rem;">
+            Los productos y variantes seleccionadas se guardan de forma permanente para responder en 0ms y no gastar red.
+          </p>
+          <div class="button-stack">
+            <button class="btn-compact btn-full btn-accent" id="btnLoadLocalCatalog" type="button" title="Cargar todos los productos guardados en pantalla">
+              <i class="ph ph-database" aria-hidden="true"></i>
+              <span>Cargar Catálogo en Pantalla</span>
+            </button>
+            <div class="button-row">
+              <button class="btn-compact btn-half" id="btnExportLocalCatalog" type="button" title="Descargar copia de seguridad en JSON">
+                <i class="ph ph-download-simple" aria-hidden="true"></i>
+                <span>Exportar JSON</span>
+              </button>
+              <button class="btn-compact btn-half" id="btnImportLocalCatalog" type="button" title="Importar copia de respaldo en JSON">
+                <i class="ph ph-upload-simple" aria-hidden="true"></i>
+                <span>Importar JSON</span>
+              </button>
+              <input type="file" id="inputImportJson" accept=".json,application/json" style="display:none;" />
+            </div>
+            <button class="btn-compact btn-full" id="btnClearLocalCatalog" type="button" title="Vaciar la memoria local">
+              <i class="ph ph-trash" aria-hidden="true"></i>
+              <span>Limpiar Catálogo Local</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE -->
+      <div class="workspace-area">
+        <!-- PROGRESS & METRICS -->
+        <div class="panel-card metrics-card">
+          <div class="progress-header">
+            <div class="status-indicator">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText">Listo para iniciar</span>
+            </div>
+            <div class="progress-right-wrap">
+              <span class="progress-percent" id="progressPercent">0%</span>
+              <span class="progress-total-badge" id="statTotalBadge">(0 códigos)</span>
+            </div>
+          </div>
+
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+          </div>
+
+          <!-- STATS GRID (5-CARD DASHBOARD FOR POKEMON) -->
+          <div class="stats-grid stats-grid-5">
+            <div class="stat-card">
+              <span class="stat-label">Base Local (0ms)</span>
+              <span class="stat-num text-teal" id="statLocal">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">TCGplayer</span>
+              <span class="stat-num text-primary" id="statTcg">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Shopify ES</span>
+              <span class="stat-num text-success" id="statShopify">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Elige Variante</span>
+              <span class="stat-num text-purple" id="statChoice">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">No Encontrados</span>
+              <span class="stat-num text-warning" id="statNotFound">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW MODE TABS -->
+        <div class="view-mode-tabs-bar" id="viewModeTabsBar" style="display: none;">
+          <div class="view-tabs-group">
+            <button class="view-tab-btn active" id="tabViewCards" type="button">
+              <i class="ph ph-squares-four"></i> <span>Listado de Productos</span>
+            </button>
+            <button class="view-tab-btn" id="tabViewCollections" type="button">
+              <i class="ph ph-folders"></i> <span id="tabCollectionsLabel">Expansiones (0)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- POST-BATCH REPORT SUMMARY (EXPANSIONS BREAKDOWN) -->
+        <div class="panel-card report-summary-card" id="reportSummaryCard" style="display: none;">
+          <div class="report-header">
+            <div class="report-title-wrap">
+              <div class="report-icon-badge">
+                <i class="ph ph-cards"></i>
+              </div>
+              <div>
+                <h3>Expansiones y Productos Identificados</h3>
+                <p id="reportSummarySubtitle">Desglose agrupado por expansiones del lote consultado. Haz clic en una para filtrar.</p>
+              </div>
+            </div>
+
+            <!-- ONE-CLICK EXPORT ACTIONS -->
+            <div class="report-actions">
+              <button class="btn-compact btn-accent" id="btnReportExportShopifyEs" type="button" title="Descargar CSV estructurado con descripciones en Español para Shopify">
+                <i class="ph ph-shopify-logo"></i>
+                <span>CSV Shopify (ES)</span>
+              </button>
+              <button class="btn-compact btn-secondary-accent" id="btnReportCopyHtml" type="button" title="Copiar tabla para pegar directo en Google Sheets o Notion">
+                <i class="ph ph-copy"></i>
+                <span>Copiar Tabla</span>
+              </button>
+              <button class="btn-compact" id="btnReportExportZip" type="button" title="Descargar paquete ZIP con fotos nombradas por UPC">
+                <i class="ph ph-file-zip"></i>
+                <span>ZIP Fotos</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- COLLECTIONS GRID -->
+          <div class="collections-grid" id="reportCollectionsGrid"></div>
+        </div>
+
+        <!-- TOOLBAR & FILTERS -->
+        <div class="results-toolbar">
+          <div class="filter-group">
+            <div class="search-input-wrap">
+              <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+              <input
+                type="text"
+                id="filterSearch"
+                placeholder="Filtrar por título, expansión, tipo..."
+              />
+            </div>
+
+            <select id="filterStatus" class="select-compact">
+              <option value="all">Todos los estados</option>
+              <option value="found">Solo encontrados</option>
+              <option value="needs_choice">Requiere elección</option>
+              <option value="not_found">Solo no encontrados</option>
+            </select>
+          </div>
+
+          <div class="actions-group">
+            <!-- EXPORT BUTTONS -->
+            <div class="export-dropdown-wrap">
+              <button class="btn-compact btn-accent" id="btnExportShopify" type="button" title="CSV listo para importar directo a Shopify (Descripciones en Español)">
+                <i class="ph ph-shopify-logo" aria-hidden="true"></i>
+                <span>CSV Shopify (ES)</span>
+              </button>
+              <button class="btn-compact" id="btnExportShopifyEn" type="button" title="CSV con títulos y descripciones en Inglés">
+                <i class="ph ph-globe" aria-hidden="true"></i>
+                <span>CSV (EN)</span>
+              </button>
+              <button class="btn-compact" id="btnCopyHtmlTable" type="button" title="Copiar tabla para pegar en Google Sheets">
+                <i class="ph ph-copy" aria-hidden="true"></i>
+                <span>Copiar Tabla</span>
+              </button>
+              <button class="btn-compact" id="btnExportZip" type="button" title="Descargar paquete ZIP con fotos nombradas por UPC">
+                <i class="ph ph-file-zip" aria-hidden="true"></i>
+                <span>ZIP Fotos</span>
+              </button>
+              <button class="btn-compact" id="btnExportCsv" type="button" title="CSV general con todas las URLs y metadatos">
+                <i class="ph ph-file-csv" aria-hidden="true"></i>
+                <span>CSV</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULTS CONTAINER -->
+        <div class="results-container">
+          <!-- EMPTY STATE -->
+          <div class="panel-card empty-state" id="emptyState">
+            <div class="empty-icon-wrap">
+              <i class="ph ph-barcode" aria-hidden="true"></i>
+            </div>
+            <h3>Sin productos consultados</h3>
+            <p>
+              Ingresa una lista de códigos o presiona "Cargar 8 SKU de muestra" en el panel lateral.
+            </p>
+          </div>
+
+          <!-- PRODUCT CARDS LIST -->
+          <div class="product-cards-list" id="productCardsList" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZIP PROGRESS MODAL -->
+    <div class="modal-overlay" id="zipProgressModal" style="display:none;">
+      <div class="modal-card zip-modal-card">
+        <h3 style="margin-top:0; font-family:'Inter',sans-serif; font-size:1.15rem;">Generando Archivo ZIP...</h3>
+        <p id="zipProgressText" style="font-size:0.875rem; color:var(--text-2); margin-bottom:1rem;">Descargando fotografías en alta resolución...</p>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="zipProgressFill" style="width:0%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toastNotification">
+      <i class="ph ph-check-circle" id="toastIcon"></i>
+      <span id="toastMsg">Acción completada</span>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script>
+    import { pokemonAdapterSpec } from '../../lib/catalog/adapters/pokemon-spec.js';
+    import { BatchRunner, type BatchItemState } from '../../lib/catalog/ui/batch.js';
+    import { escapeAttr, escapeHtml, getCleanCodes, showToast, updateInputCount } from '../../lib/catalog/ui/dom.js';
+    import {
+      copyTableHtml,
+      exportCsv,
+      exportImagesZip,
+      exportShopifyCsv,
+    } from '../../lib/catalog/ui/export.js';
+    import {
+      getFilteredProducts,
+      renderCollectionsSummary,
+      renderProductCards,
+    } from '../../lib/catalog/ui/render.js';
+    import {
+      clearLocalCatalog,
+      exportLocalCatalogJson,
+      getUniqueLocalFigures,
+      importLocalCatalogJson,
+      updateLocalCatalogBadge,
+    } from '../../lib/catalog/ui/storage.js';
+
+    // 8 SAMPLE SKUs FROM PLAN.md
+    const SAMPLE_CODES = [
+      '196214158801 Pokemon TCG 30th Celebration - Elite Trainer Box English',
+      '196214158757 Pokemon TCG 30th Celebration - Poster Collection English',
+      '196214158771 Pokemon TCG 30th Celebration - Tech Sticker Collection English',
+      '196214158726 Pokemon TCG 30th Celebration - ex Box English',
+      '196214144873 Pokemon TCG 30th Celebration - Elite Trainer Box Español',
+      '196214147263 Pokemon TCG 30th Celebration - Poster Collection Español',
+      '196214146242 Pokemon TCG 30th Celebration - ex Box Español',
+      '196214145016 Pokemon TCG 30th Celebration - Tech Sticker Collection Español',
+    ];
+
+    const STORAGE_KEY = 'evo_pokemon_local_catalog_v1';
+    const LOOKUP_ENDPOINT = '/api/catalog-lookup';
+
+    // DOM ELEMENTS
+    const indexGeneratedAtBadge = document.getElementById('indexGeneratedAtBadge') as HTMLElement;
+    const indexTotalProductsBadge = document.getElementById('indexTotalProductsBadge') as HTMLElement;
+
+    const codesInput = document.getElementById('codesInput') as HTMLTextAreaElement;
+    const codeCounter = document.getElementById('codeCounter') as HTMLElement;
+
+    const btnLoadSample = document.getElementById('btnLoadSample') as HTMLButtonElement;
+    const btnClearInput = document.getElementById('btnClearInput') as HTMLButtonElement;
+    const btnStart = document.getElementById('btnStart') as HTMLButtonElement;
+    const btnPause = document.getElementById('btnPause') as HTMLButtonElement;
+    const btnReset = document.getElementById('btnReset') as HTMLButtonElement;
+    const batchPacing = document.getElementById('batchPacing') as HTMLSelectElement;
+
+    const statusDot = document.getElementById('statusDot') as HTMLElement;
+    const statusText = document.getElementById('statusText') as HTMLElement;
+    const progressPercent = document.getElementById('progressPercent') as HTMLElement;
+    const progressBarFill = document.getElementById('progressBarFill') as HTMLElement;
+    const statTotalBadge = document.getElementById('statTotalBadge') as HTMLElement;
+    const statLocal = document.getElementById('statLocal') as HTMLElement;
+    const statTcg = document.getElementById('statTcg') as HTMLElement;
+    const statShopify = document.getElementById('statShopify') as HTMLElement;
+    const statChoice = document.getElementById('statChoice') as HTMLElement;
+    const statNotFound = document.getElementById('statNotFound') as HTMLElement;
+
+    const viewModeTabsBar = document.getElementById('viewModeTabsBar') as HTMLElement;
+    const tabViewCards = document.getElementById('tabViewCards') as HTMLButtonElement;
+    const tabViewCollections = document.getElementById('tabViewCollections') as HTMLButtonElement;
+    const tabCollectionsLabel = document.getElementById('tabCollectionsLabel') as HTMLElement;
+
+    const localCatalogBadge = document.getElementById('localCatalogBadge') as HTMLElement;
+    const btnLoadLocalCatalog = document.getElementById('btnLoadLocalCatalog') as HTMLButtonElement;
+    const btnExportLocalCatalog = document.getElementById('btnExportLocalCatalog') as HTMLButtonElement;
+    const btnImportLocalCatalog = document.getElementById('btnImportLocalCatalog') as HTMLButtonElement;
+    const inputImportJson = document.getElementById('inputImportJson') as HTMLInputElement;
+    const btnClearLocalCatalog = document.getElementById('btnClearLocalCatalog') as HTMLButtonElement;
+
+    const reportSummaryCard = document.getElementById('reportSummaryCard') as HTMLElement;
+    const reportSummarySubtitle = document.getElementById('reportSummarySubtitle') as HTMLElement;
+    const reportCollectionsGrid = document.getElementById('reportCollectionsGrid') as HTMLElement;
+    const btnReportExportShopifyEs = document.getElementById('btnReportExportShopifyEs') as HTMLButtonElement;
+    const btnReportCopyHtml = document.getElementById('btnReportCopyHtml') as HTMLButtonElement;
+    const btnReportExportZip = document.getElementById('btnReportExportZip') as HTMLButtonElement;
+
+    const filterSearch = document.getElementById('filterSearch') as HTMLInputElement;
+    const filterStatus = document.getElementById('filterStatus') as HTMLSelectElement;
+    const btnExportShopify = document.getElementById('btnExportShopify') as HTMLButtonElement;
+    const btnExportShopifyEn = document.getElementById('btnExportShopifyEn') as HTMLButtonElement;
+    const btnCopyHtmlTable = document.getElementById('btnCopyHtmlTable') as HTMLButtonElement;
+    const btnExportZip = document.getElementById('btnExportZip') as HTMLButtonElement;
+    const btnExportCsv = document.getElementById('btnExportCsv') as HTMLButtonElement;
+
+    const emptyState = document.getElementById('emptyState') as HTMLElement;
+    const productCardsList = document.getElementById('productCardsList') as HTMLElement;
+
+    const zipProgressModal = document.getElementById('zipProgressModal') as HTMLElement;
+    const zipProgressText = document.getElementById('zipProgressText') as HTMLElement;
+    const zipProgressFill = document.getElementById('zipProgressFill') as HTMLElement;
+
+    const toastNotification = document.getElementById('toastNotification') as HTMLElement;
+    const toastMsg = document.getElementById('toastMsg') as HTMLElement;
+
+    // STATE
+    let productsList: BatchItemState[] = [];
+    const runner = new BatchRunner();
+    const expandedProductIds = new Set<string>();
+
+    function notify(msg: string) {
+      showToast(toastNotification, toastMsg, msg);
+    }
+
+    function updateIndexMetaBadge(generatedAt?: string, totalProducts?: number) {
+      if (indexGeneratedAtBadge && generatedAt) {
+        indexGeneratedAtBadge.textContent = generatedAt;
+      }
+      if (indexTotalProductsBadge && totalProducts !== undefined && totalProducts > 0) {
+        indexTotalProductsBadge.textContent = `(${totalProducts} productos sellados)`;
+      }
+    }
+
+    async function fetchIndexInfo() {
+      try {
+        const res = await fetch(`${LOOKUP_ENDPOINT}?info=true`);
+        if (res.ok) {
+          const data = await res.json();
+          updateIndexMetaBadge(data.indexGeneratedAt, data.indexTotalProducts);
+        }
+      } catch (e) {
+        console.warn('No fue posible consultar metadata del índice:', e);
+      }
+    }
+
+
+    function updateStatsDashboard() {
+      const local = productsList.filter((p) => p.fromCache || p.source === 'local_index').length;
+      const tcg = productsList.filter((p) => p.source === 'tcgcsv').length;
+      const shopify = productsList.filter((p) => p.source === 'shopify_es').length;
+      const choice = productsList.filter((p) => p.needsChoice).length;
+      const notFound = productsList.filter((p) => p.status !== 'found').length;
+
+      if (statLocal) statLocal.textContent = String(local);
+      if (statTcg) statTcg.textContent = String(tcg);
+      if (statShopify) statShopify.textContent = String(shopify);
+      if (statChoice) statChoice.textContent = String(choice);
+      if (statNotFound) statNotFound.textContent = String(notFound);
+      if (statTotalBadge) statTotalBadge.textContent = `(${productsList.length} códigos)`;
+    }
+
+    const POKEMON_SOURCE_LABELS = {
+      tcgcsv: { label: 'TCGplayer (Índice)', icon: 'ph-check-circle', className: 'source-funko' },
+      shopify_es: { label: 'Shopify ES (Enriquecido)', icon: 'ph-sparkle', className: 'source-upc' },
+      translated: { label: 'Traducción Automática', icon: 'ph-translate', className: 'source-local' },
+      local_index: { label: 'Base Local', icon: 'ph-hard-drive', className: 'source-local' },
+      not_found: { label: 'No Encontrado', icon: 'ph-warning-circle', className: 'source-none' },
+    };
+
+    function refreshView() {
+      const filtered = getFilteredProducts(productsList, filterSearch.value, filterStatus.value);
+
+      if (productsList.length === 0) {
+        emptyState.style.display = 'block';
+        productCardsList.style.display = 'none';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      productCardsList.style.display = 'flex';
+
+      renderProductCards(productCardsList, filtered, {
+        adapter: pokemonAdapterSpec,
+        storageKey: STORAGE_KEY,
+        expandedProductIds,
+        sourceLabels: POKEMON_SOURCE_LABELS,
+        groupFieldKey: 'expansion',
+        onRefreshItem: async (item, cardElem) => {
+          notify(`Refrescando datos para ${item.upc || item.query}...`);
+          try {
+            const res = await fetch(LOOKUP_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: item.query || item.upc, forceRefresh: true }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.results && data.results.length > 0) {
+                const refreshed = data.results[0];
+                if (refreshed.candidates && refreshed.candidates.length > 0) {
+                  const updated = refreshed.candidates[0];
+                  const idx = productsList.findIndex((p) => p.query === item.query || p.upc === item.upc);
+                  if (idx !== -1) {
+                    productsList[idx] = { ...updated, query: item.query, needsChoice: false };
+                  }
+                  refreshView();
+                  updateStatsDashboard();
+                  notify(`¡Ficha de ${updated.upc || updated.title} actualizada!`);
+                }
+              }
+            }
+          } catch (e) {
+            notify('Error al refrescar producto.');
+          }
+        },
+        onChoiceSelected: (item, candidate) => {
+          updateStatsDashboard();
+          refreshView();
+          showBatchSummary();
+        },
+        onToast: notify,
+      });
+    }
+
+    function showBatchSummary() {
+      if (productsList.length === 0) return;
+
+      const total = productsList.length;
+      const foundItems = productsList.filter((p) => p.status === 'found');
+      const totalFound = foundItems.length;
+      const choiceCount = productsList.filter((p) => p.needsChoice).length;
+
+      let subText = `Se identificaron ${totalFound} de ${total} productos (${Math.round((totalFound / total) * 100)}%).`;
+      if (choiceCount > 0) {
+        subText += ` ⚠️ ${choiceCount} ${choiceCount === 1 ? 'producto requiere' : 'productos requieren'} elegir variante.`;
+      }
+      reportSummarySubtitle.textContent = subText;
+
+      renderCollectionsSummary(
+        reportCollectionsGrid,
+        reportSummarySubtitle,
+        tabCollectionsLabel,
+        productsList,
+        'expansion',
+        (groupName) => {
+          filterSearch.value = groupName;
+          if (tabViewCards && tabViewCollections) {
+            tabViewCards.classList.add('active');
+            tabViewCollections.classList.remove('active');
+            reportSummaryCard.style.display = 'none';
+            if (productCardsList) productCardsList.style.display = 'flex';
+          }
+          refreshView();
+          notify(`Filtrando por expansión: ${groupName}`);
+        }
+      );
+
+      if (viewModeTabsBar) viewModeTabsBar.style.display = 'flex';
+    }
+
+    // LOAD LOCAL CATALOG TO WORKSPACE
+    function loadLocalCatalogToWorkspace() {
+      const uniqueItems = getUniqueLocalFigures(STORAGE_KEY);
+      if (uniqueItems.length === 0) {
+        alert('No hay productos guardados en la base local todavía. Realiza una búsqueda primero.');
+        return;
+      }
+
+      const codes = uniqueItems.map((it) => it.query || it.upc || it.sku).filter(Boolean);
+      codesInput.value = codes.join('\n');
+      updateInputCount(codesInput, codeCounter);
+
+      productsList = uniqueItems.map((it) => ({
+        ...it,
+        source: it.source || 'local_index',
+        fromCache: true,
+        status: 'found',
+        needsChoice: false,
+      }));
+
+      btnStart.style.display = 'none';
+      btnPause.style.display = 'none';
+      btnReset.style.display = 'inline-flex';
+      btnReset.disabled = false;
+      codesInput.disabled = false;
+
+      progressBarFill.style.width = '100%';
+      progressPercent.textContent = '100%';
+      statusDot.className = 'status-dot success';
+      statusText.textContent = `Catálogo local desplegado (${productsList.length} productos)`;
+
+      updateStatsDashboard();
+      refreshView();
+      showBatchSummary();
+      notify(`¡Desplegados ${productsList.length} productos del Catálogo Local!`);
+    }
+
+    // RUN BATCH
+    async function startBatch() {
+      const rawText = codesInput.value;
+      if (!rawText.trim()) {
+        alert('Por favor ingresa al menos un código UPC o título.');
+        return;
+      }
+
+      const rawLines = rawText
+        .split(/[\r\n]+/)
+        .map((l) => l.trim())
+        .filter((l) => l.length >= 4);
+
+      if (rawLines.length === 0) {
+        alert('No se encontraron líneas válidas en el texto.');
+        return;
+      }
+
+      btnStart.disabled = true;
+      btnPause.disabled = false;
+      btnReset.disabled = false;
+      codesInput.disabled = true;
+      btnLoadSample.disabled = true;
+      btnClearInput.disabled = true;
+      reportSummaryCard.style.display = 'none';
+
+      statusDot.className = 'status-dot active';
+      statusText.textContent = 'Procesando lote Pokémon TCG...';
+      progressBarFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+
+      productsList = [];
+      updateStatsDashboard();
+      refreshView();
+
+      const pacing = (batchPacing ? batchPacing.value : 'fast') as 'fast' | 'moderate' | 'safe';
+
+      await runner.run(rawLines, {
+        storageKey: STORAGE_KEY,
+        lookupEndpoint: LOOKUP_ENDPOINT,
+        pacing,
+        onIndexMeta: (meta) => {
+          updateIndexMetaBadge(meta.generatedAt, meta.totalProducts);
+        },
+        onProgress: (completed, total) => {
+          const pct = Math.round((completed / total) * 100);
+          progressPercent.textContent = `${pct}%`;
+          progressBarFill.style.width = `${pct}%`;
+          statusText.textContent = `⚡ Procesando ${completed} de ${total}...`;
+        },
+        onStatsUpdate: () => {
+          productsList = runner.productList;
+          updateStatsDashboard();
+        },
+        onRender: () => {
+          productsList = runner.productList;
+          refreshView();
+        },
+
+        onComplete: (products) => {
+          productsList = products;
+          btnStart.disabled = false;
+          btnPause.disabled = true;
+          codesInput.disabled = false;
+          btnLoadSample.disabled = false;
+          btnClearInput.disabled = false;
+
+          statusDot.className = 'status-dot';
+          statusText.textContent = 'Búsqueda completada';
+          updateStatsDashboard();
+          refreshView();
+          showBatchSummary();
+          updateLocalCatalogBadge(STORAGE_KEY, localCatalogBadge);
+
+          const choiceCount = productsList.filter((p) => p.needsChoice).length;
+          if (choiceCount > 0) {
+            notify(`Completado: ${productsList.length} procesados. (${choiceCount} requieren elegir variante)`);
+          } else {
+            notify(`Completado: ${productsList.length} productos procesados con éxito.`);
+          }
+        },
+      });
+    }
+
+    // EVENT LISTENERS
+    codesInput.addEventListener('input', () => updateInputCount(codesInput, codeCounter));
+
+    btnLoadSample.addEventListener('click', () => {
+      codesInput.value = SAMPLE_CODES.join('\n');
+      updateInputCount(codesInput, codeCounter);
+      notify(`Cargados ${SAMPLE_CODES.length} SKU de muestra de WePlay`);
+    });
+
+    btnClearInput.addEventListener('click', () => {
+      codesInput.value = '';
+      updateInputCount(codesInput, codeCounter);
+    });
+
+    btnStart.addEventListener('click', startBatch);
+
+    btnPause.addEventListener('click', () => {
+      if (!runner.running) return;
+      if (runner.paused) {
+        runner.resume();
+        btnPause.innerHTML = '<i class="ph ph-pause"></i><span>Pausar</span>';
+        statusText.textContent = 'Procesando lote Pokémon TCG...';
+      } else {
+        runner.pause();
+        btnPause.innerHTML = '<i class="ph ph-play"></i><span>Reanudar</span>';
+        statusText.textContent = 'Pausado';
+      }
+    });
+
+    btnReset.addEventListener('click', () => {
+      runner.cancel();
+      productsList = [];
+      expandedProductIds.clear();
+      btnStart.style.display = 'inline-flex';
+      btnStart.disabled = false;
+      btnPause.style.display = 'inline-flex';
+      btnPause.disabled = true;
+      btnReset.disabled = true;
+      codesInput.disabled = false;
+      btnLoadSample.disabled = false;
+      btnClearInput.disabled = false;
+      reportSummaryCard.style.display = 'none';
+      if (viewModeTabsBar) viewModeTabsBar.style.display = 'none';
+
+      progressBarFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+      statusDot.className = 'status-dot';
+      statusText.textContent = 'Listo para iniciar';
+
+      updateStatsDashboard();
+      refreshView();
+    });
+
+    // View Mode Tabs
+    tabViewCards?.addEventListener('click', () => {
+      tabViewCards.classList.add('active');
+      tabViewCollections.classList.remove('active');
+      reportSummaryCard.style.display = 'none';
+      productCardsList.style.display = 'flex';
+      refreshView();
+    });
+
+    tabViewCollections?.addEventListener('click', () => {
+      tabViewCollections.classList.add('active');
+      tabViewCards.classList.remove('active');
+      reportSummaryCard.style.display = 'block';
+      productCardsList.style.display = 'none';
+      emptyState.style.display = 'none';
+    });
+
+    // Filters
+    filterSearch.addEventListener('input', refreshView);
+    filterStatus.addEventListener('change', refreshView);
+
+    // Local Catalog actions
+    btnLoadLocalCatalog?.addEventListener('click', loadLocalCatalogToWorkspace);
+
+    btnExportLocalCatalog?.addEventListener('click', () => {
+      exportLocalCatalogJson(STORAGE_KEY, 'evo-pokemon-local-catalog');
+      notify('Catálogo local exportado en JSON.');
+    });
+
+    btnImportLocalCatalog?.addEventListener('click', () => inputImportJson?.click());
+
+    inputImportJson?.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      importLocalCatalogJson(
+        STORAGE_KEY,
+        file,
+        (importedCount) => {
+          updateLocalCatalogBadge(STORAGE_KEY, localCatalogBadge);
+          loadLocalCatalogToWorkspace();
+          notify(`¡${importedCount} productos importados con éxito!`);
+          inputImportJson.value = '';
+        },
+        (err) => {
+          alert('Error al importar: ' + err.message);
+          inputImportJson.value = '';
+        }
+      );
+    });
+
+    btnClearLocalCatalog?.addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que deseas vaciar el catálogo local Pokémon guardado en este navegador?')) {
+        clearLocalCatalog(STORAGE_KEY);
+        updateLocalCatalogBadge(STORAGE_KEY, localCatalogBadge);
+        notify('Catálogo local vaciado.');
+      }
+    });
+
+    // Export Handlers
+    function handleExportComplete(type: string, exportedCount: number, omittedCount: number) {
+      if (omittedCount > 0) {
+        notify(`${type} descargado: ${exportedCount} productos (${omittedCount} variantes sin resolver omitidas)`);
+      } else {
+        notify(`${type} descargado: ${exportedCount} productos.`);
+      }
+    }
+
+    btnExportShopify?.addEventListener('click', () => {
+      exportShopifyCsv({
+        products: productsList,
+        lang: 'es',
+        filenamePrefix: 'shopify-pokemon-tcg',
+        vendor: 'Pokémon',
+        productType: 'Trading Card Game',
+        tagFields: ['expansion', 'productType', 'variant', 'language'],
+        onComplete: (count, omitted) => handleExportComplete('CSV Shopify (ES)', count, omitted),
+      });
+    });
+
+    btnExportShopifyEn?.addEventListener('click', () => {
+      exportShopifyCsv({
+        products: productsList,
+        lang: 'en',
+        filenamePrefix: 'shopify-pokemon-tcg',
+        vendor: 'Pokémon',
+        productType: 'Trading Card Game',
+        tagFields: ['expansion', 'productType', 'variant', 'language'],
+        onComplete: (count, omitted) => handleExportComplete('CSV Shopify (EN)', count, omitted),
+      });
+    });
+
+    btnReportExportShopifyEs?.addEventListener('click', () => {
+      exportShopifyCsv({
+        products: productsList,
+        lang: 'es',
+        filenamePrefix: 'shopify-pokemon-tcg',
+        vendor: 'Pokémon',
+        productType: 'Trading Card Game',
+        tagFields: ['expansion', 'productType', 'variant', 'language'],
+        onComplete: (count, omitted) => handleExportComplete('CSV Shopify (ES)', count, omitted),
+      });
+    });
+
+    btnCopyHtmlTable?.addEventListener('click', async () => {
+      await copyTableHtml({
+        products: productsList,
+        onComplete: (count, omitted) => {
+          if (omitted > 0) {
+            notify(`¡Tabla copiada! (${count} productos, ${omitted} variantes omitidas)`);
+          } else {
+            notify(`¡Tabla copiada! (${count} productos)`);
+          }
+        },
+      });
+    });
+
+    btnReportCopyHtml?.addEventListener('click', async () => {
+      await copyTableHtml({
+        products: productsList,
+        onComplete: (count, omitted) => {
+          if (omitted > 0) {
+            notify(`¡Tabla copiada! (${count} productos, ${omitted} variantes omitidas)`);
+          } else {
+            notify(`¡Tabla copiada! (${count} productos)`);
+          }
+        },
+      });
+    });
+
+    btnExportZip?.addEventListener('click', async () => {
+      await exportImagesZip({
+        products: productsList,
+        progressModal: zipProgressModal,
+        progressFill: zipProgressFill,
+        progressText: zipProgressText,
+        filenamePrefix: 'pokemon-tcg-photos',
+        lookupEndpoint: LOOKUP_ENDPOINT,
+        onComplete: (count, omitted) => handleExportComplete('ZIP Fotos', count, omitted),
+      });
+    });
+
+    btnReportExportZip?.addEventListener('click', async () => {
+      await exportImagesZip({
+        products: productsList,
+        progressModal: zipProgressModal,
+        progressFill: zipProgressFill,
+        progressText: zipProgressText,
+        filenamePrefix: 'pokemon-tcg-photos',
+        lookupEndpoint: LOOKUP_ENDPOINT,
+        onComplete: (count, omitted) => handleExportComplete('ZIP Fotos', count, omitted),
+      });
+    });
+
+    btnExportCsv?.addEventListener('click', () => {
+      exportCsv({
+        products: productsList,
+        filenamePrefix: 'pokemon-tcg-general',
+        onComplete: (count, omitted) => handleExportComplete('CSV General', count, omitted),
+      });
+    });
+
+    // INITIALIZE
+    updateInputCount(codesInput, codeCounter);
+    updateLocalCatalogBadge(STORAGE_KEY, localCatalogBadge);
+    fetchIndexInfo();
+  </script>
+</Base>
+
+<style is:global>
+  @import '../../styles/catalog-tool.css';
+</style>

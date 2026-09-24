@@ -1,4 +1,4 @@
-# Reporte de Progreso de Sesión — Banpresto Scraper & Sphinx ERP (Actualizado v2)
+# Reporte de Progreso de Sesión — Herramientas de Catálogo (Banpresto & Funko Pop)
 
 **Fecha:** 2026-09-02  
 **Autor:** Antigravity (EVO Creative Lab)  
@@ -7,57 +7,30 @@
 
 ---
 
-## 1. Resumen de Cambios Recientes (Gestión y Preservación de Precio Real)
+## 1. Correcciones Aplicadas en Banpresto y Funko Pop
 
-Se corrigió la pérdida de precio solicitada por Felipe:
-
-1. **Soporte de Input de 3 Campos (`JAN | Título | PVP`):**
-   - El parser (`parseInputItem`) ahora acepta strings de 3 campos separados por pipe (`|`) o tabulación (`\t` desde Excel), o payloads JSON con `{ jan, title, price / pvp }`. Mantiene 100% de compatibilidad hacia atrás con inputs de 2 campos (`JAN | Título`) o códigos sueltos.
-2. **Prioridad Estricta de Precio (Price Overriding Rule):**
-   - Si el input trae su propio precio (columna `PVP (C/IVA)` de WePlay), **ese valor manda siempre** sobre cualquier precio raspado de tiendas externas (Distrito Max, etc.).
-   - Si no viene precio en el input, se puede mostrar el precio raspado como referencia.
-   - Si no hay precio en ninguna parte, el campo queda vacío o marcado `"Sin precio"`, **nunca un placeholder inventado (se eliminó el valor fijo hardcodeado de $29.990)**.
-3. **Muestra y Exportación Completa:**
-   - Visualización en la tarjeta (grid de especificaciones).
-   - Inclusión en la ficha técnica estandarizada HTML (`<li><strong>Precio de Venta (PVP):</strong> ...</li>`).
-   - Columna dedicada `Precio PVP` en la tabla formateada para Google Sheets / Excel.
-   - Columna `Precio PVP` en la exportación a CSV General.
-   - Formato en el copiado rápido de texto.
-4. **Actualización de Muestras:**
-   - Se actualizaron los `SAMPLE_ITEMS` en `src/pages/tools/banpresto.astro` con los precios reales de la hoja `PRODUCTOS` de WePlay (incluyendo figuras de $29.990, $79.990, etc.).
+### Agrupación del Badge de Origen y Marcador de Caché (`.source-badge-group`)
+- **Problema previo:** El contenedor `.card-pills-row` usa `display: flex; flex-wrap: wrap;`. Al ser hermanos directos dentro del flex, en tarjetas con nombres de franquicia largos o en pantallas chicas, el badge de origen y el ícono de caché saltaban de línea separados, dejando el ícono de caché huérfano al inicio de la siguiente línea.
+- **Solución implementada:**
+  1. Se separó la construcción en `sourceBadge` y `cacheBadge`.
+  2. Se unificaron dentro del contenedor wrapper `<span class="source-badge-group">${sourceBadge}${cacheBadge}</span>`.
+  3. Se añadió la regla CSS `.source-badge-group { display: inline-flex; align-items: center; gap: 2px; }` en ambas herramientas para garantizar que siempre salten o permanezcan juntos de forma atómica.
 
 ---
 
-## 2. Benchmark v2 con Precios Reales (15 Filas del Contenedor)
+## 2. Historial de Correcciones de la Sesión
 
-Probado contra las 15 filas reales con el backend `netlify/functions/banpresto-lookup.mts`:
-
-| # | Item No. | JAN | Título en Excel / Factura | PVP Real WePlay | Resultado | Fuente | Galería | Precio Preservado |
-|---|---|---|---|---|---|---|---|---|
-| 1 | 69762 | 4573102697622 | Hell Teacher: Jigoku Sensei Nube Meisuke Nueno FIGURE | $29.990 | ❌ No indexado | — | 0 | ✅ $29.990 |
-| 2 | 69763 | 4573102697639 | Hell Teacher: Jigoku Sensei Nube Kyosuke Tamamo FIGURE | $29.990 | ❌ No indexado | — | 0 | ✅ $29.990 |
-| 3 | 71152 | 4573102711526 | Hell Teacher: Jigoku Sensei Nube GLITTER&GLAMOURS Yukime | $29.990 | ❌ No indexado | — | 0 | ✅ $29.990 |
-| 4 | 71553 | 4573102715531 | Shin Godzilla Monster Roah Attack eXtra Large Godzilla(2016)4th.Form | **$79.990** | ✅ Encontrado | Little Buddy | 1 foto HD | ✅ **$79.990** |
-| 5 | 71341 | 4573102713414 | JUJUTSU KAISEN MAXIMATIC YUJI ITADORI-The culling game?- | $29.990 | ✅ Encontrado | DistritoMax | 4 fotos HD | ✅ $29.990 |
-| 6 | 71342 | 4573102713421 | JUJUTSU KAISEN MAXIMATIC MEGUMI FUSHIGURO-The culling game?- | $29.990 | ✅ Encontrado | DistritoMax | 4 fotos HD | ✅ $29.990 |
-| 7 | 71101 | 4573102711014 | Dragon Ball Z Match Makers Super Saiyan Gogeta | $29.990 | ✅ Encontrado | DistritoMax | 4 fotos HD | ✅ $29.990 |
-| 8 | 71102 | 4573102711021 | Dragon Ball Z Match Makers Janemba | $29.990 | ✅ Encontrado | Little Buddy | 1 foto HD | ✅ $29.990 |
-| 9 | 71321 | 4573102713216 | NARUTO Shippuden Grandista Uzumaki Naruto#3 | $29.990 | ✅ Encontrado | DistritoMax | 5 fotos HD | ✅ $29.990 |
-| 10 | 71322 | 4573102713223 | NARUTO Shippuden Grandista Uchiha Sasuke#3 | $29.990 | ✅ Encontrado | DistritoMax | 5 fotos HD | ✅ $29.990 |
-| 11 | 71450 | 4573102714503 | ONE PIECE DXF THE GRANDLINE SERIES EXTRA MONKEY.D.LUFFY GEAR5 | $29.990 | ✅ Encontrado | Little Buddy | 1 foto HD | ✅ $29.990 |
-| 12 | 71451 | 4573102714510 | ONE PIECE THE SHUKKO MONKEY.D.LUFFY | $29.990 | ✅ Encontrado | Little Buddy | 1 foto HD | ✅ $29.990 |
-| 13 | 71288 | 4573102712882 | Spy x Family Break Time Collection Anya Forger & Bond Forger | $29.990 | ✅ Encontrado | Little Buddy | 1 foto HD | ✅ $29.990 |
-| 14 | 71295 | 4573102712950 | Chainsaw Man Combination Battle Chainsaw Man | $29.990 | ✅ Encontrado | DistritoMax | 5 fotos HD | ✅ $29.990 |
-| 15 | 71300 | 4573102713001 | Bleach Solid And Souls Ichigo Kurosaki II | $29.990 | ✅ Encontrado | Little Buddy | 1 foto HD | ✅ $29.990 |
-
-- **Tasa de Acierto Global:** **80.0% (12 de 15 figuras encontradas)**.
-- **Preservación de Precio Real:** **100%** (se verificó tanto para ítems estándar de $29.990 como ítems especiales tipo Godzilla XL de $79.990).
-- **Precisión:** 100% (cero cruces erróneos de personajes o licencias).
+1. **Paridad CSS y Estructural 1:1:** Reescritura literal de `banpresto.astro` sobre la base de `funko-pop.astro` (144 reglas CSS verificadas, galería con miniaturas, drawer bilingüe, modal ZIP y toasts idénticos).
+2. **Prioridad de Título Oficial:** Prioridad invertida en `banpresto-lookup.mts` para preservar los títulos oficiales de factura WePlay frente a scraping de terceros (verificado en JAN `4573102713872` Minato Namikaze).
+3. **Limpieza de Basura de Navegación:** Implementación de `stripNavigationBoilerplate()` que limpió el 100% de enlaces de colecciones Shopify en las 139 figuras del contenedor real.
+4. **Preservación de Origen en Índice Local:** `source` preserva el origen real del distribuidor y `fromCache: true` indica el despacho instantáneo.
+5. **Agrupación Atómica de Badges:** Implementación de `.source-badge-group` en `banpresto.astro` y `funko-pop.astro`.
 
 ---
 
-## 3. Estado de Sphinx ERP (Nota Aparte)
-
-- La persona de TI de WePlay ya no está en la empresa y el cargo está vacante; no hay soporte técnico por parte del cliente por ahora.
-- **Decisión acordada:** El futuro cargador a Sphinx será un proyecto independiente (repositorio propio, no Netlify Function, probablemente script local montado en infraestructura propia).
-- No se realizarán trabajos adicionales de RPA hasta tener acceso a Sphinx y verificar si existe un importador masivo de Excel/CSV en su módulo de inventario.
+## 3. Despliegue
+- **Commit:** `e76e842`
+- **Build Astro:** Exitoso en 627ms sin errores.
+- **Herramientas en vivo:**
+  - Banpresto Scraper: [https://evo.cl/tools/banpresto](https://evo.cl/tools/banpresto)
+  - Funko Pop Scraper: [https://evo.cl/tools/funko-pop](https://evo.cl/tools/funko-pop)

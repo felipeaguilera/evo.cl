@@ -22,7 +22,8 @@ const description = 'Catálogo de herramientas internas y utilidades desarrollad
     <div class="wrap">
       <div class="tools-grid">
         <!-- TOOL 1: BANPRESTO SCRAPER -->
-        <a href="/tools/banpresto" class="tool-card">
+        <!-- Privada: vive en el EVO Lab de cada cliente. Solo descripción, sin link. -->
+        <div class="tool-card tool-card-static">
           <div class="tool-card-icon">
             <i class="ph ph-robot"></i>
           </div>
@@ -31,14 +32,11 @@ const description = 'Catálogo de herramientas internas y utilidades desarrollad
             <h3>Banpresto Catalog Scraper</h3>
             <p>Consulta masiva de figuras Banpresto / Bandai Spirits por JAN, título y PVP. Extrae fotos HD multi-ángulo, franquicias, líneas y ficha en español. Exporta a CSV, Sheets y ZIP.</p>
           </div>
-          <div class="tool-card-footer">
-            <span>Abrir herramienta</span>
-            <i class="ph ph-arrow-right"></i>
-          </div>
-        </a>
+        </div>
 
         <!-- TOOL 2: FUNKO POP SCRAPER -->
-        <a href="/tools/funko-pop" class="tool-card">
+        <!-- Privada: vive en el EVO Lab de cada cliente. Solo descripción, sin link. -->
+        <div class="tool-card tool-card-static">
           <div class="tool-card-icon">
             <i class="ph ph-package"></i>
           </div>
@@ -47,13 +45,25 @@ const description = 'Catálogo de herramientas internas y utilidades desarrollad
             <h3>Funko Pop! Catalog Scraper</h3>
             <p>Consulta masiva de figuras Funko Pop! por UPC o SKU. Extrae títulos oficiales, colecciones, números de caja, galerías completas y exporta a Shopify CSV, Sheets y ZIP.</p>
           </div>
+        </div>
+
+        <!-- TOOL 3: POKÉMON TCG SCRAPER -->
+        <a href="/tools/pokemon-tcg" class="tool-card">
+          <div class="tool-card-icon">
+            <i class="ph ph-cards"></i>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-card-badge">E-Commerce / Retail</div>
+            <h3>Pokémon TCG Catalog Scraper</h3>
+            <p>Consulta masiva de productos sellados Pokémon TCG por UPC o título. Resuelve variantes, extrae fotos HD oficiales, datos de expansión y exporta a Shopify CSV, Sheets y ZIP.</p>
+          </div>
           <div class="tool-card-footer">
             <span>Abrir herramienta</span>
             <i class="ph ph-arrow-right"></i>
           </div>
         </a>
 
-        <!-- TOOL 3: VECTORIZER -->
+        <!-- TOOL 4: VECTORIZER -->
         <a href="/tools/vectorizer" class="tool-card">
           <div class="tool-card-icon">
             <i class="ph ph-vector-three"></i>
@@ -124,6 +134,9 @@ const description = 'Catálogo de herramientas internas y utilidades desarrollad
       transform: translateY(-4px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     }
+
+    .tool-card-static { cursor: default; }
+    .tool-card-static:hover { transform: none; border-color: var(--border); box-shadow: none; }
 
     .tool-card-icon {
       width: 48px;

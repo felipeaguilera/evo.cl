@@ -1,0 +1,99 @@
+<!-- ============================================================
+     SONDA DE FICHA HTML - EVO / WePlay
+     Pegar TODO este bloque en el campo de descripción de un
+     producto de prueba en Sphinx. Guardar. Abrir la ficha
+     publicada y anotar qué números se ven bien.
+     Este archivo también se puede abrir directo en el navegador
+     para ver cómo debería verse si todo sobrevive.
+     ============================================================ -->
+
+<style>
+.evo-ficha{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6;color:#1a1a1a;max-width:900px}
+.evo-ficha h2{font-size:1.5rem;font-weight:700;margin:1.75rem 0 .5rem;padding-bottom:.4rem;border-bottom:2px solid #ffcb05;color:#1a1a1a}
+.evo-ficha h3{font-size:1.15rem;font-weight:600;margin:1.25rem 0 .4rem;color:#2a5caa}
+.evo-ficha h4{font-size:1rem;font-weight:600;margin:1rem 0 .3rem;color:#444}
+.evo-ficha p{margin:0 0 .9rem}
+.evo-ficha .evo-probe{border-left:3px solid #ccc;padding:.6rem 0 .6rem 1rem;margin:1.5rem 0}
+.evo-ficha .evo-ok{display:inline-block;background:#e8f5e9;color:#1b5e20;font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:3px;letter-spacing:.03em}
+.evo-ficha .evo-galeria{display:flex;gap:.75rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.5rem 0 1rem;-webkit-overflow-scrolling:touch}
+.evo-ficha .evo-galeria img{flex:0 0 auto;width:220px;height:220px;object-fit:contain;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;scroll-snap-align:start}
+.evo-ficha .evo-specs{width:100%;border-collapse:collapse;margin:.5rem 0 1rem;font-size:.92rem}
+.evo-ficha .evo-specs td{padding:.5rem .75rem;border-bottom:1px solid #ececec;vertical-align:top}
+.evo-ficha .evo-specs td:first-child{font-weight:600;width:38%;color:#555}
+.evo-ficha .evo-video{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;background:#000}
+.evo-ficha .evo-video iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.evo-ficha .evo-video-alt{display:block;position:relative;max-width:560px;border-radius:8px;overflow:hidden;text-decoration:none}
+.evo-ficha .evo-video-alt img{width:100%;display:block}
+.evo-ficha .evo-video-alt span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;font-size:1.5rem;padding:.55rem 1.3rem;border-radius:50px}
+</style>
+
+<div class="evo-ficha">
+
+  <div class="evo-probe">
+    <p><strong>1. Texto y párrafo.</strong> Si lees esta frase como texto normal
+    y no ves etiquetas tipo &lt;p&gt; en pantalla, el campo acepta HTML. Si ves
+    el código escrito, la vía del HTML pegado no sirve y hay que parar acá.</p>
+  </div>
+
+  <h2>2. Jerarquía de títulos</h2>
+  <p>Este es un h2. Debería verse claramente más grande que el texto y con una
+  línea amarilla debajo.</p>
+  <h3>Este es un h3</h3>
+  <p>Debería verse en azul y más chico que el h2.</p>
+  <h4>Este es un h4</h4>
+  <p>El más chico de los tres, en gris oscuro.</p>
+
+  <h2>3. Bloque de estilos</h2>
+  <p>Si el h2 de arriba tiene línea amarilla y el h3 sale azul, el bloque
+  <code>&lt;style&gt;</code> sobrevivió y se puede usar CSS de verdad.
+  Si todo se ve gris y sin formato, el sanitizador lo borró y hay que pasar
+  todo a estilos inline. <span class="evo-ok">CSS ACTIVO</span> (esta etiqueta
+  verde solo se ve si el style pasó).</p>
+
+  <h2>4. Estilos inline</h2>
+  <p style="background:#fff8e1;border:1px solid #ffcb05;padding:.75rem 1rem;border-radius:6px;margin:0 0 .9rem">
+    Este párrafo lleva el estilo escrito en el propio elemento. Si se ve con
+    fondo amarillo claro y borde, los estilos inline pasan. Este es el plan B
+    si falla el punto 3. Casi siempre pasa.
+  </p>
+
+  <h2>5. Galería sin JavaScript</h2>
+  <p>Cuatro imágenes en fila con scroll horizontal. Sin una línea de JS. Si se
+  ven las fotos y se pueden arrastrar de lado, la galería es viable.</p>
+  <div class="evo-galeria">
+    <img src="https://tcgplayer-cdn.tcgplayer.com/product/704143_in_1000x1000.jpg" alt="Elite Trainer Box">
+    <img src="https://tcgplayer-cdn.tcgplayer.com/product/704153_in_1000x1000.jpg" alt="Poster Collection">
+    <img src="https://tcgplayer-cdn.tcgplayer.com/product/704155_in_1000x1000.jpg" alt="Sylveon ex Box">
+    <img src="https://tcgplayer-cdn.tcgplayer.com/product/704145_in_1000x1000.jpg" alt="Tech Sticker Collection">
+  </div>
+
+  <h2>6. Video de YouTube embebido</h2>
+  <p>Si abajo aparece un reproductor, el iframe sobrevive y se puede embeber
+  video. Si aparece un hueco vacío o nada, el sanitizador lo borró y va el
+  punto 7.</p>
+  <div class="evo-video">
+    <iframe src="https://www.youtube.com/embed/05w9UVH6zoQ" title="Pokemon TCG 30th Celebration" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+  <h2>7. Video, plan B sin iframe</h2>
+  <p>Miniatura enlazada. Es solo una imagen dentro de un enlace, así que pasa
+  cualquier filtro. Se ve casi igual, pero abre YouTube en otra pestaña en vez
+  de reproducir ahí mismo.</p>
+  <a class="evo-video-alt" href="https://www.youtube.com/watch?v=05w9UVH6zoQ" target="_blank" rel="noopener">
+    <img src="https://img.youtube.com/vi/05w9UVH6zoQ/maxresdefault.jpg" alt="Ver el video">
+    <span>&#9654;</span>
+  </a>
+
+  <h2>8. Tabla de especificaciones</h2>
+  <table class="evo-specs">
+    <tr><td>Expansión</td><td>Celebración 30.º Aniversario</td></tr>
+    <tr><td>Tipo de producto</td><td>Elite Trainer Box</td></tr>
+    <tr><td>Idioma</td><td>Español</td></tr>
+    <tr><td>Código de barras</td><td>196214144873</td></tr>
+    <tr><td>Contenido</td><td>9 sobres, 1 carta promocional, 65 fundas, dados y marcadores</td></tr>
+  </table>
+  <p>Si la tabla se ve ordenada en dos columnas con líneas separadoras, sirve.
+  Si se ve apretada o descuadrada, el tema de Magento está pisando los estilos y
+  hay que subir la especificidad de los selectores.</p>
+
+</div>

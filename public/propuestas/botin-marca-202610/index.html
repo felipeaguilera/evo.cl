@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Botín del Alicanto | Dirección de marca y coming soon · EVO</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E4572E;
+    --dark:   #111111;
+    --light:  #F5F3EE;
+    --bg:     #FFFFFF;
+    --text:   #111111;
+    --muted:  #5A5A5A;
+    --border: #E5E2DC;
+    --f-display: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --f-mono:    'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  @page { size: A4; margin: 20mm 18mm; }
+  @media print {
+    * { background: white !important; }
+    .pdf-bar { display: none !important; }
+    body { padding-bottom: 0 !important; }
+    html, body { height: auto !important; }
+    .figure { width: 100% !important; margin-left: 0 !important; transform: none !important; }
+    .figure-scroll { overflow: visible !important; }
+    .section { break-inside: auto; }
+    .figure .wide { width: 100% !important; }
+    .figure, .callout, .tl-item, ul.items li { break-inside: avoid; }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--f-display);
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 32px 20px 96px;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  /* --- HEADER --- */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid var(--orange);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark { height: 28px; width: auto; display: block; flex-shrink: 0; }
+  .brand-name {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    line-height: 1.3;
+  }
+  .brand-sub {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-top: 2px;
+  }
+  .doc-date {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); text-align: right; padding-top: 4px;
+  }
+
+  /* --- PARTIES --- */
+  .parties {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .party { background: var(--bg); padding: 12px 14px; }
+  .party-label {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 5px;
+  }
+  .party-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .party-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* --- PROJECT NAME --- */
+  .project-name {
+    font-size: 24px; font-weight: 800; color: var(--text);
+    letter-spacing: -.01em; margin-bottom: 3px;
+  }
+  .project-tag {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 24px;
+  }
+
+  /* --- SECTION --- */
+  .section { margin-bottom: 28px; }
+  .sec-label {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-label::before {
+    content: ""; display: inline-block;
+    width: 18px; height: 2px; background: var(--orange);
+  }
+
+  p { color: var(--muted); margin-bottom: 10px; font-size: 13px; }
+  p strong { color: var(--text); font-weight: 600; }
+  p:last-child { margin-bottom: 0; }
+
+  .sub-head {
+    font-size: 12px; font-weight: 700; color: var(--text);
+    text-transform: uppercase; letter-spacing: .04em;
+    margin: 14px 0 8px;
+  }
+  .sub-head:first-child { margin-top: 0; }
+
+  /* --- LIST --- */
+  ul.items { list-style: none; }
+  ul.items li {
+    font-size: 13px; color: var(--muted);
+    padding: 7px 0 7px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative; line-height: 1.5;
+  }
+  ul.items li:last-child { border-bottom: none; }
+  ul.items li::before {
+    content: "";
+    position: absolute; left: 0; top: 14px;
+    width: 7px; height: 7px; background: var(--orange);
+  }
+  ul.items li strong { color: var(--text); font-weight: 600; }
+  ul.items li span { display: block; font-size: 11px; color: #888; margin-top: 1px; }
+
+  /* --- DATA TABLE --- */
+  table.data { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin: 4px 0 10px; }
+  table.data th {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--orange); text-align: left;
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  table.data th.n { text-align: right; white-space: nowrap; }
+  table.data td {
+    padding: 7px 12px; font-size: 12px; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td.n {
+    text-align: right; font-family: var(--f-mono); font-size: 12px;
+    color: var(--text); font-weight: 500; white-space: nowrap;
+  }
+  table.data tr.ok td.n { color: #1E7A5C; }
+  table.data tr.hi td.n { color: var(--orange); }
+  .table-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #999; margin-top: 6px;
+  }
+
+  /* --- FIGURE (breakout) --- */
+  .figure { margin: 20px 0 6px; }
+  .figure-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); background: #FCFBF9; }
+  .figure img { display: block; height: auto; }
+  .figure .wide { width: 1100px; max-width: none; }
+  .figure .fit  { width: 100%; }
+  .fig-cap {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #999;
+    margin-top: 7px; margin-bottom: 18px; line-height: 1.6;
+  }
+  .fig-cap a { color: var(--orange); text-decoration: none; border-bottom: 1px solid rgba(228,87,46,.35); }
+  @media (min-width: 1180px) {
+    .figure { width: 1100px; margin-left: 50%; transform: translateX(-50%); }
+    .figure-scroll { overflow-x: visible; }
+    .figure .wide { width: 100%; }
+    .fig-cap { padding: 0 2px; }
+  }
+
+  .figure.narrow { width: auto !important; margin-left: 0 !important; transform: none !important; }
+  .figure.ficha .fit { width: 62%; margin: 0 auto; }
+  .figure.ficha .figure-scroll { background: #F3F1EA; padding: 18px 0; }
+
+  /* --- CALLOUT --- */
+  .callout {
+    background: var(--light);
+    padding: 16px 16px;
+    border-left: 3px solid var(--orange);
+    margin: 14px 0;
+  }
+  .callout p { color: var(--text); font-size: 13px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* --- TIMELINE --- */
+  .tl { border-left: 2px solid var(--orange); padding-left: 18px; }
+  .tl-item { position: relative; margin-bottom: 16px; }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-item::before {
+    content: "";
+    position: absolute; left: -24px; top: 4px;
+    width: 8px; height: 8px;
+    background: var(--orange); border-radius: 50%;
+  }
+  .tl-when {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 2px;
+  }
+  .tl-what { font-size: 13px; color: var(--text); font-weight: 600; }
+  .tl-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tl-note {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: .06em; color: #aaa;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- FOOTER --- */
+  .footer {
+    margin-top: 36px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 16px;
+  }
+  .foot-brand { display: flex; align-items: center; gap: 8px; }
+  .mark-sm { height: 18px; width: auto; display: block; flex-shrink: 0; }
+  .foot-text {
+    font-family: var(--f-mono); font-size: 8px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .foot-right {
+    font-family: var(--f-mono); font-size: 8px;
+    color: #aaa; text-align: right; line-height: 1.5;
+  }
+
+  /* --- PDF BAR --- */
+  .pdf-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--dark); padding: 12px 20px;
+    display: flex; justify-content: center; z-index: 100;
+  }
+  .pdf-btn {
+    background: var(--orange); color: #fff;
+    border: none; cursor: pointer;
+    font-family: var(--f-mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 10px 28px;
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; max-width: 560px; justify-content: center;
+  }
+  .pdf-btn:hover { background: #CC4A24; }
+
+  @media (max-width: 480px) {
+    body { padding: 20px 16px 96px; }
+    .header { flex-direction: column; gap: 12px; }
+    .doc-date { text-align: left; }
+    .parties { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .foot-right { text-align: left; }
+    table.data td, table.data th { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark">
+      <div>
+        <div class="brand-name">EVO Communication Lab</div>
+        <div class="brand-sub">Brand &amp; Communication</div>
+      </div>
+    </div>
+    <div class="doc-date">Octubre 2026<br>v1a</div>
+  </div>
+
+  <!-- PROJECT NAME -->
+  <div class="project-name">El Botín del Alicanto</div>
+  <div class="project-tag">Dirección de marca y coming soon · botin.cl</div>
+
+  <!-- PARTIES -->
+  <div class="parties">
+    <div class="party">
+      <div class="party-label">Cliente</div>
+      <div class="party-name">El Botín del Alicanto</div>
+      <div class="party-detail">Francisco del Álamo<br>Máquinas de coleccionables sellados</div>
+    </div>
+    <div class="party">
+      <div class="party-label">Proveedor</div>
+      <div class="party-name">EVO Communication Lab</div>
+      <div class="party-detail">EVO SpA · RUT 77.939.226-0<br>info@evo.cl</div>
+    </div>
+  </div>
+
+  <!-- 01 -->
+  <div class="section">
+    <div class="sec-label">01 Punto de partida</div>
+    <p>
+      El proyecto llegó con lo más valioso ya decidido: <strong>un nombre con historia propia, una paleta oro sobre noche y una idea de negocio clara.</strong> Máquinas de coleccionables sellados, instaladas donde la gente ya está, con stock que cambia y se avisa. Detrás, un equipo que lideró Zmart Games por más de 20 años.
+    </p>
+    <p>
+      Lo que no estaba a la altura era la forma. El logo original resuelve la lectura, pero es un ave heráldica en dorado con tipografía de sistema: podría ser una marca de cerveza, de seguros o de joyería. No dice juego, no dice colección y no dice búsqueda.
+    </p>
+    <div class="figure narrow">
+      <div class="figure-scroll">
+        <a href="assets/punto-partida.jpg" target="_blank" rel="noopener"><img src="assets/punto-partida.jpg" alt="Logo original de El Botín del Alicanto" class="fit"></a>
+      </div>
+      <div class="fig-cap">El punto de partida: lockup original. <a href="assets/punto-partida.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <div class="callout">
+      <p>
+        Se mantienen el nombre y la paleta. <strong>Se rehace el logo y se construye un sistema</strong> que pueda vivir en una máquina, en una pantalla y en un feed sin perder carácter.
+      </p>
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="section">
+    <div class="sec-label">02 La idea</div>
+    <p>
+      En la leyenda del norte, el alicanto es un ave que se alimenta de oro y plata, y quien la sigue de noche llega a la veta. <strong>Esa es la marca: la búsqueda es el botín.</strong> Lo entretenido no es el precio, es encontrar la máquina, ver qué hay esta semana y abrir la cápsula.
+    </p>
+    <ul class="items">
+      <li><strong>Cada máquina es una veta</strong><span>Un punto del mapa con número propio, como una estación de metro.</span></li>
+      <li><strong>El alicanto vuela de veta en veta</strong><span>Cargado de tesoro que se le cae de las alas y del bolso. Va dejando un rastro de luz que se puede seguir.</span></li>
+      <li><strong>El misterio vive dentro de la cápsula</strong><span>La marca es clara y legible. Lo sorpresa es el producto, no la interfaz.</span></li>
+    </ul>
+  </div>
+
+  <!-- 03 -->
+  <div class="section">
+    <div class="sec-label">03 Lo que trajimos de Tokio</div>
+    <p>
+      Japón lleva décadas resolviendo exactamente este negocio. Revisamos en terreno máquinas gashapon, muros de cápsulas y la señalética del metro, mirando <strong>cómo funcionan, no cómo se ven.</strong> Su estética saturada no viaja bien a Chile; su estructura sí.
+    </p>
+    <div class="figure">
+      <div class="figure-scroll">
+        <a href="assets/tokio.jpg" target="_blank" rel="noopener"><img src="assets/tokio.jpg" alt="Referencias de máquinas gashapon y estaciones en Tokio" class="wide"></a>
+      </div>
+      <div class="fig-cap">Ficha de serie, muro de máquinas, numeración de estaciones y cápsulas. <a href="assets/tokio.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <ul class="items">
+      <li><strong>La ficha de serie</strong><span>Cada máquina muestra la colección completa, cuántos modelos tiene y cuál es el raro. Se convierte en la ficha de veta.</span></li>
+      <li><strong>La máquina en silencio</strong><span>Carcasas blancas y neutras para que el único color saturado sea el producto.</span></li>
+      <li><strong>Estaciones numeradas</strong><span>Un código corto y un color por línea. Se convierte en el código de veta: V07.</span></li>
+      <li><strong>La cápsula</strong><span>Un huevo, una pepita. El objeto que se abre es parte de la experiencia.</span></li>
+    </ul>
+  </div>
+
+  <!-- 04 -->
+  <div class="section">
+    <div class="sec-label">04 Isotipo y logotipo</div>
+    <p>
+      El isotipo es la pieza más importante del sistema. Es el alicanto reducido a su forma más simple: cuerpo de pepita, alas abiertas, un penacho de tres rombos y un rombo que cae. <strong>Redondo y amable, para contrastar con un sistema que es angular.</strong>
+    </p>
+    <p>
+      El logotipo usa la misma tipografía display del sistema. El penacho del isotipo es, exactamente, la tilde de la Í de BOTÍN: la misma figura, a otra escala. DEL ALICANTO se distribuye al ancho de la palabra para que el bloque cierre como una sola pieza.
+    </p>
+    <div class="figure">
+      <div class="figure-scroll">
+        <a href="assets/identidad.jpg" target="_blank" rel="noopener"><img src="assets/identidad.jpg" alt="Isotipo y logotipo de El Botín del Alicanto" class="wide"></a>
+      </div>
+      <div class="fig-cap">Lockup principal, isotipo a color y a una tinta, penacho y versión sobre fondo claro. <a href="assets/identidad.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <div class="callout">
+      <p>
+        Regla de uso: <strong>el isotipo acompaña siempre al logotipo.</strong> El logotipo solo, sin el ave, no se usa. El isotipo solo sí, en espacios chicos como avatar, favicon o sello de máquina.
+      </p>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="section">
+    <div class="sec-label">05 El personaje</div>
+    <p>
+      La mascota es el mismo alicanto en versión ilustrada, y es quien trae el juego a la marca. Vuela rápido, siempre cargado, y pierde tesoro por todas partes. Un buscador de tesoros simpático, con algo de pícaro.
+    </p>
+    <div class="figure narrow">
+      <div class="figure-scroll">
+        <a href="assets/personaje-ficha.jpg" target="_blank" rel="noopener"><img src="assets/personaje-ficha.jpg" alt="Ficha maestra del personaje alicanto" class="fit"></a>
+      </div>
+      <div class="fig-cap">Ficha maestra: frente, perfil, vuelo y tres expresiones. Es la referencia para toda ilustración nueva. <a href="assets/personaje-ficha.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <p>
+      Para que el personaje se mantenga igual en cada pieza nueva, se fijan cinco rasgos que no cambian:
+    </p>
+    <ul class="items">
+      <li><strong>Cuerpo redondo y gordito</strong><span>Forma de pepita, con la panza color hueso. Es lo que lo conecta con el isotipo.</span></li>
+      <li><strong>Penacho de tres rombos</strong><span>Uno alto al centro y dos más chicos a los lados. Siempre tres, siempre rombos.</span></li>
+      <li><strong>Bolso cruzado</strong><span>De cuero, lleno de pepitas que se le escapan.</span></li>
+      <li><strong>Luz en las alas y la cola</strong><span>Las puntas de las alas y la cola larga brillan. Su estela es luz, no fuego.</span></li>
+      <li><strong>Siempre vuela</strong><span>Es un ave rápida que va de veta en veta. Lo que cae sale del bolso y de las alas, nunca de la cola.</span></li>
+    </ul>
+    <div class="figure narrow">
+      <div class="figure-scroll">
+        <a href="assets/personaje.jpg" target="_blank" rel="noopener"><img src="assets/personaje.jpg" alt="Poses del personaje alicanto" class="fit"></a>
+      </div>
+      <div class="fig-cap">Poses ya aplicadas en botin.cl: vuelo, sobre la máquina, en la cápsula, con la pepita, señalando y durmiendo sobre el botín. <a href="assets/personaje.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="section">
+    <div class="sec-label">06 Color y tipografía</div>
+    <p>
+      La paleta original se respeta, con un ajuste: el fondo pasa de un negro azulado a un <strong>azul noche más luminoso</strong>, que deja respirar al oro y se siente menos serio. El verde mineral queda reservado para estados, como stock nuevo o máquina disponible.
+    </p>
+    <div class="figure">
+      <div class="figure-scroll">
+        <a href="assets/paleta.jpg" target="_blank" rel="noopener"><img src="assets/paleta.jpg" alt="Paleta de color y tipografías" class="wide"></a>
+      </div>
+      <div class="fig-cap">Paleta y par tipográfico. <a href="assets/paleta.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <p>
+      La tipografía display es Chakra Petch: técnica, de esquinas cortadas, con algo de señalética de metro y de interfaz de anime. El texto corrido va en Bai Jamjuree, de la misma familia de diseño pero más cálida y legible. Ambas son libres y funcionan en web e impresión.
+    </p>
+  </div>
+
+  <!-- 07 -->
+  <div class="section">
+    <div class="sec-label">07 Sistema</div>
+    <p>
+      Dos formas ordenan todo el sistema y salen directamente de la historia.
+    </p>
+    <div class="figure">
+      <div class="figure-scroll">
+        <a href="assets/escalon-rombo.png" target="_blank" rel="noopener"><img src="assets/escalon-rombo.png" alt="El escalón y el rombo" class="wide"></a>
+      </div>
+      <div class="fig-cap">El escalón y el rombo, las dos formas base. <a href="assets/escalon-rombo.png" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <p>
+      Con ellas se arman las piezas que más se van a repetir. El <strong>mapa de vetas</strong> dibuja el rastro como una línea de metro. La <strong>ficha de veta</strong> traduce la ficha de serie japonesa: dónde está la máquina, qué colección tiene, cuántos modelos y cuál es el raro.
+    </p>
+    <div class="figure">
+      <div class="figure-scroll">
+        <a href="assets/mapa-vetas.png" target="_blank" rel="noopener"><img src="assets/mapa-vetas.png" alt="Mapa de vetas como línea de metro" class="wide"></a>
+      </div>
+      <div class="fig-cap">Mapa de vetas. Lugares de ejemplo. <a href="assets/mapa-vetas.png" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <div class="figure narrow ficha">
+      <div class="figure-scroll">
+        <a href="assets/ficha-veta.png" target="_blank" rel="noopener"><img src="assets/ficha-veta.png" alt="Ficha de veta" class="fit"></a>
+      </div>
+      <div class="fig-cap">Ficha de veta. Contenido de ejemplo. <a href="assets/ficha-veta.png" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="section">
+    <div class="sec-label">08 Primera aplicación</div>
+    <p>
+      El sistema ya está aplicado en la página de lanzamiento de botin.cl. Abre con el alicanto volando sobre un rajo de noche hacia una máquina, presenta las cuatro categorías, explica cómo funciona y cierra con la frase del equipo de Zmart. El correo de contacto para distribuidores y ubicaciones está protegido contra spam.
+    </p>
+    <div class="figure">
+      <div class="figure-scroll">
+        <a href="assets/coming-soon.jpg" target="_blank" rel="noopener"><img src="assets/coming-soon.jpg" alt="Coming soon de botin.cl en escritorio y celular" class="wide"></a>
+      </div>
+      <div class="fig-cap">Coming soon en escritorio y celular. <a href="https://botin-cl.netlify.app/" target="_blank" rel="noopener">Ver la página en vivo</a> · <a href="assets/coming-soon.jpg" target="_blank" rel="noopener">Ver en tamaño completo</a></div>
+    </div>
+    <div class="callout">
+      <p>
+        La página está publicada en una dirección de prueba y oculta para buscadores. <strong>Pasa a botin.cl cuando esté aprobada.</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="section">
+    <div class="sec-label">09 Lo que sigue</div>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-when">Ahora</div>
+        <div class="tl-what">Revisión de la dirección</div>
+        <div class="tl-detail">Validar isotipo, logotipo, personaje y la página. Confirmar los textos, en particular la frase de los 20 años.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Al aprobar</div>
+        <div class="tl-what">Cierre de la marca</div>
+        <div class="tl-detail">Ajuste fino del logotipo, isotipo y personaje en vector limpio, listos para imprimir en máquinas, cápsulas y material de punto de venta.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">En paralelo</div>
+        <div class="tl-what">Lanzamiento en botin.cl</div>
+        <div class="tl-detail">Conectar el dominio y abrir la página a buscadores.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Después</div>
+        <div class="tl-what">Kit de comunicación</div>
+        <div class="tl-detail">Perfiles de Instagram, TikTok y X, plantillas de publicación, ficha de veta editable y gráfica para la primera máquina.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="foot-brand">
+      <img src="assets/EVO-logo.svg" alt="EVO" class="mark-sm">
+      <div class="foot-text">EVO Communication Lab &nbsp;·&nbsp; evo.cl</div>
+    </div>
+    <div class="foot-right">
+      Dirección de marca para El Botín del Alicanto<br>
+      Octubre 2026 · v1a
+    </div>
+  </div>
+
+</div>
+
+<!-- PDF BAR -->
+<div class="pdf-bar">
+  <button class="pdf-btn" onclick="window.print()">
+    ⎙ &nbsp; Guardar como PDF
+  </button>
+</div>
+
+</body>
+</html>

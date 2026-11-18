@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Botín del Alicanto · Brand Kit</title>
+<link rel="icon" type="image/svg+xml" href="assets/logos/BDA-Iso-v1g.svg">
+
+<!-- ================================================================
+     BRAND KIT · El Botín del Alicanto · Release 1 (2026-11-18)
+     Estructura copiada a mano de clientes/sagner/brand-kit/.
+     Fuente única de contenido: 21.13 Botin de Alicanto/Kit/ y BDA-BrandSkill-v1b.zip.
+     Los comentarios PROPUESTA marcan texto redactado por EVO,
+     no trazable a Felipe, Paco ni al Kit: pendiente de aprobación.
+     ================================================================ -->
+
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+/* ================================================================
+   TOKENS · EL BOTÍN DEL ALICANTO (Kit/, reference/tokens.css)
+   ================================================================ */
+:root {
+  --noche:        #192648;
+  --noche-2:      #121C38;
+  --noche-3:      #0B1430;
+  --oro:          #E8B53A;
+  --oro-vivo:     #F7D98A;
+  --plata:        #B9C2D2;
+  --hueso:        #F3F1EA;
+  --mineral:      #2FB39A;
+  --tx2:          #B4BCD0;
+  --tx3:          #8790A8;
+  --linea:        rgba(185,194,210,.16);
+  --oro-10:       rgba(232,181,58,.10);
+  --rombo:        polygon(50% 0,100% 50%,50% 100%,0 50%);
+
+  --font-heading: 'Chakra Petch', 'Arial Narrow', sans-serif;
+  --font-body:    'Bai Jamjuree', system-ui, sans-serif;
+
+  --sidebar-w: 220px;
+  --r-sm: 2px; --r-md: 4px; --r-lg: 8px;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--noche);
+  color: var(--hueso);
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+/* ================================================================
+   LAYOUT: sidebar + content
+   ================================================================ */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--noche-3);
+  position: fixed; top: 0; left: 0; bottom: 0;
+  overflow-y: auto; z-index: 50;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--linea);
+}
+.sidebar-brand { padding: 28px 20px 24px; border-bottom: 1px solid var(--linea); }
+.sidebar-logo { height: 44px; width: auto; margin-bottom: 12px; }
+.sidebar-tagline {
+  font-family: var(--font-heading);
+  font-size: 0.65rem; color: var(--tx3); font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.4;
+}
+.sidebar-nav { padding: 16px 0; flex: 1; }
+.nav-section-label {
+  font-family: var(--font-heading);
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(185,194,210,0.4); padding: 14px 20px 6px;
+}
+.nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; font-size: 0.82rem; font-weight: 400;
+  color: var(--tx2); transition: color 0.15s, background 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-link i { font-size: 1rem; flex-shrink: 0; }
+.nav-link:hover { color: var(--hueso); background: rgba(255,255,255,0.03); }
+.nav-link.active { color: var(--oro); border-left-color: var(--oro); background: var(--oro-10); font-weight: 600; }
+.sidebar-footer {
+  padding: 16px 20px; border-top: 1px solid var(--linea);
+  font-size: 0.7rem; color: var(--tx3); line-height: 1.7;
+}
+.sidebar-footer a { color: var(--tx2); transition: color 0.15s; }
+.sidebar-footer a:hover { color: var(--oro); }
+
+.content { margin-left: var(--sidebar-w); flex: 1; min-width: 0; }
+
+/* MOBILE NAV */
+.mobile-nav { display: none; background: var(--noche-3); border-bottom: 3px solid var(--oro); position: sticky; top: 0; z-index: 50; }
+.mobile-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 56px; }
+.mobile-nav-logo { height: 32px; width: auto; }
+.mobile-menu-btn { background: none; border: none; cursor: pointer; color: var(--hueso); font-size: 1.5rem; padding: 4px; }
+.mobile-menu { display: none; flex-direction: column; background: rgba(11,20,48,0.98); padding: 8px 0 16px; }
+.mobile-menu.open { display: flex; }
+.mobile-menu .nav-link { padding: 10px 24px; }
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .content { margin-left: 0; }
+  .mobile-nav { display: block; }
+}
+
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+.section { padding: 64px 48px; border-bottom: 1px solid var(--linea); background: var(--noche); }
+.section:nth-child(even) { background: var(--noche-2); }
+@media (max-width: 768px) { .section { padding: 48px 20px; } }
+
+.section-header { margin-bottom: 40px; }
+.section-number {
+  font-family: var(--font-heading);
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--oro); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.section-number::before { content: ''; display: block; width: 9px; height: 9px; background: var(--oro); clip-path: var(--rombo); }
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.875rem; font-weight: 700; letter-spacing: 0; line-height: 1.15;
+  color: var(--oro); margin-bottom: 10px;
+}
+.section-desc { font-size: 1rem; color: var(--tx2); line-height: 1.65; max-width: 640px; }
+
+/* ================================================================
+   HERO
+   ================================================================ */
+.hero-section {
+  background: var(--noche);
+  padding: 56px 48px;
+  border-bottom: 6px solid var(--oro);
+  position: relative; overflow: hidden;
+}
+.hero-art {
+  position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+  width: 300px; pointer-events: none;
+}
+@media (max-width: 1100px) { .hero-art { width: 220px; opacity: .9; } }
+@media (max-width: 768px) { .hero-section { padding: 40px 20px; } .hero-art { display: none; } }
+.hero-text { position: relative; max-width: 620px; }
+.hero-eyebrow {
+  font-family: var(--font-heading);
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--oro); margin-bottom: 16px;
+}
+.hero-section h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem); font-weight: 700;
+  color: var(--hueso); margin-bottom: 10px; line-height: 1.02; text-transform: uppercase;
+}
+.hero-section h1 span { color: var(--oro); }
+.hero-section p { font-size: 1rem; color: var(--tx2); max-width: 520px; line-height: 1.65; }
+.hero-meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--linea); }
+.hero-meta-item { font-size: 0.875rem; }
+.hero-meta-label { font-family: var(--font-heading); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tx3); margin-bottom: 3px; }
+.hero-meta-value { color: var(--hueso); }
+
+/* ================================================================
+   COLORES
+   ================================================================ */
+.color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.swatch { border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--linea); cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+.swatch:hover { transform: translateY(-2px); border-color: rgba(232,181,58,.5); }
+.swatch-color { height: 80px; position: relative; }
+.swatch-copy-hint {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.28); opacity: 0; transition: opacity 0.15s;
+  font-family: var(--font-heading); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #fff;
+}
+.swatch-copy-hint.dark { background: rgba(255,255,255,0.25); color: var(--noche); }
+.swatch:hover .swatch-copy-hint { opacity: 1; }
+.swatch-info { background: var(--noche-3); padding: 10px 12px; }
+.swatch-name { font-size: 0.78rem; font-weight: 600; color: var(--hueso); }
+.swatch-hex  { font-family: var(--font-heading); font-size: 0.78rem; font-weight: 500; color: var(--oro); margin-top: 2px; letter-spacing: .04em; }
+.swatch-use  { font-size: 0.7rem; color: var(--tx2); margin-top: 3px; line-height: 1.4; }
+
+.copied-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px);
+  background: var(--noche-3); color: var(--hueso);
+  font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 600;
+  padding: 10px 20px; border-radius: var(--r-lg); border: 1px solid var(--linea); border-bottom: 3px solid var(--oro);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 200;
+}
+.copied-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.color-group-title {
+  font-family: var(--font-heading);
+  font-size: 0.74rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--tx2); margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--linea);
+}
+.color-group-title:first-child { margin-top: 0; }
+
+/* ================================================================
+   TIPOGRAFÍA
+   ================================================================ */
+.type-specimen {
+  background: var(--noche-3); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 28px 32px; margin-bottom: 12px;
+  display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start;
+}
+@media (max-width: 600px) { .type-specimen { grid-template-columns: 1fr; } .type-meta-block { text-align: left; } }
+.type-sample-text { line-height: 1.1; color: var(--hueso); }
+.type-meta-block { text-align: right; min-width: 180px; }
+.type-family { font-size: 0.78rem; font-weight: 600; color: var(--hueso); }
+.type-specs  { font-family: var(--font-heading); font-size: 0.7rem; color: var(--tx2); margin-top: 4px; line-height: 1.6; }
+
+.font-card {
+  background: var(--noche-3); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 24px 28px; margin-bottom: 12px; border-left: 4px solid var(--oro);
+}
+.font-card-name { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: var(--hueso); }
+.font-card-role { font-family: var(--font-heading); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tx3); margin-bottom: 12px; }
+.font-card-sample { font-size: 0.9rem; color: var(--tx2); line-height: 1.6; }
+.font-card-sample strong { color: var(--hueso); font-weight: 600; }
+.font-weights { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--linea); }
+.font-weight-chip { font-size: 0.8125rem; color: var(--tx2); }
+.font-weight-chip strong { color: var(--hueso); }
+
+/* ================================================================
+   LOGOTIPOS
+   ================================================================ */
+.logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.logo-card { background: var(--noche-3); border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--linea); }
+.logo-canvas { display: flex; align-items: center; justify-content: center; padding: 40px 32px; min-height: 180px; }
+.logo-canvas img { max-height: 96px; width: auto; }
+.logo-card-info { padding: 16px 20px; border-top: 1px solid var(--linea); }
+.logo-card-name { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: var(--hueso); }
+.logo-card-use { font-size: 0.82rem; color: var(--tx2); line-height: 1.5; margin-bottom: 14px; }
+.logo-card-formats { display: flex; gap: 8px; flex-wrap: wrap; }
+.format-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-heading); font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: var(--r-sm);
+  background: var(--oro-10); color: var(--oro); border: 1px solid rgba(232,181,58,.45);
+  transition: background .15s, color .15s;
+}
+a.format-badge:hover { background: var(--oro); color: var(--noche); }
+.logo-rules {
+  background: var(--noche-3); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 24px 28px; margin-top: 32px; border-left: 4px solid var(--plata);
+}
+.logo-rules-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; color: var(--hueso); }
+.logo-rules ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.logo-rules li { font-size: 0.9rem; color: var(--tx2); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+.logo-rules li i { color: var(--oro); flex-shrink: 0; margin-top: 3px; }
+.logo-rules li i.no { color: #E07A6A; }
+.logo-rules li strong { color: var(--hueso); font-weight: 600; }
+
+/* ================================================================
+   PERSONAJE
+   ================================================================ */
+.sheet { background: var(--noche); border: 1px solid var(--linea); border-radius: var(--r-md); overflow: hidden; margin-bottom: 24px; }
+.sheet img { width: 100%; height: auto; }
+.sheet-caption { padding: 12px 20px; border-top: 1px solid var(--linea); font-size: 0.82rem; color: var(--tx2); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sheet-caption a { color: var(--oro); font-family: var(--font-heading); font-weight: 600; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+.pose-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+@media (max-width: 700px) { .pose-grid { grid-template-columns: repeat(2, 1fr); } .pose-canvas { height: 170px; } }
+.pose-card { background: var(--noche-3); border: 1px solid var(--linea); border-radius: var(--r-md); overflow: hidden; display: flex; flex-direction: column; }
+.pose-canvas { height: 220px; display: flex; align-items: center; justify-content: center; padding: 18px; background: var(--noche); }
+.pose-canvas img { max-height: 100%; width: auto; }
+.pose-info { padding: 12px 16px; border-top: 1px solid var(--linea); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pose-name { font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600; color: var(--hueso); }
+.pose-file { font-size: 0.72rem; color: var(--tx3); }
+.traits { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.trait-num { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--oro); line-height: 1; margin-bottom: 8px; }
+
+/* ================================================================
+   FORMAS Y SISTEMA (reemplaza "Componentes" de Sagner)
+   ================================================================ */
+.component-block { background: var(--noche-3); border-radius: var(--r-md); border: 1px solid var(--linea); padding: 28px 32px; margin-bottom: 16px; }
+.component-block-title {
+  font-family: var(--font-heading);
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--tx2); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--linea);
+}
+.comp-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.comp-text { font-size: 0.9rem; color: var(--tx2); line-height: 1.6; max-width: 640px; }
+.comp-text strong { color: var(--hueso); font-weight: 600; }
+.rombo { width: 22px; height: 30px; background: var(--oro); clip-path: var(--rombo); }
+.rombo.sm { width: 12px; height: 16px; }
+.rombo.vivo { background: var(--oro-vivo); }
+.rombo-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.rombo-list li { display: flex; gap: 12px; align-items: center; font-size: 0.9rem; color: var(--tx2); }
+.rombo-list li::before { content: ''; width: 8px; height: 11px; background: var(--oro); clip-path: var(--rombo); flex-shrink: 0; }
+.veta-code {
+  font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; letter-spacing: .04em;
+  color: var(--noche); background: var(--oro); padding: 6px 14px; border-radius: var(--r-sm);
+}
+.veta-code.outline { background: transparent; color: var(--oro); border: 2px solid var(--oro); }
+.demo-note { font-size: 0.75rem; color: var(--tx3); margin-top: 12px; }
+
+/* ================================================================
+   VOZ DE MARCA
+   ================================================================ */
+.voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.voice-card { background: var(--noche-3); border-radius: var(--r-md); border: 1px solid var(--linea); padding: 20px 22px; border-top: 3px solid var(--plata); transition: border-color 0.2s; }
+.voice-card:hover { border-top-color: var(--oro); }
+.voice-card-title { font-family: var(--font-heading); font-size: 1.0625rem; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--hueso); }
+.voice-card-title i { color: var(--oro); }
+.voice-card-body { font-size: 0.9rem; color: var(--tx2); line-height: 1.55; }
+
+.messaging-block { background: var(--noche-3); border: 1px solid var(--linea); border-radius: var(--r-md); padding: 28px 32px; position: relative; overflow: hidden; }
+.messaging-block::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--oro); }
+.msg-label { font-family: var(--font-heading); font-size: 0.64rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--oro); margin-bottom: 10px; }
+.msg-text { font-size: 0.95rem; color: var(--tx2); line-height: 1.6; }
+.msg-slogan { font-family: var(--font-heading); font-size: 1.625rem; font-weight: 700; color: var(--hueso); line-height: 1.2; margin-bottom: 8px; }
+.msg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.cta-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 8px; }
+.cta-table th { font-family: var(--font-heading); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tx3); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--linea); }
+.cta-table td { padding: 10px 12px; border-bottom: 1px solid var(--linea); color: var(--tx2); }
+.cta-table td:last-child { font-family: var(--font-heading); font-weight: 600; color: var(--oro); }
+
+/* ================================================================
+   DESCARGAS
+   ================================================================ */
+.download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.download-card {
+  background: var(--noche-3); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 16px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.download-card:hover { border-color: rgba(232,181,58,.45); transform: translateY(-2px); }
+.download-card.new { border-color: rgba(232,181,58,.45); }
+.download-icon { width: 48px; height: 48px; background: var(--oro-10); border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; color: var(--oro); font-size: 1.5rem; }
+.download-title { font-family: var(--font-heading); font-size: 1.125rem; font-weight: 700; color: var(--hueso); }
+.download-desc { font-size: 0.9rem; color: var(--tx2); line-height: 1.55; flex: 1; }
+.download-contents { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 12px; border-top: 1px solid var(--linea); }
+.download-tag { font-family: var(--font-heading); font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--r-sm); color: var(--tx2); border: 1px solid var(--linea); }
+.btn-download {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent; color: var(--oro); border: 2px solid var(--oro);
+  font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 11px 20px; border-radius: var(--r-sm); transition: background 0.15s, color 0.15s; width: 100%;
+}
+.btn-download:hover, .btn-download.accent { background: var(--oro); color: var(--noche); }
+.btn-download.accent:hover { background: var(--oro-vivo); border-color: var(--oro-vivo); }
+
+/* ================================================================
+   PRINT (fondo Noche se mantiene: el kit es oscuro por regla de marca)
+   ================================================================ */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .sidebar, .mobile-nav, .swatch-copy-hint, .copied-toast, .btn-download { display: none !important; }
+  .layout { display: block; }
+  .content { margin-left: 0; }
+  @page { size: A4; margin: 0; }
+  .print-header { display: flex !important; align-items: center; justify-content: space-between; padding: 18mm 16mm 12pt; background: var(--noche); border-bottom: 3pt solid var(--oro); }
+  .print-header img { height: 30pt; width: auto; }
+  .print-header-right { text-align: right; font-size: 8pt; color: var(--tx2); line-height: 1.6; }
+  .hero-art { display: none; }
+  .section { page-break-inside: avoid; }
+  #colores, #tipografia, #logotipos, #personaje, #formas, #voz, #descargas { page-break-before: always; }
+  .swatch, .font-card, .logo-card, .voice-card, .download-card, .type-specimen, .messaging-block, .component-block, .pose-card { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="copied-toast" id="toast">HEX copiado al portapapeles</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="#identidad"><img class="mobile-nav-logo" src="assets/logos/BDA-Lockup-v1g.svg" alt="El Botín del Alicanto"></a>
+    <button class="mobile-menu-btn" onclick="toggleMenu()" aria-label="Menú"><i class="ph-bold ph-list" id="menu-icon"></i></button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a class="nav-link" href="#identidad" onclick="closeMenu()"><i class="ph ph-info"></i>Identidad</a>
+    <a class="nav-link" href="#colores" onclick="closeMenu()"><i class="ph ph-palette"></i>Colores</a>
+    <a class="nav-link" href="#tipografia" onclick="closeMenu()"><i class="ph ph-text-aa"></i>Tipografía</a>
+    <a class="nav-link" href="#logotipos" onclick="closeMenu()"><i class="ph ph-seal"></i>Logotipos</a>
+    <a class="nav-link" href="#personaje" onclick="closeMenu()"><i class="ph ph-bird"></i>Personaje</a>
+    <a class="nav-link" href="#formas" onclick="closeMenu()"><i class="ph ph-diamond"></i>Formas y sistema</a>
+    <a class="nav-link" href="#voz" onclick="closeMenu()"><i class="ph ph-chat-text"></i>Voz de marca</a>
+    <a class="nav-link" href="#descargas" onclick="closeMenu()"><i class="ph ph-download-simple"></i>Descargas</a>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <a href="#identidad"><img class="sidebar-logo" src="assets/logos/BDA-Lockup-v1g.svg" alt="El Botín del Alicanto"></a>
+      <div class="sidebar-tagline">Brand Kit · Release 1</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Identidad</div>
+      <a class="nav-link active" href="#identidad"><i class="ph ph-info"></i>Visión general</a>
+      <a class="nav-link" href="#colores"><i class="ph ph-palette"></i>Colores</a>
+      <a class="nav-link" href="#tipografia"><i class="ph ph-text-aa"></i>Tipografía</a>
+      <div class="nav-section-label">Elementos</div>
+      <a class="nav-link" href="#logotipos"><i class="ph ph-seal"></i>Logotipos</a>
+      <a class="nav-link" href="#personaje"><i class="ph ph-bird"></i>Personaje</a>
+      <a class="nav-link" href="#formas"><i class="ph ph-diamond"></i>Formas y sistema</a>
+      <div class="nav-section-label">Comunicación</div>
+      <a class="nav-link" href="#voz"><i class="ph ph-chat-text"></i>Voz de marca</a>
+      <div class="nav-section-label">Recursos</div>
+      <a class="nav-link" href="#descargas"><i class="ph ph-download-simple"></i>Descargas</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div>El Botín del Alicanto</div>
+      <div><a href="mailto:contacto@botin.cl">contacto@botin.cl</a></div>
+      <div><a href="https://botin.cl" target="_blank">botin.cl</a></div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Print header -->
+    <div class="print-header" style="display:none">
+      <img src="assets/logos/BDA-Lockup-v1g.svg" alt="El Botín del Alicanto">
+      <div class="print-header-right">Brand Kit · Release 1 · Noviembre 2026<br>botin.cl · contacto@botin.cl</div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero-section" id="identidad">
+      <img class="hero-art" src="assets/character/web/pose-vuelo.webp" alt="El alicanto volando">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Brand Kit · Release 1</div>
+        <h1>El <span>Botín</span><br>del Alicanto</h1>
+        <!-- PROPUESTA: bajada copiada del patrón de Sagner -->
+        <p>Guía de identidad visual y comunicación. Referencia para el uso correcto de todos los elementos de marca.</p>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Versión</div>
+            <div class="hero-meta-value">Release 1 · Noviembre 2026</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Rubro</div>
+            <div class="hero-meta-value">Máquinas de coleccionables sellados</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Claim</div>
+            <div class="hero-meta-value">Sigue el rastro.</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Web</div>
+            <div class="hero-meta-value">botin.cl</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 01 VISIÓN GENERAL -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">01 · Identidad</div>
+        <h2 class="section-title">Visión general</h2>
+        <!-- PROPUESTA -->
+        <p class="section-desc">Qué es Botín y la idea que ordena todo lo que comunica.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:12px; margin-bottom:32px">
+        <div class="font-card">
+          <div class="font-card-name">Qué es</div>
+          <div class="font-card-sample">El Botín del Alicanto (<strong>Botín</strong>, botin.cl) instala máquinas con coleccionables sellados (juguetes, cartas TCG, coleccionables, blind boxes) donde la gente ya está, con stock que cambia y se anuncia.</div>
+        </div>
+        <div class="font-card">
+          <div class="font-card-name">Idea de marca</div>
+          <div class="font-card-sample" style="font-family:var(--font-heading); font-size:1.25rem; font-weight:700; color:var(--oro); margin-bottom:8px">La búsqueda es el botín.</div>
+          <div class="font-card-sample">La gracia es encontrar la máquina, ver qué tiene esta semana y abrir la cápsula. La marca es clara y legible; la sorpresa vive dentro de la cápsula, nunca en la interfaz.</div>
+        </div>
+        <div class="font-card" style="border-left-color:var(--plata)">
+          <div class="font-card-name">Equipo fundador</div>
+          <div class="font-card-sample">Parte del equipo que lideró Zmart Games por más de 20 años.</div>
+        </div>
+      </div>
+
+      <div class="voice-grid" style="margin-bottom:0">
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-map-pin"></i>Veta</div>
+          <div class="voice-card-body">Cada máquina es una veta, con un código corto como una estación de metro.</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-bird"></i>Alicanto</div>
+          <div class="voice-card-body">Ave de la leyenda del norte de Chile que se alimenta de oro y plata. Vuela de veta en veta dejando tesoro.</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-path"></i>Rastro</div>
+          <div class="voice-card-body">El recorrido entre vetas, dibujado como una línea de metro. Siempre ordenado, siempre apuntando a una máquina.</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-package"></i>Cápsula</div>
+          <div class="voice-card-body">Donde vive el misterio: cuál te toca, no si vale la pena ir.</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 02 COLORES -->
+    <section class="section" id="colores">
+      <div class="section-header">
+        <div class="section-number">02 · Identidad</div>
+        <h2 class="section-title">Colores</h2>
+        <p class="section-desc">Clic en cualquier color para copiar el HEX. El fondo por defecto es Noche. El oro nunca es fondo: es luz.</p>
+      </div>
+
+      <div class="color-group-title">Base · Noche</div>
+      <div class="color-grid">
+        <div class="swatch" onclick="copyHex('#192648')">
+          <div class="swatch-color" style="background:#192648"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Noche</div><div class="swatch-hex">#192648</div><div class="swatch-use">Fondo por defecto de todo</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#121C38')">
+          <div class="swatch-color" style="background:#121C38"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Noche profunda</div><div class="swatch-hex">#121C38</div><div class="swatch-use">Paneles, tarjetas, secciones</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#0B1430')">
+          <div class="swatch-color" style="background:#0B1430"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Noche profunda 2</div><div class="swatch-hex">#0B1430</div><div class="swatch-use">Paneles, tarjetas, secciones</div></div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Luz · Oro</div>
+      <div class="color-grid">
+        <div class="swatch" onclick="copyHex('#E8B53A')">
+          <div class="swatch-color" style="background:#E8B53A"><div class="swatch-copy-hint dark"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Oro</div><div class="swatch-hex">#E8B53A</div><div class="swatch-use">Logo, titulares, acentos clave</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#F7D98A')">
+          <div class="swatch-color" style="background:#F7D98A"><div class="swatch-copy-hint dark"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Oro vivo</div><div class="swatch-hex">#F7D98A</div><div class="swatch-use">Destellos, brillo, énfasis sobre oscuro</div></div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Neutros y texto</div>
+      <div class="color-grid">
+        <div class="swatch" onclick="copyHex('#B9C2D2')">
+          <div class="swatch-color" style="background:#B9C2D2"><div class="swatch-copy-hint dark"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Plata</div><div class="swatch-hex">#B9C2D2</div><div class="swatch-use">"DEL ALICANTO", texto secundario, líneas</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#F3F1EA')">
+          <div class="swatch-color" style="background:#F3F1EA"><div class="swatch-copy-hint dark"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Blanco hueso</div><div class="swatch-hex">#F3F1EA</div><div class="swatch-use">Texto sobre oscuro; fondo de piezas claras</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#B4BCD0')">
+          <div class="swatch-color" style="background:#B4BCD0"><div class="swatch-copy-hint dark"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Texto 2</div><div class="swatch-hex">#B4BCD0</div><div class="swatch-use">Texto secundario sobre oscuro</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#8790A8')">
+          <div class="swatch-color" style="background:#8790A8"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Texto 3</div><div class="swatch-hex">#8790A8</div><div class="swatch-use">Texto terciario sobre oscuro</div></div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Estados de interfaz</div>
+      <div class="color-grid">
+        <div class="swatch" onclick="copyHex('#2FB39A')">
+          <div class="swatch-color" style="background:#2FB39A"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <div class="swatch-info"><div class="swatch-name">Verde mineral</div><div class="swatch-hex">#2FB39A</div><div class="swatch-use">Solo estados: stock nuevo, máquina disponible. Nunca decorativo</div></div>
+        </div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas de color</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span><strong>El oro nunca es fondo: es luz.</strong> Siempre sobre oscuro.</span></li>
+          <li><i class="ph-bold ph-check"></i>El fondo por defecto es Noche, no blanco. Blanco hueso como fondo solo en documentos para imprimir en volumen o para lectura larga.</li>
+          <li><i class="ph-bold ph-x no"></i>Sin degradados, salvo uno sutil de Noche a Noche profunda. Sin neón ni colores de fuego.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 03 TIPOGRAFÍA -->
+    <section class="section" id="tipografia">
+      <div class="section-header">
+        <div class="section-number">03 · Identidad</div>
+        <h2 class="section-title">Tipografía</h2>
+        <p class="section-desc">Dos familias libres (SIL Open Font License). Chakra Petch para titulares y códigos, Bai Jamjuree para todo el texto corrido.</p>
+      </div>
+
+      <div class="font-card">
+        <div class="font-card-name" style="font-size:1.875rem">Chakra Petch</div>
+        <div class="font-card-role">Titulares, números, códigos de veta, etiquetas, botones</div>
+        <div class="font-card-sample" style="font-family:var(--font-heading); font-size:1.25rem; font-weight:600; color:var(--oro); text-transform:uppercase">V07 · Sigue el rastro.</div>
+        <div class="font-weights">
+          <div class="font-weight-chip"><strong style="font-family:var(--font-heading); font-weight:700">Bold 700</strong></div>
+          <div class="font-weight-chip"><strong style="font-family:var(--font-heading); font-weight:600">SemiBold 600</strong></div>
+          <div class="font-weight-chip"><strong style="font-family:var(--font-heading); font-weight:500">Medium 500</strong></div>
+          <div class="font-weight-chip">Mayúsculas para etiquetas y códigos cortos</div>
+        </div>
+      </div>
+
+      <div class="font-card" style="margin-top:12px">
+        <div class="font-card-name" style="font-family:var(--font-body); font-size:1.5rem; font-weight:600">Bai Jamjuree</div>
+        <div class="font-card-role">Todo el texto corrido</div>
+        <div class="font-card-sample">La gracia es encontrar la máquina, ver qué tiene esta semana y abrir la cápsula. La sorpresa vive dentro de la cápsula, nunca en la interfaz.</div>
+        <div class="font-weights">
+          <div class="font-weight-chip"><strong style="font-weight:600">SemiBold 600</strong></div>
+          <div class="font-weight-chip"><strong style="font-weight:500">Medium 500</strong></div>
+          <div class="font-weight-chip"><strong style="font-weight:400">Regular 400</strong></div>
+        </div>
+      </div>
+
+      <!-- PROPUESTA: escala de tamaños (los pesos y roles vienen del Kit; los tamaños no) -->
+      <div style="margin-top:28px">
+        <div class="type-specimen">
+          <div class="type-sample-text" style="font-family:var(--font-heading); font-size:3rem; font-weight:700; line-height:1.04; color:var(--oro); text-transform:uppercase">Tesoros que se cazan</div>
+          <div class="type-meta-block"><div class="type-family">Chakra Petch Bold</div><div class="type-specs">3rem / 48px<br>weight: 700<br>uppercase</div></div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-sample-text" style="font-family:var(--font-heading); font-size:2rem; font-weight:700; line-height:1.15">Encabezado H1</div>
+          <div class="type-meta-block"><div class="type-family">Chakra Petch Bold</div><div class="type-specs">2rem / 32px<br>weight: 700</div></div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-sample-text" style="font-family:var(--font-heading); font-size:1.375rem; font-weight:600">Subtítulo H2</div>
+          <div class="type-meta-block"><div class="type-family">Chakra Petch SemiBold</div><div class="type-specs">1.375rem / 22px<br>weight: 600</div></div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-sample-text" style="font-family:var(--font-body); font-size:1rem; font-weight:400; line-height:1.65; max-width:500px">Texto de cuerpo. Cada máquina es una veta. El alicanto vuela de veta en veta dejando tesoro, y el rastro siempre apunta a una máquina.</div>
+          <div class="type-meta-block"><div class="type-family">Bai Jamjuree Regular</div><div class="type-specs">1rem / 16px<br>weight: 400<br>lh: 1.65</div></div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-sample-text" style="font-family:var(--font-heading); font-size:0.8125rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase">Busca tu botín</div>
+          <div class="type-meta-block"><div class="type-family">Chakra Petch SemiBold</div><div class="type-specs">0.8125rem / 13px<br>weight: 600<br>UPPERCASE ls: 0.08em</div></div>
+        </div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Respaldo</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i>Si el formato no permite incrustar fuentes (por ejemplo un .docx que se abre en otro equipo), usar Arial Narrow para titulares y Arial para texto, y avisarlo.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 04 LOGOTIPOS -->
+    <section class="section" id="logotipos">
+      <div class="section-header">
+        <div class="section-number">04 · Elementos</div>
+        <h2 class="section-title">Logotipos</h2>
+        <p class="section-desc">Logo pack release 1 (noviembre 2026). Todos los vectores están en curvas, sin texto vivo. Clic en el formato para descargar.</p>
+      </div>
+
+      <div class="color-group-title" style="border:none; margin-top:0">Lockup</div>
+      <div class="logo-grid" style="margin-bottom:20px">
+        <div class="logo-card" style="grid-column:1 / -1">
+          <div class="logo-canvas" style="background:#192648; min-height:220px">
+            <img src="assets/logos/BDA-Lockup-v1g.svg" alt="Lockup El Botín del Alicanto" style="max-height:120px">
+          </div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Lockup principal</div>
+            <div class="logo-card-use">Isotipo + BOTÍN + DEL ALICANTO. Solo sobre fondos oscuros. Todavía no hay versión para fondo claro.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/BDA-Lockup-v1g.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/BDA-Lockup-v1g.png" download><i class="ph-bold ph-download-simple"></i>PNG transparente</a>
+              <a class="format-badge" href="assets/logos/BDA-Lockup-Noche-v1g.png" download><i class="ph-bold ph-download-simple"></i>PNG sobre Noche</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Isotipo</div>
+      <div class="logo-grid" style="margin-bottom:32px">
+        <div class="logo-card">
+          <div class="logo-canvas" style="background:#192648">
+            <img src="assets/logos/BDA-Iso-v1g.svg" alt="Isotipo a color">
+          </div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Isotipo a color</div>
+            <div class="logo-card-use">Maestro. Para fondos oscuros o claros, y solo en espacios chicos: avatar, favicon, sello de máquina, esquina de página.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/BDA-Iso-v1g.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/BDA-Iso-v1g.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+        <div class="logo-card">
+          <div class="logo-canvas" style="background:#F3F1EA">
+            <img src="assets/logos/BDA-Iso-Mono-v1g.svg" alt="Isotipo a una tinta">
+          </div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Isotipo a una tinta</div>
+            <div class="logo-card-use">Noche #192648, ojos y pico calados. Para fondos claros e impresión a un color.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/BDA-Iso-Mono-v1g.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/BDA-Iso-Mono-v1g.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas de uso</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span><strong>El isotipo es la pieza más importante de la marca y siempre acompaña al logotipo.</strong></span></li>
+          <li><i class="ph-bold ph-check"></i>La tilde de la Í en BOTÍN es la cresta del isotipo (tres rombos), nunca un acento común.</li>
+          <li><i class="ph-bold ph-check"></i>El lockup dorado va solo sobre fondos oscuros. Sobre fondo claro se usa el isotipo solo (color o una tinta).</li>
+          <li><i class="ph-bold ph-check"></i>En HTML usar los SVG; en documentos y presentaciones sirven los PNG.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca usar el logotipo BOTÍN sin el pájaro.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca redibujar, recolorear, estirar, rotar, contornear ni agregar efectos al logo.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca rearmar el lockup con texto vivo.</li>
+          <li><i class="ph-bold ph-x no"></i>No usar el logo heráldico de agosto 2026 ni versiones anteriores del isotipo.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 05 PERSONAJE -->
+    <section class="section" id="personaje">
+      <div class="section-header">
+        <div class="section-number">05 · Elementos</div>
+        <h2 class="section-title">Personaje</h2>
+        <p class="section-desc">La mascota es el propio alicanto, ilustrado. Es un pájaro repartidor: deja pepitas, no las pierde.</p>
+      </div>
+
+      <div class="sheet">
+        <img src="assets/character/web/ficha-maestra.webp" alt="Ficha maestra del alicanto" loading="lazy">
+        <div class="sheet-caption"><span>Ficha maestra de referencia</span><a href="assets/character/ficha-maestra.png" download>Descargar PNG</a></div>
+      </div>
+
+      <div class="color-group-title" style="border:none; margin-top:0">Poses aprobadas</div>
+      <div class="pose-grid">
+        <div class="pose-card"><div class="pose-canvas"><img src="assets/character/web/pose-vuelo.webp" alt="Pose volando" loading="lazy"></div><div class="pose-info"><div><div class="pose-name">Volando</div><div class="pose-file">pose-vuelo</div></div><a class="format-badge" href="assets/character/pose-vuelo.png" download>PNG</a></div></div>
+        <div class="pose-card"><div class="pose-canvas"><img src="assets/character/web/pose-maquina.webp" alt="Pose sobre una máquina" loading="lazy"></div><div class="pose-info"><div><div class="pose-name">Sobre una máquina</div><div class="pose-file">pose-maquina</div></div><a class="format-badge" href="assets/character/pose-maquina.png" download>PNG</a></div></div>
+        <div class="pose-card"><div class="pose-canvas"><img src="assets/character/web/pose-capsula.webp" alt="Pose en una cápsula" loading="lazy"></div><div class="pose-info"><div><div class="pose-name">En una cápsula</div><div class="pose-file">pose-capsula</div></div><a class="format-badge" href="assets/character/pose-capsula.png" download>PNG</a></div></div>
+        <div class="pose-card"><div class="pose-canvas"><img src="assets/character/web/pose-pepita.webp" alt="Pose con una pepita" loading="lazy"></div><div class="pose-info"><div><div class="pose-name">Con una pepita</div><div class="pose-file">pose-pepita</div></div><a class="format-badge" href="assets/character/pose-pepita.png" download>PNG</a></div></div>
+        <div class="pose-card"><div class="pose-canvas"><img src="assets/character/web/pose-senalando.webp" alt="Pose señalando" loading="lazy"></div><div class="pose-info"><div><div class="pose-name">Señalando</div><div class="pose-file">pose-senalando</div></div><a class="format-badge" href="assets/character/pose-senalando.png" download>PNG</a></div></div>
+        <div class="pose-card"><div class="pose-canvas"><img src="assets/character/web/pose-durmiendo.webp" alt="Pose durmiendo sobre el tesoro" loading="lazy"></div><div class="pose-info"><div><div class="pose-name">Durmiendo sobre el tesoro</div><div class="pose-file">pose-durmiendo</div></div><a class="format-badge" href="assets/character/pose-durmiendo.png" download>PNG</a></div></div>
+      </div>
+
+      <div class="color-group-title">Rasgos fijos, siempre</div>
+      <div class="traits">
+        <div class="font-card"><div class="trait-num">1</div><div class="font-card-sample">Cuerpo redondo y gordito, dorado, con guata ovalada blanco hueso, mejillas rosadas, pico naranjo pequeño y ojos negros simples.</div></div>
+        <div class="font-card"><div class="trait-num">2</div><div class="font-card-sample">Cresta de <strong>tres rombos de cristal</strong>: uno alto al centro y dos más chicos inclinados hacia afuera.</div></div>
+        <div class="font-card"><div class="trait-num">3</div><div class="font-card-sample"><strong>Bolso mensajero</strong> de cuero café, correa sobre el hombro derecho, bolso en la <strong>cadera izquierda</strong>, tapa abierta y doblada hacia atrás con tesoro asomándose.</div></div>
+        <div class="font-card"><div class="trait-num">4</div><div class="font-card-sample">Alas cortas y redondeadas con puntas que brillan, cola larga como cinta que brilla. Luz, nunca fuego.</div></div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas del personaje</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i>Es un pájaro repartidor, no un ladrón ni un torpe. El rastro es una línea ordenada que apunta a una máquina, nunca un desorden; nada cae de la cola.</li>
+          <li><i class="ph-bold ph-check"></i>Usar las poses existentes tal como están.</li>
+          <li><i class="ph-bold ph-check"></i>Si se necesita una ilustración nueva, se describe desde estos rasgos y la ficha maestra, y se presenta como borrador para aprobación.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca voltear horizontalmente una pose: el bolso queda en el lado equivocado.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca recolorear, cortar por la cresta ni agregar accesorios.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca mezclar personajes ni logos de terceros.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 06 FORMAS Y SISTEMA (reemplaza "Componentes" de Sagner: Botín no tiene componentes definidos en el Kit) -->
+    <section class="section" id="formas">
+      <div class="section-header">
+        <div class="section-number">06 · Elementos</div>
+        <h2 class="section-title">Formas y sistema</h2>
+        <p class="section-desc">La estructura es angular (mina, metro, información); el personaje es redondo (juego, calidez). Ese contraste es la marca.</p>
+      </div>
+
+      <div class="component-block">
+        <div class="component-block-title">Formas base</div>
+        <div class="comp-row" style="margin-bottom:18px">
+          <div class="rombo"></div><div class="rombo sm"></div><div class="rombo vivo"></div><div class="rombo sm"></div><div class="rombo"></div>
+        </div>
+        <ul class="rombo-list">
+          <li><span><strong style="color:var(--hueso)">Rombo:</strong> levemente alargado, como la cresta. Se usa como viñeta, separador y marcador.</span></li>
+          <li><span><strong style="color:var(--hueso)">Escalón:</strong> borde escalonado, como una mina a rajo abierto.</span></li>
+        </ul>
+      </div>
+
+      <div class="component-block">
+        <div class="component-block-title">Códigos de veta</div>
+        <div class="comp-row">
+          <span class="veta-code">V07</span>
+          <span class="veta-code outline">V07</span>
+        </div>
+        <p class="comp-text" style="margin-top:16px">Cada máquina tiene un código corto, como una estación de metro, en Chakra Petch. Los lugares y códigos de ejemplo se marcan como ejemplo mientras no existan los reales.</p>
+        <div class="demo-note">V07 es un código de ejemplo.</div>
+      </div>
+
+      <div class="component-block">
+        <div class="component-block-title">Piezas del sistema</div>
+        <ul class="rombo-list">
+          <li><span><strong style="color:var(--hueso)">Ficha de veta:</strong> dónde está la máquina, qué colección tiene, cuántos modelos y cuál es el raro.</span></li>
+          <li><span><strong style="color:var(--hueso)">Mapa de vetas:</strong> el rastro dibujado como una línea de metro que conecta las vetas.</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 07 VOZ DE MARCA -->
+    <section class="section" id="voz">
+      <div class="section-header">
+        <div class="section-number">07 · Comunicación</div>
+        <h2 class="section-title">Voz de marca</h2>
+        <p class="section-desc">Habla como un buscador de tesoros con experiencia, no como un vendedor.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:12px; margin-bottom:28px">
+        <div class="font-card" style="border-left-color:var(--plata)">
+          <div class="font-card-name" style="font-size:1rem">Registro</div>
+          <div class="font-card-sample">Español de Chile, tuteo, frases cortas y cálidas, sin relleno corporativo.</div>
+        </div>
+        <div class="font-card" style="border-left-color:var(--plata)">
+          <div class="font-card-name" style="font-size:1rem">Vocabulario minero</div>
+          <div class="font-card-sample">Veta, pepita, rastro, botín, la mina (bodega). Bienvenido cuando se lee natural; no forzarlo en cada frase.</div>
+        </div>
+        <div class="font-card" style="border-left-color:var(--plata)">
+          <div class="font-card-name" style="font-size:1rem">Lo que no hacemos</div>
+          <div class="font-card-sample">No prometer lo que tiene una máquina si no se conoce el stock. El misterio es cuál te toca, no si vale la pena ir. Las marcas de producto (Pokémon, Magic, Pop Mart) se nombran como lo que se vende, pero sus logos y personajes nunca son parte de la gráfica de Botín.</div>
+        </div>
+      </div>
+
+      <div class="msg-grid">
+        <div class="messaging-block">
+          <div class="msg-label">Claim</div>
+          <div class="msg-slogan">Sigue el rastro.</div>
+        </div>
+        <div class="messaging-block">
+          <div class="msg-label">Tagline</div>
+          <div class="msg-slogan">Tesoros que se cazan.</div>
+        </div>
+        <div class="messaging-block">
+          <div class="msg-label">Firma · una vez, en origen o manual</div>
+          <div class="msg-slogan" style="font-size:1.25rem">El alicanto sabe dónde está el botín.</div>
+        </div>
+      </div>
+
+      <div class="font-card">
+        <div class="font-card-name" style="font-size:1rem">Llamados a la acción</div>
+        <table class="cta-table">
+          <thead><tr><th>Dónde</th><th>Texto</th></tr></thead>
+          <tbody>
+            <tr><td>Web y bio</td><td>Busca tu botín</td></tr>
+            <tr><td>Pantalla de la máquina</td><td>Elige y abre</td></tr>
+            <tr><td>Captura de correo</td><td>Avísame cuando llegue</td></tr>
+            <tr><td>Contenido de usuarios</td><td>Muestra lo que te salió</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="font-card" style="border-left-color:var(--plata); margin-top:12px">
+        <div class="font-card-name" style="font-size:1rem">Canales</div>
+        <div class="font-card-sample">Web <strong>botin.cl</strong> · Correo <strong>contacto@botin.cl</strong> · Instagram y TikTok <strong>@botin.cl</strong> · X <strong>@botincl</strong></div>
+      </div>
+    </section>
+
+
+    <!-- 08 DESCARGAS -->
+    <section class="section" id="descargas">
+      <div class="section-header">
+        <div class="section-number">08 · Recursos</div>
+        <h2 class="section-title">Descargas</h2>
+        <!-- PROPUESTA -->
+        <p class="section-desc">Archivos listos para usar, en un zip por tipo.</p>
+      </div>
+
+      <div class="download-grid">
+        <div class="download-card">
+          <div class="download-icon"><i class="ph-bold ph-seal"></i></div>
+          <div class="download-title">Logotipos</div>
+          <div class="download-desc">Logo pack release 1: lockup, isotipo a color e isotipo a una tinta, en SVG (en curvas) y PNG.</div>
+          <div class="download-contents">
+            <span class="download-tag">SVG</span><span class="download-tag">PNG</span><span class="download-tag">Release 1</span>
+          </div>
+          <a class="btn-download accent" href="assets/docs/BDA-Logos-r1.zip" download><i class="ph-bold ph-download-simple"></i>Descargar ZIP</a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon"><i class="ph-bold ph-text-aa"></i></div>
+          <div class="download-title">Tipografías</div>
+          <div class="download-desc">Chakra Petch (500, 600, 700) y Bai Jamjuree (400, 500, 600) en TTF, para instalar en el sistema. Incluye sus licencias OFL.</div>
+          <div class="download-contents">
+            <span class="download-tag">TTF</span><span class="download-tag">SIL OFL</span><span class="download-tag">6 archivos</span>
+          </div>
+          <a class="btn-download" href="assets/docs/BDA-Fonts.zip" download><i class="ph-bold ph-download-simple"></i>Descargar ZIP</a>
+        </div>
+
+        <div class="download-card new">
+          <div class="download-icon"><i class="ph-bold ph-sparkle"></i></div>
+          <div class="download-title">Brand skill</div>
+          <!-- PROPUESTA -->
+          <div class="download-desc">La versión del kit para asistentes de IA: reglas en texto, logos, fuentes, poses del personaje y tokens CSS en un solo zip. Se carga como skill para que lo que se genere con IA salga con la marca.</div>
+          <div class="download-contents">
+            <span class="download-tag">ZIP</span><span class="download-tag">SKILL.md</span><span class="download-tag">v1b</span>
+          </div>
+          <a class="btn-download" href="assets/docs/BDA-BrandSkill-v1b.zip" download><i class="ph-bold ph-download-simple"></i>Descargar ZIP</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /.layout -->
+
+<script>
+// Copy HEX
+function copyHex(hex) {
+  navigator.clipboard.writeText(hex).then(() => {
+    const t = document.getElementById('toast');
+    t.textContent = hex + ' copiado';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+// Mobile menu
+function toggleMenu() {
+  const m = document.getElementById('mobile-menu');
+  const i = document.getElementById('menu-icon');
+  const open = m.classList.toggle('open');
+  i.className = open ? 'ph-bold ph-x' : 'ph-bold ph-list';
+}
+function closeMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('menu-icon').className = 'ph-bold ph-list';
+}
+
+// Active nav on scroll
+const sections = document.querySelectorAll('section[id], div[id="identidad"]');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.nav-link[href="#' + e.target.id + '"]').forEach(a => a.classList.add('active'));
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

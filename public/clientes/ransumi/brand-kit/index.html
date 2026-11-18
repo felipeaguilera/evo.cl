@@ -260,6 +260,17 @@ a.format-badge:hover { background: var(--verde); color: var(--crema); }
 .logo-rules li i.no { color: #A6533F; }
 .logo-rules li strong { color: var(--tx); font-weight: 600; }
 
+/* Aplicaciones: etiqueta de caja */
+.label-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 32px; background: var(--crema); }
+.label-strip figure { margin: 0; }
+.label-strip img { width: 100%; height: auto; display: block; box-shadow: 0 0 0 1px var(--linea); background: #fff; }
+.label-strip figcaption { font-size: 0.72rem; color: var(--tx2); margin-top: 8px; text-align: center; }
+.photo-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.photo-row img { width: 100%; height: auto; display: block; border-radius: var(--r-md); border: 1px solid var(--linea); }
+.photo-note { font-size: 0.82rem; color: var(--tx2); line-height: 1.5; margin-top: 12px; }
+@media (max-width: 900px) { .label-strip { grid-template-columns: repeat(3, 1fr); padding: 20px; } }
+@media (max-width: 600px) { .label-strip { grid-template-columns: repeat(2, 1fr); } .photo-row { grid-template-columns: 1fr; } }
+
 /* ================================================================
    VISIÓN GENERAL (voice cards reutilizadas como conceptos del símbolo)
    ================================================================ */
@@ -328,6 +339,7 @@ a.format-badge:hover { background: var(--verde); color: var(--crema); }
     <a class="nav-link" href="#colores" onclick="closeMenu()"><i class="ph ph-palette"></i>Colores</a>
     <a class="nav-link" href="#tipografia" onclick="closeMenu()"><i class="ph ph-text-aa"></i>Tipografía</a>
     <a class="nav-link" href="#logotipos" onclick="closeMenu()"><i class="ph ph-flower-lotus"></i>Logotipos</a>
+    <a class="nav-link" href="#etiqueta" onclick="closeMenu()"><i class="ph ph-package"></i>Etiqueta de caja</a>
     <a class="nav-link" href="#descargas" onclick="closeMenu()"><i class="ph ph-download-simple"></i>Descargas</a>
   </div>
 </div>
@@ -347,6 +359,8 @@ a.format-badge:hover { background: var(--verde); color: var(--crema); }
       <a class="nav-link" href="#tipografia"><i class="ph ph-text-aa"></i>Tipografía</a>
       <div class="nav-section-label">Elementos</div>
       <a class="nav-link" href="#logotipos"><i class="ph ph-flower-lotus"></i>Logotipos</a>
+      <div class="nav-section-label">Aplicaciones</div>
+      <a class="nav-link" href="#etiqueta"><i class="ph ph-package"></i>Etiqueta de caja</a>
       <div class="nav-section-label">Recursos</div>
       <a class="nav-link" href="#descargas"><i class="ph ph-download-simple"></i>Descargas</a>
     </nav>
@@ -649,10 +663,70 @@ a.format-badge:hover { background: var(--verde); color: var(--crema); }
     </section>
 
 
-    <!-- 05 DESCARGAS -->
+    <!-- 05 ETIQUETA DE CAJA -->
+    <section class="section" id="etiqueta">
+      <div class="section-header">
+        <div class="section-number">05 · Aplicaciones</div>
+        <h2 class="section-title">Etiqueta de caja</h2>
+        <p class="section-desc">Hexagon en sus cinco colores. Una etiqueta de 150 x 297 mm que envuelve la caja: tapa, frente y base.</p>
+      </div>
+
+      <div class="logo-card" style="margin-bottom:20px">
+        <div class="label-strip">
+          <figure><img src="assets/packaging/label-hexagon-translucent.webp" alt="Etiqueta de caja Hexagon Translucent" loading="lazy"><figcaption>Translucent</figcaption></figure>
+          <figure><img src="assets/packaging/label-hexagon-dark-bronze.webp" alt="Etiqueta de caja Hexagon Dark Bronze" loading="lazy"><figcaption>Dark Bronze</figcaption></figure>
+          <figure><img src="assets/packaging/label-hexagon-terracotta.webp" alt="Etiqueta de caja Hexagon Terracotta" loading="lazy"><figcaption>Terracotta</figcaption></figure>
+          <figure><img src="assets/packaging/label-hexagon-black-matte.webp" alt="Etiqueta de caja Hexagon Black Matte" loading="lazy"><figcaption>Black Matte</figcaption></figure>
+          <figure><img src="assets/packaging/label-hexagon-calm-sand.webp" alt="Etiqueta de caja Hexagon Calm Sand" loading="lazy"><figcaption>Calm Sand</figcaption></figure>
+        </div>
+        <div class="logo-card-info">
+          <div class="logo-card-name">Etiqueta Hexagon v2g</div>
+          <div class="logo-card-use">Versión casera, una por A4 para cortar y doblar, y versión para imprenta a tamaño final con 3 mm de sangrado y marcas de corte.</div>
+          <div class="logo-card-formats">
+            <a class="format-badge" href="assets/docs/RANSUMI-BoxLabel-202610-v2g.pdf" download><i class="ph-bold ph-download-simple"></i>PDF A4</a>
+            <a class="format-badge" href="assets/docs/RANSUMI-BoxLabel-202610-v2g-PRINT.pdf" download><i class="ph-bold ph-download-simple"></i>PDF imprenta</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Prueba sobre la caja real</div>
+      <div class="photo-row">
+        <img src="assets/packaging/test-print-1.webp" alt="Prueba impresa de la etiqueta sobre la caja real, foto 1" loading="lazy">
+        <img src="assets/packaging/test-print-2.webp" alt="Prueba impresa de la etiqueta sobre la caja real, foto 2" loading="lazy">
+        <img src="assets/packaging/test-print-3.webp" alt="Prueba impresa de la etiqueta sobre la caja real, foto 3" loading="lazy">
+      </div>
+      <p class="photo-note">Prueba en papel normal de la versión anterior (v2f). A partir de ella se agrandó el texto y la línea de apertura se movió al pliegue.</p>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Cómo está armada</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span><strong>Tapa:</strong> lockup a color, ランスミ y la línea "Un nuevo espacio para tu orquídea."</span></li>
+          <li><i class="ph-bold ph-check"></i><span><strong>Frente:</strong> "Macetero para orquídeas", el nombre del modelo, el render en su color real, el dibujo en planta y la ficha (Ø exterior, alto, Ø boca, color, incluye).</span></li>
+          <li><i class="ph-bold ph-check"></i><span><strong>Base:</strong> QR a ransumi.com, espacio para el código de barras y el copyright.</span></li>
+          <li><i class="ph-bold ph-check"></i>El color va como dato, no como lista para marcar. Una etiqueta por modelo y color.</li>
+          <li><i class="ph-bold ph-check"></i>Las medidas salen siempre de ransumi.com.</li>
+          <li><i class="ph-bold ph-check"></i>La línea "Abrir aquí" coincide con el pliegue inferior; el pliegue superior no se marca.</li>
+          <li><i class="ph-bold ph-x no"></i>Solo RANSUMI: sin la marca, el dominio ni el Instagram de la tienda, sin FR Group y sin ® ni ™.</li>
+        </ul>
+      </div>
+
+      <div class="logo-rules" style="margin-top:16px; border-left-color: var(--tx3)">
+        <div class="logo-rules-title"><i class="ph-bold ph-hourglass"></i> Por definir</div>
+        <ul>
+          <li><i class="ph-bold ph-dot-outline"></i>Etiquetas de OrchiSphere y Mandala, cuando estén sus renders por color.</li>
+          <li><i class="ph-bold ph-dot-outline"></i>Confirmar las medidas de Hexagon midiendo la pieza real.</li>
+          <li><i class="ph-bold ph-dot-outline"></i>Código de barras impreso; por ahora va como sticker.</li>
+          <li><i class="ph-bold ph-dot-outline"></i>Tamaño y terminación para un tiraje de imprenta.</li>
+          <li><i class="ph-bold ph-dot-outline"></i>Logo con transfer y realce sobre la caja.</li>
+          <li><i class="ph-bold ph-dot-outline"></i>Línea de origen, en una versión futura.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 06 DESCARGAS -->
     <section class="section" id="descargas">
       <div class="section-header">
-        <div class="section-number">05 · Recursos</div>
+        <div class="section-number">06 · Recursos</div>
         <h2 class="section-title">Descargas</h2>
         <!-- PROPUESTA -->
         <p class="section-desc">Archivos listos para usar, en un zip por tipo.</p>

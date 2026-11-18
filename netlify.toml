@@ -23,3 +23,10 @@
   status = 200
   force = true
 
+
+# RANSUMI: el kit de agosto en /clientes/fr-group/ quedo reemplazado (2026-11-18)
+[[redirects]]
+  from = "/clientes/fr-group/*"
+  to = "/clientes/ransumi/brand-kit/"
+  status = 301
+  force = true

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RANSUMI · Brand Kit</title>
+<link rel="icon" type="image/svg+xml" href="assets/logos/RANSUMI-Isotipo-v1a.svg">
+
+<!-- ================================================================
+     BRAND KIT · RANSUMI · v1 (2026-11-18)
+     Estructura copiada a mano de clientes/botin/brand-kit/.
+     Fuente de contenido: 21.10 FR Group (_client.md, PLAN-RANSUMI.md,
+     202610-RAN-BoxLabel CLAUDE.md y assets). Logos limpiados del master
+     de la etiqueta de caja, sin cambios de dibujo.
+     Los comentarios PROPUESTA marcan texto redactado por EVO,
+     no trazable a Felipe, Ramón ni al kit: pendiente de aprobación.
+     Esta página nunca muestra la marca, el dominio ni el Instagram
+     de la tienda, ni ® / "marca registrada" (registro en trámite).
+     ================================================================ -->
+
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+/* ================================================================
+   TOKENS · RANSUMI
+   Marca: verde, magenta, crema (piezas finales 2026-09/10).
+   Superficie: derivados del crema y del verde (PROPUESTA).
+   El magenta no se usa en la interfaz: solo vive en la flor del logo.
+   ================================================================ */
+:root {
+  --verde:        #03502A;
+  --magenta:      #AB0745;
+  --crema:        #F9F3EC;
+  --crema-2:      #F2E9DE;
+  --papel:        #FFFCF8;
+  --tx:           #1E2B23;
+  --tx2:          #4A5A50;
+  --tx3:          #7C8A81;
+  --linea:        rgba(3,80,42,.14);
+  --verde-08:     rgba(3,80,42,.08);
+
+  --font-heading: 'Zen Kaku Gothic New', 'Inter', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+
+  --sidebar-w: 220px;
+  --r-sm: 2px; --r-md: 4px; --r-lg: 8px;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--crema);
+  color: var(--tx);
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+/* ================================================================
+   LAYOUT: sidebar + content
+   ================================================================ */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--papel);
+  position: fixed; top: 0; left: 0; bottom: 0;
+  overflow-y: auto; z-index: 50;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--linea);
+}
+.sidebar-brand { padding: 28px 20px 24px; border-bottom: 1px solid var(--linea); }
+.sidebar-logo { height: 96px; width: auto; margin-bottom: 14px; }
+.sidebar-tagline {
+  font-size: 0.65rem; color: var(--tx3); font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.4;
+}
+.sidebar-nav { padding: 16px 0; flex: 1; }
+.nav-section-label {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--tx3); padding: 14px 20px 6px;
+}
+.nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; font-size: 0.82rem; font-weight: 400;
+  color: var(--tx2); transition: color 0.15s, background 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-link i { font-size: 1rem; flex-shrink: 0; }
+.nav-link:hover { color: var(--verde); background: var(--verde-08); }
+.nav-link.active { color: var(--verde); border-left-color: var(--verde); background: var(--verde-08); font-weight: 600; }
+.sidebar-footer {
+  padding: 16px 20px; border-top: 1px solid var(--linea);
+  font-size: 0.7rem; color: var(--tx3); line-height: 1.7;
+}
+.sidebar-footer a { color: var(--tx2); transition: color 0.15s; }
+.sidebar-footer a:hover { color: var(--verde); }
+
+.content { margin-left: var(--sidebar-w); flex: 1; min-width: 0; }
+
+/* MOBILE NAV */
+.mobile-nav { display: none; background: var(--papel); border-bottom: 3px solid var(--verde); position: sticky; top: 0; z-index: 50; }
+.mobile-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 56px; }
+.mobile-nav-logo { height: 18px; width: auto; }
+.mobile-menu-btn { background: none; border: none; cursor: pointer; color: var(--verde); font-size: 1.5rem; padding: 4px; }
+.mobile-menu { display: none; flex-direction: column; background: var(--papel); padding: 8px 0 16px; border-bottom: 1px solid var(--linea); }
+.mobile-menu.open { display: flex; }
+.mobile-menu .nav-link { padding: 10px 24px; }
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .content { margin-left: 0; }
+  .mobile-nav { display: block; }
+}
+
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+.section { padding: 64px 48px; border-bottom: 1px solid var(--linea); background: var(--crema); }
+.section:nth-child(even) { background: var(--crema-2); }
+@media (max-width: 768px) { .section { padding: 48px 20px; } }
+
+.section-header { margin-bottom: 40px; }
+.section-number {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--verde); margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+}
+.section-number::before { content: ''; display: block; width: 18px; height: 2px; background: var(--verde); }
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.875rem; font-weight: 500; letter-spacing: .01em; line-height: 1.2;
+  color: var(--verde); margin-bottom: 10px;
+}
+.section-desc { font-size: 1rem; color: var(--tx2); line-height: 1.65; max-width: 640px; }
+
+/* ================================================================
+   HERO
+   ================================================================ */
+.hero-section {
+  background: var(--crema);
+  padding: 56px 48px;
+  border-bottom: 6px solid var(--verde);
+  position: relative; overflow: hidden;
+}
+.hero-art {
+  position: absolute; right: 56px; top: 50%; transform: translateY(-50%);
+  width: 240px; pointer-events: none;
+}
+@media (max-width: 1100px) { .hero-art { width: 180px; } }
+@media (max-width: 768px) { .hero-section { padding: 40px 20px; } .hero-art { display: none; } }
+.hero-text { position: relative; max-width: 620px; }
+.hero-eyebrow {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--verde); margin-bottom: 16px;
+}
+.hero-section h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, 3.75rem); font-weight: 500; letter-spacing: .12em;
+  color: var(--verde); margin-bottom: 6px; line-height: 1.02;
+}
+.hero-kana { font-family: var(--font-heading); font-weight: 500; font-size: 1.125rem; letter-spacing: .12em; color: var(--verde); margin-bottom: 20px; }
+.hero-section p { font-size: 1rem; color: var(--tx2); max-width: 520px; line-height: 1.65; }
+.hero-meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--linea); }
+.hero-meta-item { font-size: 0.875rem; }
+.hero-meta-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tx3); margin-bottom: 3px; }
+.hero-meta-value { color: var(--tx); }
+
+/* ================================================================
+   COLORES
+   ================================================================ */
+.color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.swatch { border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--linea); cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+.swatch:hover { transform: translateY(-2px); border-color: rgba(3,80,42,.4); }
+.swatch-color { height: 96px; position: relative; }
+.swatch-copy-hint {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: rgba(0,0,0,0.25); opacity: 0; transition: opacity 0.15s;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #fff;
+}
+.swatch-copy-hint.dark { background: rgba(3,80,42,0.08); color: var(--verde); }
+.swatch:hover .swatch-copy-hint { opacity: 1; }
+.swatch-info { background: var(--papel); padding: 10px 12px; }
+.swatch-name { font-size: 0.78rem; font-weight: 600; color: var(--tx); }
+.swatch-hex  { font-size: 0.78rem; font-weight: 500; color: var(--verde); margin-top: 2px; letter-spacing: .04em; }
+.swatch-use  { font-size: 0.7rem; color: var(--tx2); margin-top: 3px; line-height: 1.4; }
+
+.copied-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px);
+  background: var(--papel); color: var(--tx);
+  font-size: 0.8125rem; font-weight: 600;
+  padding: 10px 20px; border-radius: var(--r-lg); border: 1px solid var(--linea); border-bottom: 3px solid var(--verde);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 200;
+}
+.copied-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.color-group-title {
+  font-size: 0.74rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--tx2); margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--linea);
+}
+.color-group-title:first-child { margin-top: 0; }
+
+/* ================================================================
+   TIPOGRAFÍA
+   ================================================================ */
+.type-specimen {
+  background: var(--papel); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 28px 32px; margin-bottom: 12px;
+  display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center;
+}
+@media (max-width: 600px) { .type-specimen { grid-template-columns: 1fr; } .type-meta-block { text-align: left; } }
+.type-sample-text { line-height: 1.1; color: var(--verde); }
+.type-meta-block { text-align: right; min-width: 180px; }
+.type-family { font-size: 0.78rem; font-weight: 600; color: var(--tx); }
+.type-specs  { font-size: 0.7rem; color: var(--tx2); margin-top: 4px; line-height: 1.6; }
+
+.font-card {
+  background: var(--papel); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 24px 28px; margin-bottom: 12px; border-left: 4px solid var(--verde);
+}
+.font-card-name { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 500; margin-bottom: 6px; color: var(--verde); }
+.font-card-role { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tx3); margin-bottom: 12px; }
+.font-card-sample { font-size: 0.9rem; color: var(--tx2); line-height: 1.6; }
+.font-card-sample strong { color: var(--tx); font-weight: 600; }
+.font-weights { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--linea); }
+.font-weight-chip { font-size: 0.8125rem; color: var(--tx2); }
+.font-weight-chip strong { color: var(--tx); }
+
+/* ================================================================
+   LOGOTIPOS
+   ================================================================ */
+.logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.logo-card { background: var(--papel); border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--linea); }
+.logo-canvas { display: flex; align-items: center; justify-content: center; padding: 40px 32px; min-height: 240px; background: var(--crema); }
+.logo-canvas img { max-height: 170px; width: auto; }
+.logo-card-info { padding: 16px 20px; border-top: 1px solid var(--linea); }
+.logo-card-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; color: var(--tx); }
+.logo-card-use { font-size: 0.82rem; color: var(--tx2); line-height: 1.5; margin-bottom: 14px; }
+.logo-card-formats { display: flex; gap: 8px; flex-wrap: wrap; }
+.format-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: var(--r-sm);
+  background: var(--verde-08); color: var(--verde); border: 1px solid rgba(3,80,42,.35);
+  transition: background .15s, color .15s;
+}
+a.format-badge:hover { background: var(--verde); color: var(--crema); }
+.logo-rules {
+  background: var(--papel); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 24px 28px; margin-top: 32px; border-left: 4px solid var(--verde);
+}
+.logo-rules-title { font-size: 1rem; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; color: var(--tx); }
+.logo-rules ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.logo-rules li { font-size: 0.9rem; color: var(--tx2); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+.logo-rules li i { color: var(--verde); flex-shrink: 0; margin-top: 3px; }
+.logo-rules li i.no { color: #A6533F; }
+.logo-rules li strong { color: var(--tx); font-weight: 600; }
+
+/* ================================================================
+   VISIÓN GENERAL (voice cards reutilizadas como conceptos del símbolo)
+   ================================================================ */
+.voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.voice-card { background: var(--papel); border-radius: var(--r-md); border: 1px solid var(--linea); padding: 20px 22px; border-top: 3px solid var(--linea); transition: border-color 0.2s; }
+.voice-card:hover { border-top-color: var(--verde); }
+.voice-card-title { font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: var(--tx); }
+.voice-card-title i { color: var(--verde); }
+.voice-card-body { font-size: 0.9rem; color: var(--tx2); line-height: 1.55; }
+
+/* ================================================================
+   DESCARGAS
+   ================================================================ */
+.download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.download-card {
+  background: var(--papel); border-radius: var(--r-md); border: 1px solid var(--linea);
+  padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 16px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.download-card:hover { border-color: rgba(3,80,42,.4); transform: translateY(-2px); }
+.download-icon { width: 48px; height: 48px; background: var(--verde-08); border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; color: var(--verde); font-size: 1.5rem; }
+.download-title { font-family: var(--font-heading); font-size: 1.125rem; font-weight: 500; color: var(--verde); }
+.download-desc { font-size: 0.9rem; color: var(--tx2); line-height: 1.55; flex: 1; }
+.download-contents { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 12px; border-top: 1px solid var(--linea); }
+.download-tag { font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--r-sm); color: var(--tx2); border: 1px solid var(--linea); }
+.btn-download {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent; color: var(--verde); border: 2px solid var(--verde);
+  font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 11px 20px; border-radius: var(--r-sm); transition: background 0.15s, color 0.15s; width: 100%;
+}
+.btn-download:hover, .btn-download.accent { background: var(--verde); color: var(--crema); }
+.btn-download.accent:hover { background: #02391E; border-color: #02391E; }
+
+/* ================================================================
+   PRINT (fondo crema se mantiene)
+   ================================================================ */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .sidebar, .mobile-nav, .swatch-copy-hint, .copied-toast, .btn-download { display: none !important; }
+  .layout { display: block; }
+  .content { margin-left: 0; }
+  @page { size: A4; margin: 0; }
+  .print-header { display: flex !important; align-items: center; justify-content: space-between; padding: 18mm 16mm 12pt; background: var(--crema); border-bottom: 3pt solid var(--verde); }
+  .print-header img { height: 14pt; width: auto; }
+  .print-header-right { text-align: right; font-size: 8pt; color: var(--tx2); line-height: 1.6; }
+  .hero-art { display: none; }
+  .section { page-break-inside: avoid; }
+  #colores, #tipografia, #logotipos, #descargas { page-break-before: always; }
+  .swatch, .font-card, .logo-card, .voice-card, .download-card, .type-specimen { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="copied-toast" id="toast">HEX copiado al portapapeles</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="#identidad"><img class="mobile-nav-logo" src="assets/logos/RANSUMI-Wordmark-v1a.svg" alt="RANSUMI"></a>
+    <button class="mobile-menu-btn" onclick="toggleMenu()" aria-label="Menú"><i class="ph-bold ph-list" id="menu-icon"></i></button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a class="nav-link" href="#identidad" onclick="closeMenu()"><i class="ph ph-info"></i>Visión general</a>
+    <a class="nav-link" href="#colores" onclick="closeMenu()"><i class="ph ph-palette"></i>Colores</a>
+    <a class="nav-link" href="#tipografia" onclick="closeMenu()"><i class="ph ph-text-aa"></i>Tipografía</a>
+    <a class="nav-link" href="#logotipos" onclick="closeMenu()"><i class="ph ph-flower-lotus"></i>Logotipos</a>
+    <a class="nav-link" href="#descargas" onclick="closeMenu()"><i class="ph ph-download-simple"></i>Descargas</a>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <a href="#identidad"><img class="sidebar-logo" src="assets/logos/RANSUMI-Lockup-Vertical-v1a.svg" alt="RANSUMI"></a>
+      <div class="sidebar-tagline">Brand Kit · v1</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Identidad</div>
+      <a class="nav-link active" href="#identidad"><i class="ph ph-info"></i>Visión general</a>
+      <a class="nav-link" href="#colores"><i class="ph ph-palette"></i>Colores</a>
+      <a class="nav-link" href="#tipografia"><i class="ph ph-text-aa"></i>Tipografía</a>
+      <div class="nav-section-label">Elementos</div>
+      <a class="nav-link" href="#logotipos"><i class="ph ph-flower-lotus"></i>Logotipos</a>
+      <div class="nav-section-label">Recursos</div>
+      <a class="nav-link" href="#descargas"><i class="ph ph-download-simple"></i>Descargas</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div>RANSUMI</div>
+      <div><a href="https://ransumi.com" target="_blank" rel="noopener">ransumi.com</a></div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Print header -->
+    <div class="print-header" style="display:none">
+      <img src="assets/logos/RANSUMI-Wordmark-v1a.svg" alt="RANSUMI">
+      <div class="print-header-right">Brand Kit · v1 · Noviembre 2026<br>ransumi.com</div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero-section" id="identidad">
+      <img class="hero-art" src="assets/logos/RANSUMI-Isotipo-v1a.svg" alt="Isotipo RANSUMI">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Brand Kit · v1</div>
+        <h1>RANSUMI</h1>
+        <div class="hero-kana">ランスミ</div>
+        <!-- PROPUESTA: bajada copiada del patrón de Sagner y Botín -->
+        <p>Guía de identidad visual. Referencia para el uso correcto de todos los elementos de marca.</p>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Versión</div>
+            <div class="hero-meta-value">v1 · Noviembre 2026</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Producto</div>
+            <div class="hero-meta-value">Macetero para orquídeas</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-label">Web</div>
+            <div class="hero-meta-value">ransumi.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 01 VISIÓN GENERAL -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">01 · Identidad</div>
+        <h2 class="section-title">Visión general</h2>
+        <!-- PROPUESTA -->
+        <p class="section-desc">Qué es RANSUMI, de dónde viene el nombre y qué dice el símbolo.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:12px; margin-bottom:32px">
+        <div class="font-card">
+          <div class="font-card-name">Qué es</div>
+          <!-- Trazable: _client.md (contenedor abierto, definido por Ramón) y Fundamento v1c (objeto de diseño). Redacción PROPUESTA. -->
+          <div class="font-card-sample">RANSUMI es la marca del producto: un macetero de diseño para orquídeas, abierto para que entre aire a la raíz. Resuelve al mismo tiempo el cuidado de la planta y cómo se ve en la casa.</div>
+        </div>
+        <div class="font-card">
+          <div class="font-card-name">El nombre</div>
+          <!-- Trazable: _client.md. Se escribe en katakana, como en ransumi.com y la etiqueta de caja. -->
+          <div class="font-card-sample"><strong>Ran</strong>, orquídea, y <strong>sumi</strong>, la tinta del sumi-e. En japonés se escribe en katakana: ランスミ.</div>
+        </div>
+        <div class="font-card">
+          <div class="font-card-name">Idea de marca</div>
+          <!-- Trazable: Fundamento v1c (Felipe). -->
+          <div class="font-card-sample" style="font-family:var(--font-heading); font-size:1.2rem; font-weight:500; color:var(--verde); line-height:1.4">Donde lo técnico y lo orgánico se encuentran.</div>
+        </div>
+      </div>
+
+      <!-- Conceptos del símbolo: trazables a _client.md y PLAN-RANSUMI.md (bloque 2). Redacción PROPUESTA. -->
+      <div class="voice-grid" style="margin-bottom:0">
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-flower"></i>La flor</div>
+          <div class="voice-card-body">Una sola orquídea, simétrica como es en la naturaleza. El detalle interior se recorta de la masa, no se dibuja encima.</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-hexagon"></i>El contenedor abierto</div>
+          <div class="voice-card-body">Un hexágono abierto en sus vértices, igual que el macetero: los vacíos son por donde entra el aire.</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-plant"></i>Tallo y raíz</div>
+          <div class="voice-card-body">El tallo cruza la abertura de abajo y termina en un nodo. La planta crece más allá de su contenedor.</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-card-title"><i class="ph-bold ph-drop"></i>Contención</div>
+          <div class="voice-card-body">Pocos colores, mucho aire. El vacío es parte del diseño, como en el sumi-e.</div>
+        </div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas de texto</div>
+        <!-- Trazable: 202610-RAN-BoxLabel/CLAUDE.md -->
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span>El nombre se escribe <strong>RANSUMI</strong>, en mayúsculas. En japonés, solo <strong>ランスミ</strong>, sin traducción ni bajada.</span></li>
+          <li><i class="ph-bold ph-check"></i>La web de la marca es ransumi.com.</li>
+          <li><i class="ph-bold ph-check"></i>Los colores de producto se nombran siempre en inglés: Translucent, Dark Bronze, Terracotta, Black Matte, Calm Sand.</li>
+          <li><i class="ph-bold ph-x no"></i><span>Sin ® ni ™ ni "marca registrada" mientras el registro esté en trámite. Solo copyright: <strong>© 2026 RANSUMI.</strong></span></li>
+          <li><i class="ph-bold ph-x no"></i>Las piezas RANSUMI no llevan la marca, el dominio ni el Instagram de la tienda.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 02 COLORES -->
+    <section class="section" id="colores">
+      <div class="section-header">
+        <div class="section-number">02 · Identidad</div>
+        <h2 class="section-title">Colores</h2>
+        <p class="section-desc">Clic en cualquier color para copiar el HEX. Verde para todo, magenta solo en la flor.</p>
+      </div>
+
+      <div class="color-group-title">Marca</div>
+      <div class="color-grid">
+        <div class="swatch" onclick="copyHex('#03502A')">
+          <div class="swatch-color" style="background:#03502A"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <!-- Nombre "Verde": PROPUESTA -->
+          <div class="swatch-info"><div class="swatch-name">Verde</div><div class="swatch-hex">#03502A</div><div class="swatch-use">Logotipo, contenedor, tallo, texto. Todo lo que no es flor</div></div>
+        </div>
+        <div class="swatch" onclick="copyHex('#AB0745')">
+          <div class="swatch-color" style="background:#AB0745"><div class="swatch-copy-hint"><i class="ph ph-copy"></i> Copiar</div></div>
+          <!-- Nombre "Magenta": PROPUESTA -->
+          <div class="swatch-info"><div class="swatch-name">Magenta</div><div class="swatch-hex">#AB0745</div><div class="swatch-use">Solo la flor del logo y la boca del dibujo en planta</div></div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Fondo</div>
+      <div class="color-grid">
+        <div class="swatch" onclick="copyHex('#F9F3EC')">
+          <div class="swatch-color" style="background:#F9F3EC"><div class="swatch-copy-hint dark"><i class="ph ph-copy"></i> Copiar</div></div>
+          <!-- Nombre "Crema": PROPUESTA. Valor tomado del fondo del logotipo 202609. -->
+          <div class="swatch-info"><div class="swatch-name">Crema</div><div class="swatch-hex">#F9F3EC</div><div class="swatch-use">Fondo de piezas claras</div></div>
+        </div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas de color</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span><strong>El magenta vive solo en la flor.</strong> Todo lo demás va en verde.</span></li>
+          <li><i class="ph-bold ph-check"></i>Merch siempre a un solo color: crema sobre verde, o verde sobre crudo.</li>
+          <li><i class="ph-bold ph-x no"></i>Sin degradados: no imprimen.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 03 TIPOGRAFÍA -->
+    <section class="section" id="tipografia">
+      <div class="section-header">
+        <div class="section-number">03 · Identidad</div>
+        <h2 class="section-title">Tipografía</h2>
+        <p class="section-desc">Dos familias libres (SIL Open Font License). Zen Kaku Gothic New para el nombre del modelo y ランスミ, Inter para todo lo demás.</p>
+      </div>
+
+      <div class="font-card">
+        <div class="font-card-name" style="font-size:1.875rem">Zen Kaku Gothic New</div>
+        <div class="font-card-role">Nombre del modelo, katakana ランスミ</div>
+        <div class="font-card-sample" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:500; color:var(--verde)">Hexagon · ランスミ</div>
+        <div class="font-weights">
+          <div class="font-weight-chip"><strong style="font-family:var(--font-heading); font-weight:500">Medium 500</strong></div>
+          <!-- PROPUESTA: razón de no usar Light, trazable a PLAN-RANSUMI.md -->
+          <div class="font-weight-chip">Nunca Light: en serigrafía se quiebra</div>
+        </div>
+      </div>
+
+      <div class="font-card" style="margin-top:12px">
+        <div class="font-card-name" style="font-family:var(--font-body); font-size:1.5rem; font-weight:600">Inter</div>
+        <div class="font-card-role">Texto de apoyo, fichas, etiquetas</div>
+        <div class="font-card-sample">Una sola orquídea dentro de su contenedor, abierto para que entre aire a la raíz.</div>
+        <div class="font-weights">
+          <div class="font-weight-chip"><strong style="font-weight:600">SemiBold 600</strong></div>
+          <div class="font-weight-chip"><strong style="font-weight:500">Medium 500</strong></div>
+          <div class="font-weight-chip"><strong style="font-weight:400">Regular 400</strong></div>
+        </div>
+      </div>
+
+      <!-- Escala tomada de la etiqueta de caja aprobada (v2g, impresa). Tamaños en pt. -->
+      <div class="color-group-title" style="margin-top:28px">Escala de impresión · etiqueta de caja</div>
+      <div class="type-specimen">
+        <div class="type-sample-text" style="font-family:var(--font-heading); font-size:3rem; font-weight:500; letter-spacing:.01em">Hexagon</div>
+        <div class="type-meta-block"><div class="type-family">Zen Kaku Gothic New Medium</div><div class="type-specs">36 pt<br>Nombre del modelo</div></div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-sample-text" style="font-family:var(--font-heading); font-size:1.25rem; font-weight:500; letter-spacing:.12em">ランスミ</div>
+        <div class="type-meta-block"><div class="type-family">Zen Kaku Gothic New Medium</div><div class="type-specs">15 pt · tracking 0.12em<br>Tapa</div></div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-sample-text" style="font-family:var(--font-body); font-size:1rem; font-weight:600">Terracotta</div>
+        <div class="type-meta-block"><div class="type-family">Inter SemiBold</div><div class="type-specs">12 pt<br>Valores de la ficha</div></div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-sample-text" style="font-family:var(--font-body); font-size:0.75rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase">Color</div>
+        <div class="type-meta-block"><div class="type-family">Inter SemiBold</div><div class="type-specs">7.5 pt · uppercase · tracking 0.14em<br>Rótulos</div></div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span>La clienta principal es mujer de 50 años o más: <strong>texto de apoyo nunca bajo 7.5 pt.</strong> Se agranda lo que existe, no se agrega contenido.</span></li>
+          <li><i class="ph-bold ph-x no"></i>Nada de tipografías que imitan pincel: el carácter japonés viene de la composición y del aire, no de la letra.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 04 LOGOTIPOS -->
+    <section class="section" id="logotipos">
+      <div class="section-header">
+        <div class="section-number">04 · Elementos</div>
+        <h2 class="section-title">Logotipos</h2>
+        <p class="section-desc">Todos los vectores están en curvas, sin texto vivo. Clic en el formato para descargar.</p>
+      </div>
+
+      <div class="color-group-title" style="border:none; margin-top:0">Lockup vertical</div>
+      <div class="logo-grid" style="margin-bottom:20px">
+        <div class="logo-card">
+          <div class="logo-canvas"><img src="assets/logos/RANSUMI-Lockup-Vertical-v1a.svg" alt="Lockup vertical RANSUMI a color"></div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Lockup vertical a color</div>
+            <!-- PROPUESTA -->
+            <div class="logo-card-use">Versión principal. Isotipo y RANSUMI. Para fondos claros.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/RANSUMI-Lockup-Vertical-v1a.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/RANSUMI-Lockup-Vertical-v1a.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+        <div class="logo-card">
+          <div class="logo-canvas"><img src="assets/logos/RANSUMI-Lockup-Vertical-1Tinta-v1a.svg" alt="Lockup vertical RANSUMI a una tinta"></div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Lockup vertical a una tinta</div>
+            <div class="logo-card-use">Todo en verde #03502A. Para merch e impresión a un color.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/RANSUMI-Lockup-Vertical-1Tinta-v1a.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/RANSUMI-Lockup-Vertical-1Tinta-v1a.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Isotipo</div>
+      <div class="logo-grid" style="margin-bottom:20px">
+        <div class="logo-card">
+          <div class="logo-canvas"><img src="assets/logos/RANSUMI-Isotipo-v1a.svg" alt="Isotipo RANSUMI a color"></div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Isotipo a color</div>
+            <!-- PROPUESTA -->
+            <div class="logo-card-use">Para avatar, favicon y espacios donde el nombre ya está presente.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/RANSUMI-Isotipo-v1a.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/RANSUMI-Isotipo-v1a.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+        <div class="logo-card">
+          <div class="logo-canvas"><img src="assets/logos/RANSUMI-Isotipo-1Tinta-v1a.svg" alt="Isotipo RANSUMI a una tinta"></div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Isotipo a una tinta</div>
+            <div class="logo-card-use">Todo en verde #03502A. Para impresión a un color.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/RANSUMI-Isotipo-1Tinta-v1a.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/RANSUMI-Isotipo-1Tinta-v1a.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="color-group-title">Logotipo</div>
+      <div class="logo-grid" style="margin-bottom:32px">
+        <div class="logo-card" style="grid-column:1 / -1">
+          <div class="logo-canvas" style="min-height:160px"><img src="assets/logos/RANSUMI-Wordmark-v1a.svg" alt="Logotipo RANSUMI" style="max-height:44px"></div>
+          <div class="logo-card-info">
+            <div class="logo-card-name">Logotipo</div>
+            <!-- PROPUESTA -->
+            <div class="logo-card-use">RANSUMI solo, en verde. Para formatos muy horizontales y cabeceras.</div>
+            <div class="logo-card-formats">
+              <a class="format-badge" href="assets/logos/RANSUMI-Wordmark-v1a.svg" download><i class="ph-bold ph-download-simple"></i>SVG</a>
+              <a class="format-badge" href="assets/logos/RANSUMI-Wordmark-v1a.png" download><i class="ph-bold ph-download-simple"></i>PNG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-rules">
+        <div class="logo-rules-title"><i class="ph-bold ph-info"></i> Reglas de uso</div>
+        <ul>
+          <li><i class="ph-bold ph-check"></i><span><strong>En la versión a color, el magenta va solo en la flor.</strong></span></li>
+          <li><i class="ph-bold ph-check"></i>En merch, siempre la versión a una tinta.</li>
+          <!-- PROPUESTA -->
+          <li><i class="ph-bold ph-check"></i>En HTML usar los SVG; en documentos y presentaciones sirven los PNG.</li>
+          <li><i class="ph-bold ph-check"></i>Todavía no hay versión horizontal ni en negativo.</li>
+          <!-- PROPUESTA: reglas genéricas copiadas de Botín -->
+          <li><i class="ph-bold ph-x no"></i>Nunca redibujar, recolorear, estirar, rotar, contornear ni agregar efectos al logo.</li>
+          <li><i class="ph-bold ph-x no"></i>Nunca rearmar el lockup con texto vivo.</li>
+          <li><i class="ph-bold ph-x no"></i>No usar las exploraciones de agosto 2026 ni versiones anteriores del símbolo.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- 05 DESCARGAS -->
+    <section class="section" id="descargas">
+      <div class="section-header">
+        <div class="section-number">05 · Recursos</div>
+        <h2 class="section-title">Descargas</h2>
+        <!-- PROPUESTA -->
+        <p class="section-desc">Archivos listos para usar, en un zip por tipo.</p>
+      </div>
+
+      <div class="download-grid">
+        <div class="download-card">
+          <div class="download-icon"><i class="ph-bold ph-flower-lotus"></i></div>
+          <div class="download-title">Logotipos</div>
+          <div class="download-desc">Lockup vertical e isotipo a color y a una tinta, más el logotipo, en SVG (en curvas) y PNG transparente.</div>
+          <div class="download-contents">
+            <span class="download-tag">SVG</span><span class="download-tag">PNG</span><span class="download-tag">10 archivos</span>
+          </div>
+          <a class="btn-download accent" href="assets/docs/RANSUMI-Logos-v1a.zip" download><i class="ph-bold ph-download-simple"></i>Descargar ZIP</a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon"><i class="ph-bold ph-text-aa"></i></div>
+          <div class="download-title">Tipografías</div>
+          <div class="download-desc">Zen Kaku Gothic New (400, 500) e Inter (400, 500, 600) en TTF, para instalar en el sistema. Incluye sus licencias OFL.</div>
+          <div class="download-contents">
+            <span class="download-tag">TTF</span><span class="download-tag">SIL OFL</span><span class="download-tag">5 fuentes</span>
+          </div>
+          <a class="btn-download" href="assets/docs/RANSUMI-Fonts-v1a.zip" download><i class="ph-bold ph-download-simple"></i>Descargar ZIP</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /.layout -->
+
+<script>
+// Copy HEX
+function copyHex(hex) {
+  navigator.clipboard.writeText(hex).then(() => {
+    const t = document.getElementById('toast');
+    t.textContent = hex + ' copiado';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+// Mobile menu
+function toggleMenu() {
+  const m = document.getElementById('mobile-menu');
+  const i = document.getElementById('menu-icon');
+  const open = m.classList.toggle('open');
+  i.className = open ? 'ph-bold ph-x' : 'ph-bold ph-list';
+}
+function closeMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('menu-icon').className = 'ph-bold ph-list';
+}
+
+// Active nav on scroll
+const sections = document.querySelectorAll('section[id], div[id="identidad"]');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.nav-link[href="#' + e.target.id + '"]').forEach(a => a.classList.add('active'));
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
